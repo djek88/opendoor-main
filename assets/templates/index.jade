@@ -1,0 +1,30 @@
+html(ng-app="opendoorApp")
+	head
+		title Church Finder
+		base(href="/")
+		link(rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css")
+
+		script(src="bower_components/jquery/dist/jquery.min.js")
+		script(src="bower_components/bootstrap/dist/js/bootstrap.min.js")
+		script(src="bower_components/angular/angular.js")
+		script(src="bower_components/angular-route/angular-route.js")
+
+		script(src="assets/js/app.js")
+		script(src="assets/js/controllers.js")
+
+		block styles
+		block scripts
+	block body
+		body
+			nav.navbar.navbar-default(ng-controller="ToolbarCtrl")
+				.container-fluid
+					.navbar-header
+						a.navbar-brand(href='/login')
+							img(alt='Brand', src='assets/img/sim-icon.png' width="20")
+					ul.nav.navbar-nav.navbar-right
+						li
+							p.navbar-text {{ $email }}
+						li
+							a(href="/logout") Logout
+
+.ng-view

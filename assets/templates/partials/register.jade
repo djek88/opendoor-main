@@ -1,0 +1,22 @@
+form#loginModal.modal(tabindex='-1', role='dialog' action="/register" method="POST")
+	.modal-dialog
+		.modal-content
+			.modal-header
+				h4.modal-title Login
+			.modal-body
+				.form-group
+					label(for='email') Email address
+					input#email.form-control(type='email',name='email', placeholder='Email')
+				.form-group
+					label(for='password') Password
+					input#password.form-control(type='password', name='password', placeholder='Password')
+				.checkbox
+					label
+						input#remember(type='checkbox')
+						| Remember me
+			.modal-footer
+				.register-message.pull-left
+					| Already registered?
+					a(href="/login" data-dismiss="modal") Login
+				input.btn.btn(type='button' value="Cancel" ng-click="$back()" data-dismiss="modal")
+				input.btn.btn-primary(type='submit' value="Register")

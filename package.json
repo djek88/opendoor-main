@@ -1,0 +1,20 @@
+{
+  "name": "opendoor",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vavooon",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.0",
+    "cookie-session": "^1.2.0",
+    "express": "^4.13.3",
+    "jade": "^1.11.0",
+    "mongoose": "^4.3.1",
+    "sha1": "^1.1.1"
+  }
+}
