@@ -12,8 +12,11 @@ var session = require('cookie-session');
 var jade = require('jade');
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
+var PlaceManager = require('./app/placemanager.js')(mongoose);
+var placeManager = new PlaceManager;
+var sha1 = require('sha1');
 
-app.use(cookieParser({keys: config.cookieKeys}));
+app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(session({secret: config.sessionSecret}));
@@ -35,6 +38,18 @@ db.once('open', function () {
 	});
 });
 
+
+function showErrorPage(res, message) {
+	jade.renderFile(__dirname + '/assets/templates/error.jade', {message: message}, function (err, html) {
+		if (err) {
+			console.log(err);
+		}
+		res.send(html);
+	});
+}
+
+
+
 app.get('/assets/templates/partials/:filename.html', function (req, res) {
 	jade.renderFile(__dirname + '/assets/templates/partials/' + req.params.filename + '.jade', function (err, html) {
 		if (err) {
@@ -47,36 +62,77 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 
 app.post('/login', function (req, res) {
 	if (req.session.loggedIn) {
-		res.redirect('/find');
+		res.redirect('/');
 	}
 	else {
-		userManager.find(req.body, function (err, users) {
-			if (users.length) {
-				res.redirect('/');
-			}
-			else {
-				res.redirect('/login');
-			}
-		});
+
+		if(req.body.email && req.body.password) {
+			userManager.find({email: req.body.email, password: sha1(req.body.password)}, function (err, users) {
+				if (users.length) {
+					var user = users[0];
+					req.session.id = user._id;
+					res.cookie('email', user.email);
+					res.redirect('/');
+				}
+				else {
+					res.redirect('/login?message=wrongloginorpassword');
+				}
+			});
+		}
 	}
+});
+
+app.get('/logout', function (req, res) {
+	console.log( req.session.id);
+	delete req.session.id;
+	res.clearCookie('email');
+	res.redirect('/');
 });
 
 app.post('/register', function (req, res) {
 	if (req.session.loggedIn) {
-		res.redirect('/find');
+		res.redirect('/');
 	}
 	else {
-		userManager.register(req.body, function (err, user) {
-			res.redirect('/login');
-		});
+		if(req.body.email && req.body.password) {
+			userManager.register({email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
+				if (err) {
+					switch (err.message) {
+						case 'alreadyregistered':
+							res.redirect('/register?message=alreadyregistered');
+						break;
+						default:
+							res.redirect('/error');
+						break;
+					}
+				}
+				else {
+					res.redirect('/login?message=regsuccess');
+				}
+			});
+		}
 	}
 });
 
-app.use(function(req, res) {
+
+app.get('/places/search', function (req, res) {
+	placeManager.find(req.query, function(err, places){
+		if (!err) {
+			res.send(JSON.stringify(places));
+		}
+		else {
+			res.send(JSON.stringify(err));
+		}
+	});
+});
+
+app.use(['/', '/login', '/register', '/error'], function(req, res) {
 	jade.renderFile(__dirname + '/assets/templates/index.jade', function (err, content) {
-		if (err) {
+		if (!err) {
+			res.send(content);
+		}
+		else {
 			console.log(err);
 		}
-		res.send(content);
 	});
 });

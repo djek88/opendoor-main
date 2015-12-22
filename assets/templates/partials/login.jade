@@ -1,22 +1,29 @@
-form#loginModal.modal(tabindex='-1', role='dialog' action="/login" method="POST")
-	.modal-dialog
-		.modal-content
-			.modal-header
-				h4.modal-title Login
-			.modal-body
-				.form-group
-					label(for='email') Email address
-					input#email.form-control(type='email',name='email', placeholder='Email')
-				.form-group
-					label(for='password') Password
-					input#password.form-control(type='password', name='password', placeholder='Password')
-				.checkbox
-					label
-						input#remember(type='checkbox')
-						| Remember me
-			.modal-footer
-				.register-message.pull-left
-					| Don't have an account?
-					a(href="/register" ng-click="$close()") Register
-				input.btn.btn(type='button' value="Cancel" ng-click="$back()" data-dismiss="modal")
-				input.btn.btn-primary(type='submit' value="Login")
+#page-container.page-container.page-sidebar-fixed.page-header-fixed.fade.in.p-t-0
+	.ng-scope(ui-view="")
+		.ng-scope(ui-view="")
+			.ng-scope(ui-view="")
+				.login.bg-black.animated.fadeInDown
+					.login-header
+						.brand
+							span.logo
+							|  OpenDoor
+							small small description here
+						.icon
+							i.fa.fa-sign-in
+					.login-content
+						.alert.fade.in(ng-show="$alertMessage", ng-class="'alert-' + $alertType")
+							span.close(data-dismiss='alert') ×
+							i.fa.fa-check.fa-2x.pull-left
+							p {{ $alertMessage }}
+						form.margin-bottom-0(, method="POST", action="/login", novalidate name="loginForm")
+							.form-group.m-b-20(ng-class="{'has-error': (loginForm.$submitted || loginForm.email.$touched) && (loginForm.email.$error.required || loginForm.email.$error.email)}")
+								div(ng-show="loginForm.$submitted || loginForm.email.$touched")
+									label.control-label(ng-show="loginForm.email.$error.required") Email is required.
+									label.control-label(ng-show="loginForm.email.$error.email") This is not a valid email.
+								input.form-control.input-lg(placeholder="Email Address", type="email", name="email", ng-model="email" required)
+							.form-group.m-b-20(ng-class="{'has-error': (loginForm.$submitted || loginForm.password.$touched) && loginForm.password.$error.required}")
+								div(ng-show="loginForm.$submitted || loginForm.password.$touched")
+									label.control-label(ng-show="loginForm.password.$error.required") Password is required.
+								input.form-control.input-lg(placeholder="Password", type="password", name="password", ng-model="password" required)
+							.login-buttons
+								input.btn.btn-success.btn-block.btn-lg(type="button" value="Login" ng-click="submitForm()")

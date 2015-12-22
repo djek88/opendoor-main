@@ -4,6 +4,7 @@
  */
 var opendoorApp = angular.module('opendoorApp', [
 	'ngRoute',
+	'ngCookies',
 	'opendoorControllers'
 ]);
 
@@ -12,7 +13,7 @@ opendoorApp.config(
 		$locationProvider.html5Mode(true);
 		$routeProvider.
 		when('/', {
-			templateUrl: 'assets/templates/partials/index.html'
+			templateUrl: 'assets/templates/partials/search.html'
 			, controller: 'SearchCtrl'
 		}).
 		when('/login', {
@@ -23,11 +24,15 @@ opendoorApp.config(
 				templateUrl: 'assets/templates/partials/register.html'
 			, controller: 'RegisterCtrl'
 		}).
-		when('/phones/:phoneId', {
-			templateUrl: 'partials/phone-detail.html',
-			//controller: 'PhoneDetailCtrl'
+		when('/error', {
+				templateUrl: 'assets/templates/partials/error.html'
+			, controller: 'ErrorCtrl'
+		}).
+		when('/notfound', {
+			templateUrl: 'assets/templates/partials/error.html'
+			, controller: 'ErrorCtrl'
 		}).
 		otherwise({
-			redirectTo: '/'
+			redirectTo: '/notfound'
 		});
 	});

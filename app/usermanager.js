@@ -5,8 +5,6 @@
  */
 
 
-var sha1 = require('sha1');
-
 module.exports = function(mongoose) {
 
 	var userSchema = new mongoose.Schema({
@@ -19,23 +17,34 @@ module.exports = function(mongoose) {
 
 	function UserManager() {
 		this.register = function(data, callback) {
-			var User = mongoose.model('user', userSchema);
-			var user = new User({
-				name: data.name
-				, email: data.email
-				, password: sha1(data.password)
-			});
-			user.save(function (err, user) {
-				console.log("User was saved successfully");
-				if (typeof callback == 'function') {
-					callback(err, user);
+			this.find({email: data.email}, function(err, users) {
+				if (!err) {
+					if (!users.length) {
+						var User = mongoose.model('user', userSchema);
+						var user = new User({
+								email: data.email
+							, password: data.password
+						});
+						user.save(function (err, user) {
+							console.log("User was saved successfully");
+							if (typeof callback == 'function') {
+								callback(err, user);
+							}
+						});
+					}
+					else {
+						var e = new Error("alreadyregistered");
+						callback(e, users);
+					}
+				}
+				else {
+					callback(err, users);
 				}
 			});
 		};
 
-		this.find = function(data, callback) {
-			console.log(data);
-			User.find({email: data.email, password: sha1(data.password)}, function(err, user){
+		this.find = function(options, callback) {
+			User.find(options, function(err, user){
 				if (typeof callback == 'function') {
 					callback(err, user);
 				}

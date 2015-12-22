@@ -1,0 +1,55 @@
+#content.content
+	.container
+		.row
+			.col-12
+				.panel.panel-inverse(data-sortable-id='ui-widget-2', data-init='true')
+					.panel-heading
+						.btn-group.pull-right
+							button.btn.btn-primary.btn-xs(type='button',ng-hide="$locationSelectorIsOpen", ng-click="$toggleLocationSelection()") Change
+						h4.panel-title {{$address}}
+					.panel-body(ng-show="$locationSelectorIsOpen")
+						//p Panel Content Here
+						form.form-idnline
+							.form-group.m-r-10
+								label.control-label My location
+								br
+								i.fa.fa-map-marker
+								|  Latitude: {{$lat}}, Longitude: {{$lng}}
+							.form-group.m-r-10
+								label.control-label Detect location automatically
+								br
+								button.btn.btn-success.btn-sm(type="button" ng-click="$getLocationFromBrowser()") Detect
+							p OR
+							.form-group.m-r-10
+								label.control-label Enter address or mail/ZIP code
+								input#addressField.form-control
+							.form-group.m-r-10
+								button.btn.btn-success.btn-sm(type="button" ng-click="$getLocationByAddress()") Find
+							.login-buttons
+							button.btn.btn-md.btn-primary.m-r-5.pull-right(type='submit', ng-click="$toggleLocationSelection()") Change location
+			.col-12
+				table.table(ng-show='$places.length')
+					thead
+						tr
+							th Name
+							th Faith
+							th Distance
+					tbody
+						tr(ng-repeat='$place in $places')
+							td {{$place.name}}
+							td {{$place.faith}}
+							td {{$place.distance}}
+				//.panel.panel-inverse
+				//	.panel-heading
+				//		h4.panel-title Nearest places
+				//	.panel-body(ng-repeat='$place in $places')
+				//		.media.media-sm
+				//			a.media-left(href='javascript:;')
+				//				img.media-object.rounded-corner(src='assets/img/worship.png', alt='')
+				//			.media-body
+				//				h4.media-heading {{$place.name}}
+				//				p
+				//					| {{$place.distance}}m
+				//	.panel-body(ng-hide='$places.length')
+				//		p.text-center
+				//			strong No results found...
