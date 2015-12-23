@@ -12,22 +12,36 @@ module.exports = function(mongoose) {
 		, address: String
 		, email: String
 		, addedByEmail: String
-		, location: { type: [Number], index: '2dsphere' }
+		, location : {
+			type: {
+				type: String,
+				default: 'Point'
+			},
+			coordinates: [Number]
+		}
 	});
-	var Place = mongoose.model('place', placeSchema);
 	placeSchema.index({location: '2dsphere'});
+	placeSchema.set('autoIndex', true);
 
-	function UserManager() {
+	var Place = mongoose.model('place', placeSchema);
+
+	function PlaceManager() {
 		this.add = function(data, callback) {
 			var place = new Place({
 					name: data.name
-				, lat: data.lat
-				, lng: data.lng
+				, denomination: data.denomination
+				, postCode: data.postCode
+				, address: data.address
+				, email: data.email
+				, addedByEmail: data.addedByEmail
+				, location : {
+							type : "Point"
+						,	coordinates : data.location
+					}
 			});
-			place.save(function (err, user) {
-				console.log("Place was saved successfully");
+			place.save(function (err, place) {
 				if (typeof callback == 'function') {
-					callback(err, user);
+					callback(err, place);
 				}
 			});
 		};
@@ -36,16 +50,16 @@ module.exports = function(mongoose) {
 			Place.aggregate([
 				{
 					"$geoNear": {
-						"near": {
-							"type": "Point",
-							"coordinates": [
-														parseFloat(data.lat)
-													, parseFloat(data.lng)]
-						},
-						"distanceField": "distance",
-						"maxDistance": 20000,
-						"spherical": true,
-						"query": { "location.type": "Point" }
+							"near": {
+									"type": "Point"
+								,	"coordinates": [
+															parseFloat(data.lat)
+														, parseFloat(data.lng)]
+							}
+						,	"distanceField": "distance"
+						,	"maxDistance": 20000
+						,	"spherical": true
+						,	"query": { "location.type": "Point" }
 					}
 				},
 				{
@@ -55,7 +69,14 @@ module.exports = function(mongoose) {
 			function(err, places) {
 				callback(err, places);
 			});
+		};
+
+		this.getById = function(id, callback) {
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)},
+				function(err, places) {
+					callback(err, places);
+				});
 		}
 	}
-	return UserManager;
+	return PlaceManager;
 };

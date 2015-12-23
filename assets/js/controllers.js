@@ -8,14 +8,6 @@
 
 var opendoorControllers = angular.module('opendoorControllers', []);
 
-opendoorControllers.controller('PhoneListCtrl', ['$scope', '$http',
-	function ($scope, $http) {
-		$http.get('phones/phones.json').success(function(data) {
-			$scope.phones = data;
-		});
-
-		$scope.orderProp = 'age';
-	}]);
 
 opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
 	function($scope, $location) {
@@ -30,9 +22,9 @@ opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
 			break;
 		}
 		$scope.submitForm = function() {
-			$scope.loginForm.$submitted = true;
-			if ($scope.loginForm.$valid) {
-				document.forms.loginForm.submit();
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
 			}
 		};
 	}
@@ -47,9 +39,9 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 				break;
 		}
 		$scope.submitForm = function() {
-			$scope.registerForm.$submitted = true;
-			if ($scope.registerForm.$valid) {
-				document.forms.registerForm.submit();
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
 			}
 		};
 	}
@@ -62,133 +54,90 @@ opendoorControllers.controller('ToolbarCtrl', ['$scope', '$cookies',
 	}
 ]);
 
-opendoorControllers.controller('SearchCtrl', ['$scope', '$http',
-	function($scope, $http) {
-		var geocoder;
-		//var map;
-		function initialize() {
-			geocoder = new google.maps.Geocoder();
-			var latlng = new google.maps.LatLng(-34.397, 150.644);
-			//var mapOptions = {
-			//	zoom: 8,
-			//	center: latlng
-			//};
-			//map = new google.maps.Map(document.getElementById("map"), mapOptions);
+opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		function setData($place) {
+			$scope.$imageSrc = 'assets/img/worship.png';
+			$scope.$name = $place.name;
 		}
-		initialize();
+		if ($rootScope.$selectedPlace) {
+			setData($rootScope.$selectedPlace);
+		}
+		else {
+			var id = $location.url().split('/').pop();
+			$http({
+					url: '/ajax/places/' + id
+				, method: 'GET'
+			}).
+			success(function (data, status, headers, config) {
+				console.log(data);
+				if (typeof data== 'object') {
+					setData(data);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function (data, status, headers, config) {
+				$location.url('/notfound');
+			});
+		}
+	}
+]);
 
-		function getAddressFromLocation(location) {
-			console.log(location);
-			if (Array.isArray(location)) {
-				console.log('is array');
-				var latlng = {lat: location[0], lng: location[1]};
-				geocoder.geocode({'location': latlng}, function (results, status) {
-					if (status === google.maps.GeocoderStatus.OK) {
-						$scope.$apply(function () {
-							$scope.$address = results[0].formatted_address;
-						});
-					}
-				});
+opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		$scope.$denominations = $rootScope.$denominations;
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
 			}
-			else if (typeof location == 'object') {
-				console.log('is object');
-				$scope.$apply(function(){
-					$scope.$address = location.formatted_address;
-				});
-			}
-		}
+		};
+	}
+]);
+
+
+opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
+	function($scope, $http, $rootScope, $location) {
+
+		$scope.$denominations = $rootScope.$denominations;
+		$scope.denomination = '*';
+		$scope.$openPlace = function($place) {
+			$rootScope.$selectedPlace = $place;
+			$location.url('/places/' + $place._id);
+			console.log($place);
+		};
 
 		$scope.$places = [];
-		$scope.$locationSelectorIsOpen = false;
-		$scope.$toggleLocationSelection = function() {
-			if ($scope.$locationSelectorIsOpen) {
-				$scope.$searchPlaces();
-			}
-			$scope.$locationSelectorIsOpen = !$scope.$locationSelectorIsOpen;
-		}
+		$scope.$message = 'Press "Search" to find nearest places';
 		$scope.$searchPlaces = function() {
-			$http({
-					url: '/places/search'
-				,	method: 'GET'
-				, params: {
-						lat: $scope.$lat
-					,	lng: $scope.$lng
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				var location = document.forms.form.location.value.split(',');
+				if (location.length) {
+					$scope.$message = 'Searching…';
+					$http({
+							url: '/ajax/places/search'
+						, method: 'GET'
+						, params: {
+								lat: location[0]
+							, lng: location[1]
+						}
+					}).
+					success(function (data, status, headers, config) {
+						for (var i in data) {
+							data[i].distance = Math.round(data[i].distance);
+						}
+						$scope.$places = data;
+						$scope.$message = '';
+					}).
+					error(function (data, status, headers, config) {
+						$scope.$message = 'Error processing request';
+					});
 				}
-			}).
-			success(function(data, status, headers, config) {
-				for (var i in data) {
-					data[i].distance = Math.round(data[i].distance);
-				}
-				$scope.$places = data;
-			}).
-			error(function(data, status, headers, config) {
-				// log error
-			});
-		};
-
-		$scope.showPosition = function (position) {
-			$scope.$apply(function(){
-				$scope.$lat = position.coords.latitude;
-				$scope.$lng = position.coords.longitude;
-				$scope.$accuracy = position.coords.accuracy;
-			});
-			getAddressFromLocation([position.coords.latitude, position.coords.longitude]);
-			$scope.$searchPlaces();
-			//var latlng = new google.maps.LatLng($scope.lat, $scope.lng);
-			//$scope.model.myMap.setCenter(latlng);
-			//$scope.myMarkers.push(new google.maps.Marker({ map: $scope.model.myMap, position: latlng }));
-		};
-
-		$scope.showError = function (error) {
-			switch (error.code) {
-				case error.PERMISSION_DENIED:
-					$scope.error = "User denied the request for Geolocation."
-					break;
-				case error.POSITION_UNAVAILABLE:
-					$scope.error = "Location information is unavailable."
-					break;
-				case error.TIMEOUT:
-					$scope.error = "The request to get user location timed out."
-					break;
-				case error.UNKNOWN_ERROR:
-					$scope.error = "An unknown error occurred."
-					break;
-			}
-			$scope.$apply();
-		};
-
-
-		$scope.$getLocationFromBrowser = function () {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition($scope.showPosition, $scope.showError);
-			}
-			else {
-				$scope.error = "Geolocation is not supported by this browser.";
 			}
 		};
-
-		$scope.$getLocationByAddress = function() {
-			var address=$('#addressField').val();
-			console.log(address);
-			geocoder.geocode( { 'address': address}, function(results, status) {
-				if (status == google.maps.GeocoderStatus.OK) {
-					console.log(results);
-					$scope.$lat = results[0].geometry.location.lat();
-					$scope.$lng = results[0].geometry.location.lng();
-					getAddressFromLocation(results[0]);
-					//map.setCenter(results[0].geometry.location);
-					//var marker = new google.maps.Marker({
-					//	map: map,
-					//	position: results[0].geometry.location
-					//});
-				} else {
-					alert("Geocode was not successful for the following reason: " + status);
-				}
-			});
-
-		};
-
-		$scope.$getLocationFromBrowser();
 	}
 ]);
 
@@ -203,14 +152,22 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 		switch (message) {
 			case 'alreadyregistered':
 				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Your email already exists in our database. Please try to restore your password';
 			break;
 			case 'notfound':
 				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Page not found';
+				break;
+			case 'placeaddded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Location was added successfully';
 				break;
 			default:
 				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'An unexpected error happened';
 			break;
 		}

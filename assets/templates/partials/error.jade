@@ -4,6 +4,6 @@
 			.col-12
 				.panel(ng-class="'panel-' + $alertType")
 					.panel-heading
-						h4.panel-title Error
-					.panel-body.bg-red.text-white
+						h4.panel-title {{$alertTitle}}
+					.panel-body
 						p {{ $alertMessage }}

@@ -21,6 +21,7 @@ html(ng-app="opendoorApp")
 		script(src="bower_components/angular-cookies/angular-cookies.js")
 		script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAiVuMoB87VUPDarbOKo7-CyvQuT3tlfkc')
 
+		script(src="assets/js/locationpicker.js")
 		script(src="assets/js/app.js")
 		script(src="assets/js/controllers.js")
 	block body
@@ -41,6 +42,8 @@ html(ng-app="opendoorApp")
 							li.dropdown
 								a(href='/')
 									| HOME
+							li(ng-show="$isLoggedIn")
+								a(href='/places/add') ADD A PLACE
 							li(ng-show="$isLoggedIn")
 								a.pointer(data-toggle='dropdown' ng-disabled)
 									| MY PROFILE
