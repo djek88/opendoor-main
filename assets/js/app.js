@@ -37,7 +37,7 @@ opendoorApp.directive('ngLocation', function() {
 
 
 opendoorApp.run(function($rootScope) {
-	$rootScope.$denominations = [
+	$rootScope.$faiths = [
 			'Christian'
 		,	'Judaism'
 		,	'Taoism'
@@ -80,6 +80,10 @@ opendoorApp.config(
 		when('/message', {
 			templateUrl: 'assets/templates/partials/error.html'
 			, controller: 'ErrorCtrl'
+		}).
+		when('/feedback', {
+			templateUrl: 'assets/templates/partials/feedback.html'
+			, controller: 'FeedbackCtrl'
 		}).
 		when('/notfound', {
 			templateUrl: 'assets/templates/partials/error.html'

@@ -17,10 +17,10 @@
 							.input-group-btn
 								button.btn.btn-inverse Detect location
 					span.inline-spacer
-					.form-group(ng-class="{'has-error': (form.$submitted || form.denomination.$touched) && form.denomination.$error.required}")
-						select.form-control(name="denomination", ng-model="denomination", required)
+					.form-group(ng-class="{'has-error': (form.$submitted || form.faith.$touched) && form.faith.$error.required}")
+						select.form-control(name="faith", ng-model="faith", required)
 							option(value="*", selected) All faiths
-							option(value="{{$name}}", ng-repeat="$name in $denominations") {{$name}}
+							option(value="{{$name}}", ng-repeat="$name in $faiths") {{$name}}
 					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 			.col-12.m-t-40

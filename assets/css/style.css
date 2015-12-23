@@ -69,3 +69,7 @@ select.form-control,
 .table {
 	margin-bottom: 0;
 }
+
+img.place-photo {
+	max-width: 100%;
+}

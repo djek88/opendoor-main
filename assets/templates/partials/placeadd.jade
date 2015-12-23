@@ -6,16 +6,24 @@
 				label.col-md-3.control-label Place name
 				.col-md-9
 					input.form-control(type="text", name="name", ng-model="name", required)
-			.form-group(ng-class="{'has-error': (form.$submitted || form.denomination.$touched) && form.denomination.$error.required}")
-				label.col-md-3.control-label Denomination
+			.form-group(ng-class="{'has-error': (form.$submitted || form.faith.$touched) && form.faith.$error.required}")
+				label.col-md-3.control-label Faith
 				.col-md-9
-					select.form-control(name="denomination", ng-model="denomination", required)
+					select.form-control(name="faith", ng-model="faith", required)
 						option(value="",selected, disabled)
-						option(value="{{$name}}", ng-repeat="$name in $denominations") {{$name}}
-			.form-group(ng-class="{'has-error': (form.$submitted || form.postCode.$touched) && form.postCode.$error.required}")
-				label.col-md-3.control-label Post code
+						option(value="{{$name}}", ng-repeat="$name in $faiths") {{$name}}
+			.form-group(ng-class="{'has-error': (form.$submitted || form.pastorName.$touched) && form.pastorName.$error.required}")
+				label.col-md-3.control-label Pastor name
 				.col-md-9
-					input.form-control(type="text", name="postCode", ng-model="postCode", required)
+					input.form-control(type="text", name="pastorName", ng-model="pastorName")
+			.form-group(ng-class="{'has-error': (form.$submitted || form.phone.$touched) && form.phone.$error.required}")
+				label.col-md-3.control-label Phone number
+				.col-md-9
+					input.form-control(type="text", name="phone", ng-model="phone")
+			.form-group(ng-class="{'has-error': (form.$submitted || form.postalCode.$touched) && form.postalCode.$error.required}")
+				label.col-md-3.control-label Postal code
+				.col-md-9
+					input.form-control(type="text", name="postalCode", ng-model="postalCode")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
 				label.col-md-3.control-label Location
 				.col-md-9

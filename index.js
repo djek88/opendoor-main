@@ -3,6 +3,7 @@ var http = require('http');
 var fs = require('fs');
 var querystring = require('querystring');
 var express = require('express');
+var nodemailer = require('nodemailer');
 var app = express();
 var mongoose = require('mongoose');
 var db = mongoose.connection;
@@ -16,7 +17,7 @@ var userManager = new UserManager;
 var PlaceManager = require('./app/placemanager.js')(mongoose);
 var placeManager = new PlaceManager;
 var sha1 = require('sha1');
-
+var transporter = nodemailer.createTransport();
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
@@ -24,9 +25,10 @@ app.use(session({secret: config.sessionSecret}));
 
 mongoose.connect(config.mongoURI);
 
-
 app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
+app.use('/photos', express.static('photos'));
+app.use('/favicon.ico', express.static('favicon.ico'));
 
 
 db.on('error', console.error);
@@ -131,45 +133,63 @@ app.get('/ajax/places/:id', function (req, res) {
 });
 
 
+app.post('/feedback', function (req, res) {
+	if (req.session.id) {
+		res.redirect('/message?message=feedbacksaved');
+	}
+	res.end();
+});
 
 app.post('/places/add', function (req, res) {
 	var fields = {};
-	var f;
-	var uploadedFileExt;
 	var imagesPath =__dirname + '/photos/';
+	var fileExt;
+	var tempFileName;
+	var state = 0;
+
+	function addPlace() {
+		state++;
+		if (state == 2) {
+			var location = fields.location.split(',');
+			var data = {
+					name: fields.name
+				, faith: fields.faith
+				, postCode: fields.postCode
+				, address: fields.address
+				, email: fields.email
+				, addedByEmail: req.session.email
+				, photoExt: fileExt
+				, location: location
+			};
+
+			placeManager.add(data, function (err, place) {
+				if (!err) {
+					//fs.writeFile(imagesPath + place._id + uploadedFileExt, fileContent, {encoding: 'ascii'}, function(){
+					//	console.log(arguments);
+					//});
+
+					fs.rename(tempFileName, imagesPath + place._id + place.photoExt, function(err){
+						res.redirect('/message?message=placeadded');
+						res.end();
+						console.log('renamed');
+					});
+				}
+				else {
+					console.log(err.stack);
+					res.end();
+				}
+			});
+		}
+	}
+
+
 	if (req.busboy) {
 		req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-			f = file;
-			uploadedFileExt = '.' + filename.split('.').pop();
-			var fstream = fs.createWriteStream(imagesPath + Date.now() + uploadedFileExt);
+			fileExt = '.' + filename.split('.').pop();
+			tempFileName = imagesPath + Date.now() + fileExt;
+			var fstream = fs.createWriteStream(tempFileName);
 			file.pipe(fstream);
-			fstream.on('close', function () {
-				var location = fields.location.split(',');
-				var data = {
-					name: fields.name
-					,	denomination: fields.denomination
-					,	postCode: fields.postCode
-					,	address: fields.address
-					,	email: fields.email
-					,	addedByEmail: req.session.email
-					,	location: location
-				};
-				placeManager.add(data, function(err, place){
-					if (!err) {
-						//fs.writeFile(imagesPath + place._id + uploadedFileExt, fileContent, {encoding: 'ascii'}, function(){
-						//	console.log(arguments);
-						//});
-
-						console.log('added')
-
-						res.end();
-					}
-					else {
-						console.log(err.stack);
-						res.end();
-					}
-				});
-			});
+			fstream.on('close', addPlace);
 			//file.on('data', function(data) {
 			//	console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
 			//});
@@ -181,13 +201,13 @@ app.post('/places/add', function (req, res) {
 		req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
 			fields[key] = value;
 		});
-		req.busboy.on('finish', function() {
-
-		});
+		req.busboy.on('finish', addPlace);
 	}
 });
 
 app.use(function(req, res) {
+	console.log('common handler')
+	console.log(req.path)
 	if (req.xhr) {
 		res.status(404).end();
 	}

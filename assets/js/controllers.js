@@ -57,8 +57,8 @@ opendoorControllers.controller('ToolbarCtrl', ['$scope', '$cookies',
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
 		function setData($place) {
-			$scope.$imageSrc = 'assets/img/worship.png';
-			$scope.$name = $place.name;
+			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
+			$scope.$place = $place;
 		}
 		if ($rootScope.$selectedPlace) {
 			setData($rootScope.$selectedPlace);
@@ -87,7 +87,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
-		$scope.$denominations = $rootScope.$denominations;
+		$scope.$faiths = $rootScope.$faiths;
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
@@ -101,8 +101,8 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$locati
 opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
 	function($scope, $http, $rootScope, $location) {
 
-		$scope.$denominations = $rootScope.$denominations;
-		$scope.denomination = '*';
+		$scope.$faiths = $rootScope.$faiths;
+		$scope.faith = '*';
 		$scope.$openPlace = function($place) {
 			$rootScope.$selectedPlace = $place;
 			$location.url('/places/' + $place._id);
@@ -126,16 +126,32 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						}
 					}).
 					success(function (data, status, headers, config) {
-						for (var i in data) {
-							data[i].distance = Math.round(data[i].distance);
+						if (data.length) {
+							for (var i in data) {
+								data[i].distance = Math.round(data[i].distance);
+							}
+							$scope.$message = '';
+						}
+						else {
+							$scope.$message = 'There are no places nearby';
 						}
 						$scope.$places = data;
-						$scope.$message = '';
 					}).
 					error(function (data, status, headers, config) {
 						$scope.$message = 'Error processing request';
 					});
 				}
+			}
+		};
+	}
+]);
+
+opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
 			}
 		};
 	}
@@ -159,6 +175,16 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertType = 'danger';
 				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Page not found';
+				break;
+			case 'placeadded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Place was added successfully';
+				break;
+			case 'feedbacksaved':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Thank you for the feedback';
 				break;
 			case 'placeaddded':
 				$scope.$alertType = 'info';

@@ -7,15 +7,16 @@ module.exports = function(mongoose) {
 
 	var placeSchema = new mongoose.Schema({
 			name: String
-		, denomination: String
+		, faith: String
 		, postCode: String
 		, address: String
 		, email: String
 		, addedByEmail: String
+		, photoExt: String
 		, location : {
 			type: {
-				type: String,
-				default: 'Point'
+					type: String
+				,	default: 'Point'
 			},
 			coordinates: [Number]
 		}
@@ -29,11 +30,12 @@ module.exports = function(mongoose) {
 		this.add = function(data, callback) {
 			var place = new Place({
 					name: data.name
-				, denomination: data.denomination
+				, faith: data.faith
 				, postCode: data.postCode
 				, address: data.address
 				, email: data.email
 				, addedByEmail: data.addedByEmail
+				, photoExt: data.photoExt
 				, location : {
 							type : "Point"
 						,	coordinates : data.location

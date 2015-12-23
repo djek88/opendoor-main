@@ -1,8 +1,17 @@
 #content.content
 	.container.bg-white
-		.row
-			.col-sm-3
-				img.p-t-10.p-b-10(ng-src="{{$imageSrc}}")
-			.col-sm-9
-				h3 {{$name}}
-				p Description
+		.row.p-10
+			.col-lg-6
+				img.place-photo.center-block(ng-src="{{$imageSrc}}")
+			.col-lg-6
+				dl
+					dt Name
+					dd {{$place.name}}
+					dt(ng-show="$place.faith")  Faith
+					dd {{$place.faith}}
+					dt(ng-show="$place.pastorName")  Pastor name
+					dd {{$place.pastorName}}
+					dt(ng-show="$place.address")  Address
+					dd {{$place.address}}
+					dt(ng-show="$place.postalCode") Postal code
+					dd {{$place.postalCode}}
