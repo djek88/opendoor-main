@@ -134,9 +134,31 @@ app.get('/ajax/places/:id', function (req, res) {
 
 
 app.post('/feedback', function (req, res) {
-	if (req.session.id) {
-		res.redirect('/message?message=feedbacksaved');
-	}
+	userManager.find({isAdmin: true}, function(err, users){
+		if (err) {
+			console.log(err);
+		}
+		else {
+			console.log(users);
+		}
+	});
+	//var mailOptions = {
+	//	from: 'Fred Foo ✔ <foo@blurdybloop.com>', // sender address
+	//	to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
+	//	subject: 'Hello ✔', // Subject line
+	//	text: 'Hello world ✔', // plaintext body
+	//	html: '<b>Hello world ✔</b>' // html body
+	//};
+	//
+	//// send mail with defined transport object
+	//transporter.sendMail(mailOptions, function(error, info){
+	//	if(error){
+	//		return console.log(error);
+	//	}
+	//	console.log('Message sent: ' + info.response);
+	//
+	//});
+	res.redirect('/message?message=feedbacksaved');
 	res.end();
 });
 
@@ -206,8 +228,6 @@ app.post('/places/add', function (req, res) {
 });
 
 app.use(function(req, res) {
-	console.log('common handler')
-	console.log(req.path)
 	if (req.xhr) {
 		res.status(404).end();
 	}
