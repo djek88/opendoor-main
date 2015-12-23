@@ -19,7 +19,7 @@ var sha1 = require('sha1');
 
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(busboy({ immediate: true }));
+app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
 
 mongoose.connect(config.mongoURI);
@@ -134,44 +134,55 @@ app.get('/ajax/places/:id', function (req, res) {
 
 app.post('/places/add', function (req, res) {
 	var fields = {};
-	var fileContent = '';
+	var f;
+	var uploadedFileExt;
 	var imagesPath =__dirname + '/photos/';
 	if (req.busboy) {
 		req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-			file.on('data', function(data) {
-				fileContent += data;
-				console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
+			f = file;
+			uploadedFileExt = '.' + filename.split('.').pop();
+			var fstream = fs.createWriteStream(imagesPath + Date.now() + uploadedFileExt);
+			file.pipe(fstream);
+			fstream.on('close', function () {
+				var location = fields.location.split(',');
+				var data = {
+					name: fields.name
+					,	denomination: fields.denomination
+					,	postCode: fields.postCode
+					,	address: fields.address
+					,	email: fields.email
+					,	addedByEmail: req.session.email
+					,	location: location
+				};
+				placeManager.add(data, function(err, place){
+					if (!err) {
+						//fs.writeFile(imagesPath + place._id + uploadedFileExt, fileContent, {encoding: 'ascii'}, function(){
+						//	console.log(arguments);
+						//});
+
+						console.log('added')
+
+						res.end();
+					}
+					else {
+						console.log(err.stack);
+						res.end();
+					}
+				});
 			});
-			file.on('end', function() {
-				console.log('File [' + fieldname + '] Finished');
-			});
+			//file.on('data', function(data) {
+			//	console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
+			//});
+			//file.on('end', function() {
+			//	console.log('File [' + fieldname + '] Finished');
+			//});
 			file.resume();
 		});
 		req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
 			fields[key] = value;
-			console.log('field');
 		});
 		req.busboy.on('finish', function() {
-			var location = fields.location.split(',');
-			var data = {
-					name: fields.name
-				,	denomination: fields.denomination
-				,	postCode: fields.postCode
-				,	address: fields.address
-				,	email: fields.email
-				,	addedByEmail: req.session.email
-				,	location: location
-			};
-			placeManager.add(data, function(err, place){
-				if (!err) {
-					//fs.writeFile(imagesPath + place._id)
-					res.end();
-				}
-				else {
-					console.log(err.stack);
-					res.end();
-				}
-			});
+
 		});
 	}
 });
