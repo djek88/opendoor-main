@@ -28,7 +28,10 @@ if (config.mailConfig.transport == 'gmail') {
 }
 else if (config.mailConfig.transport == 'smtp') {
 	var transporter = nodemailer.createTransport(smtpTransport(config.mailConfig));
-
+}
+else {
+	console.err("No valid transport was found");
+	process.exit(1);
 }
 
 mongoose.connect(config.mongoURI);

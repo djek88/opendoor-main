@@ -11,7 +11,8 @@ var config = {
 		//	,	pass: 'userpass'
 		//}
 		//,	senderAddress: 'user@gmail.com'
-			host: 'localhost'
+			transport: 'smtp'
+		,	host: 'localhost'
 		,	port: 25
 		,	auth: {
 				user: 'username'
