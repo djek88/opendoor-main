@@ -19,7 +19,7 @@ html(ng-app="opendoorApp")
 		script(src="bower_components/angular/angular.js")
 		script(src="bower_components/angular-route/angular-route.js")
 		script(src="bower_components/angular-cookies/angular-cookies.js")
-		script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAiVuMoB87VUPDarbOKo7-CyvQuT3tlfkc')
+		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}')
 
 		script(src="assets/js/locationpicker.js")
 		script(src="assets/js/app.js")
@@ -57,4 +57,7 @@ html(ng-app="opendoorApp")
 								a(href='/login') LOG IN
 							li(ng-hide="$isLoggedIn")
 								a(href='/register') REGISTER
-			.ng-view
+			#wrap.ng-view
+			footer#footer.my-footer(ng-controller="FooterCtrl")
+				| © 2016 OpenDoor -
+				a.pointer(ng-click="$leaveFeedback($event)", ng-disabled="$isFeedbackPage")  Leave feedback

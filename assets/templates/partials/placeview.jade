@@ -4,14 +4,17 @@
 			.col-lg-6
 				img.place-photo.center-block(ng-src="{{$imageSrc}}")
 			.col-lg-6
+				h3 {{$place.name}}
 				dl
-					dt Name
-					dd {{$place.name}}
 					dt(ng-show="$place.faith")  Faith
 					dd {{$place.faith}}
 					dt(ng-show="$place.pastorName")  Pastor name
 					dd {{$place.pastorName}}
-					dt(ng-show="$place.address")  Address
-					dd {{$place.address}}
+					dt(ng-show="$place.phone")  Phone
+					dd {{$place.phone}}
 					dt(ng-show="$place.postalCode") Postal code
 					dd {{$place.postalCode}}
+					dt(ng-show="$place.address")  Address
+					dd {{$place.address}}
+					dt(ng-show="$place.email")  Email
+					dd {{$place.email}}

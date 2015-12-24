@@ -8,7 +8,9 @@ module.exports = function(mongoose) {
 	var placeSchema = new mongoose.Schema({
 			name: String
 		, faith: String
-		, postCode: String
+		, pastorName: String
+		, phone: String
+		, postalCode: String
 		, address: String
 		, email: String
 		, addedByEmail: String
@@ -31,7 +33,9 @@ module.exports = function(mongoose) {
 			var place = new Place({
 					name: data.name
 				, faith: data.faith
-				, postCode: data.postCode
+				, pastorName: data.pastorName
+				, phone: data.phone
+				, postalCode: data.postalCode
 				, address: data.address
 				, email: data.email
 				, addedByEmail: data.addedByEmail
@@ -49,15 +53,15 @@ module.exports = function(mongoose) {
 		};
 
 		this.find = function(data, callback) {
-			Place.aggregate([
+			var options = [
 				{
 					"$geoNear": {
-							"near": {
-									"type": "Point"
-								,	"coordinates": [
-															parseFloat(data.lat)
-														, parseFloat(data.lng)]
-							}
+						"near": {
+							"type": "Point"
+							,	"coordinates": [
+								parseFloat(data.lat)
+								, parseFloat(data.lng)]
+						}
 						,	"distanceField": "distance"
 						,	"maxDistance": 20000
 						,	"spherical": true
@@ -67,7 +71,11 @@ module.exports = function(mongoose) {
 				{
 					"$sort": {"distance": 1} // Sort the nearest first
 				}
-			],
+			];
+			if (data.faiths && data.faiths != '*') {
+				options.push( {"$match": {'faith': data.faiths}});
+			}
+			Place.aggregate(options,
 			function(err, places) {
 				callback(err, places);
 			});

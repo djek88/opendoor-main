@@ -98,15 +98,19 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$locati
 ]);
 
 
-opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
-	function($scope, $http, $rootScope, $location) {
+opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
 
-		$scope.$faiths = $rootScope.$faiths;
-		$scope.faith = '*';
-		$scope.$openPlace = function($place) {
+		$scope.$faithsList = $rootScope.$faiths;
+		$scope.faiths = '*';
+		$scope.$openPlace = function($event, $place) {
 			$rootScope.$selectedPlace = $place;
-			$location.url('/places/' + $place._id);
-			console.log($place);
+			if ($event.which == 2) {
+				$window.open('/places/' + $place._id, '_blank');
+			}
+			else {
+				$location.url('/places/' + $place._id);
+			}
 		};
 
 		$scope.$places = [];
@@ -116,6 +120,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			if ($scope.form.$valid) {
 				var location = document.forms.form.location.value.split(',');
 				if (location.length) {
+					console.log($scope.form.faiths.$modelValue);
 					$scope.$message = 'Searching…';
 					$http({
 							url: '/ajax/places/search'
@@ -123,6 +128,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						, params: {
 								lat: location[0]
 							, lng: location[1]
+							, faiths: $scope.form.faiths.$modelValue
 						}
 					}).
 					success(function (data, status, headers, config) {
@@ -148,12 +154,29 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
+		$scope.$targetPage = $location.hash();
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
 				document.forms.form.submit();
 			}
 		};
+	}
+]);
+
+
+opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location', '$window',
+	function($scope, $rootScope, $location, $window) {
+		var feedbackPage = '/feedback';
+		$scope.$leaveFeedback = function($event) {
+			var targetPage = feedbackPage + '#' + $location.path();
+			if ($event.which == 2) {
+				$window.open(targetPage, '_blank');
+			}
+			else {
+				$location.url(targetPage);
+			}
+		}
 	}
 ]);
 

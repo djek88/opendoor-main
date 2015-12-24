@@ -1,4 +1,21 @@
-.html, body {
+@media (min-width: 768px) {
+	.form-inline .form-group {
+		margin-right: 10px;
+	}
+
+	.form-inline .location-picker input {
+		min-width: 300px;
+	}
+}
+
+@media (max-width: 420px) {
+	.hidden-sm-down {
+		display: none;
+	}
+}
+
+
+html, body {
 	height: auto;
 }
 
@@ -47,15 +64,6 @@
 	border-bottom-right-radius: 0;
 }
 
-@media (min-width: 768px) {
-	.form-inline .form-group {
-		margin-right: 10px;
-	}
-
-	.form-inline .location-picker input {
-		min-width: 300px;
-	}
-}
 
 select.form-control,
 .form-control {
@@ -72,4 +80,29 @@ select.form-control,
 
 img.place-photo {
 	max-width: 100%;
+}
+
+.place-link {
+ cursor: pointer;
+}
+
+
+.place-link:hover {
+	background-color: #EFFBFF;
+}
+
+.place-link:hover .fa {
+	color: #3E63D2;
+}
+
+#wrap {
+	min-height: 85%;
+}
+
+.my-footer {
+	border-top: 1px solid #CAD0D6;
+	padding: 15px 0;
+	margin: 0 2%;
+	width: 96%;
+	text-align: center;
 }

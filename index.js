@@ -17,7 +17,7 @@ var userManager = new UserManager;
 var PlaceManager = require('./app/placemanager.js')(mongoose);
 var placeManager = new PlaceManager;
 var sha1 = require('sha1');
-var transporter = nodemailer.createTransport();
+var transporter = nodemailer.createTransport(config.mailConfig);
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
@@ -54,7 +54,7 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
-	if (req.session.loggedIn) {
+	if (req.session.id) {
 		res.redirect('/');
 	}
 	else {
@@ -77,7 +77,6 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
-	console.log( req.session.id);
 	delete req.session.id;
 	delete req.session.email;
 	res.clearCookie('email');
@@ -85,7 +84,7 @@ app.get('/logout', function (req, res) {
 });
 
 app.post('/register', function (req, res) {
-	if (req.session.loggedIn) {
+	if (req.session.id) {
 		res.redirect('/');
 	}
 	else {
@@ -139,25 +138,37 @@ app.post('/feedback', function (req, res) {
 			console.log(err);
 		}
 		else {
-			console.log(users);
+			var adminEmails = [];
+			for (var i=0; i<users.length; i++) {
+				var user = users[i];
+				if (user.email) {
+					adminEmails.push(user.email);
+				}
+			}
+			console.log(adminEmails);
+			var mailText = 'User: ' + req.body.name +
+											'\nEmail: ' + req.body.email +
+											'\nTarget page: ' + req.body.target +
+											'\nNote: ' + req.body.note;
+			var mailOptions = {
+				from: config.mailConfig.senderAddress, // sender address
+				to: adminEmails.join(', '), // list of receivers
+				subject: 'Feedback about OpenDoor', // Subject line
+				text: mailText
+				//html: '<b>Hello world ✔</b>' // html body
+			};
+
+			// send mail with defined transport object
+			transporter.sendMail(mailOptions, function(error, info){
+				if(error){
+					return console.log(error);
+				}
+				console.log('Message sent: ' + info.response);
+
+			});
 		}
 	});
-	//var mailOptions = {
-	//	from: 'Fred Foo ✔ <foo@blurdybloop.com>', // sender address
-	//	to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
-	//	subject: 'Hello ✔', // Subject line
-	//	text: 'Hello world ✔', // plaintext body
-	//	html: '<b>Hello world ✔</b>' // html body
-	//};
-	//
-	//// send mail with defined transport object
-	//transporter.sendMail(mailOptions, function(error, info){
-	//	if(error){
-	//		return console.log(error);
-	//	}
-	//	console.log('Message sent: ' + info.response);
-	//
-	//});
+
 	res.redirect('/message?message=feedbacksaved');
 	res.end();
 });
@@ -176,7 +187,9 @@ app.post('/places/add', function (req, res) {
 			var data = {
 					name: fields.name
 				, faith: fields.faith
-				, postCode: fields.postCode
+				, pastorName: fields.pastorName
+				, phone: fields.phone
+				, postalCode: fields.postalCode
 				, address: fields.address
 				, email: fields.email
 				, addedByEmail: req.session.email
@@ -186,10 +199,6 @@ app.post('/places/add', function (req, res) {
 
 			placeManager.add(data, function (err, place) {
 				if (!err) {
-					//fs.writeFile(imagesPath + place._id + uploadedFileExt, fileContent, {encoding: 'ascii'}, function(){
-					//	console.log(arguments);
-					//});
-
 					fs.rename(tempFileName, imagesPath + place._id + place.photoExt, function(err){
 						res.redirect('/message?message=placeadded');
 						res.end();
@@ -212,12 +221,6 @@ app.post('/places/add', function (req, res) {
 			var fstream = fs.createWriteStream(tempFileName);
 			file.pipe(fstream);
 			fstream.on('close', addPlace);
-			//file.on('data', function(data) {
-			//	console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
-			//});
-			//file.on('end', function() {
-			//	console.log('File [' + fieldname + '] Finished');
-			//});
 			file.resume();
 		});
 		req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
@@ -232,7 +235,7 @@ app.use(function(req, res) {
 		res.status(404).end();
 	}
 	else {
-		jade.renderFile(__dirname + '/assets/templates/index.jade', function (err, content) {
+		jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys}, function (err, content) {
 			if (!err) {
 				res.send(content);
 			}

@@ -17,10 +17,10 @@
 							.input-group-btn
 								button.btn.btn-inverse Detect location
 					span.inline-spacer
-					.form-group(ng-class="{'has-error': (form.$submitted || form.faith.$touched) && form.faith.$error.required}")
-						select.form-control(name="faith", ng-model="faith", required)
+					.form-group(ng-class="{'has-error': (form.$submitted || form.faiths.$touched) && form.faiths.$error.required}")
+						select.form-control(name="faiths", ng-model="faiths", required)
 							option(value="*", selected) All faiths
-							option(value="{{$name}}", ng-repeat="$name in $faiths") {{$name}}
+							option(value="{{$name}}", ng-repeat="$name in $faithsList") {{$name}}
 					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 			.col-12.m-t-40
@@ -30,14 +30,13 @@
 						thead
 							tr
 								th Name
-								th Faith
+								th.hidden-sm-down Faith
 								th Distance
 								th
 						tbody
-							tr(ng-repeat='$place in $places')
+							tr.place-link(ng-repeat="$place in $places", ng-click="$openPlace($event, $place)")
 								td {{$place.name}}
-								td {{$place.faith}}
+								td.hidden-sm-down {{$place.faith}}
 								td {{$place.distance}}m
 								td.text-right
-									a(ng-click="$openPlace($place)")
-										i.fa.fa-chevron-right
+									i.fa.fa-chevron-right
