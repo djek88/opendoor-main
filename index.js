@@ -33,7 +33,7 @@ app.use('/favicon.ico', express.static('favicon.ico'));
 
 db.on('error', console.error);
 db.once('open', function () {
-	var server = app.listen(config.port, function () {
+	var server = app.listen(config.port, config.hostname, function () {
 		var host = server.address().address;
 		var port = server.address().port;
 
