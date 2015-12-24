@@ -17,11 +17,19 @@ var userManager = new UserManager;
 var PlaceManager = require('./app/placemanager.js')(mongoose);
 var placeManager = new PlaceManager;
 var sha1 = require('sha1');
-var transporter = nodemailer.createTransport(config.mailConfig);
+
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
+
+if (config.mailConfig.transport == 'gmail') {
+	var transporter = nodemailer.createTransport(config.mailConfig);
+}
+else if (config.mailConfig.transport == 'smtp') {
+	var transporter = nodemailer.createTransport(smtpTransport(config.mailConfig));
+
+}
 
 mongoose.connect(config.mongoURI);
 

@@ -4,12 +4,19 @@ var config = {
 	,	sessionSecret: '1234567890QWERTY1223'
 	, mongoURI: 'mongodb://localhost:27017/opendoor'
 	, mailConfig: {
-		service: 'Gmail'
+		//	transport: 'gmail'
+		//,	service: 'Gmail'
+		//,	auth: {
+		//	 	user: 'user@gmail.com'
+		//	,	pass: 'userpass'
+		//}
+		//,	senderAddress: 'user@gmail.com'
+			host: 'localhost'
+		,	port: 25
 		,	auth: {
-				user: 'user@gmail.com'
-			,	pass: 'userpass'
-		}
-		,	senderAddress: 'user@gmail.com'
+				user: 'username'
+			,	pass: 'password'
+			}
 	}
 	,	apiKeys: {
 		googleMaps: 'yourApiKey'
