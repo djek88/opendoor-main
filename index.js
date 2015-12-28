@@ -121,7 +121,7 @@ app.post('/register', function (req, res) {
 
 
 app.get('/ajax/places/search', function (req, res) {
-	placeManager.find(req.query, function(err, places){
+	placeManager.findNearby(req.query, function(err, places){
 		if (!err) {
 			res.send(JSON.stringify(places));
 		}
@@ -187,9 +187,33 @@ app.post('/feedback', function (req, res) {
 app.post('/places/add', function (req, res) {
 	var fields = {};
 	var imagesPath =__dirname + '/photos/';
-	var fileExt;
-	var tempFileName;
+	var fileExt = null;
+	var tempFileName = null;
 	var state = 0;
+
+	function finishRequest(id) {
+		var userMail = req.session.email;
+		var mailText = 'Thank you for adding a place!\n' +
+				'Please confirm it by passing the link: ' +
+				config.url + '/places/confirm/' + id;
+		var mailOptions = {
+			from: config.mailConfig.senderAddress, // sender address
+			to: userMail, // list of receivers
+			subject: 'Place confirmation', // Subject line
+			text: mailText
+		};
+
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, function(error, info){
+			if(error){
+				return console.log(error);
+			}
+			console.log('Message sent: ' + info.response);
+
+		});
+		res.redirect('/message?message=placeadded');
+		res.end();
+	}
 
 	function addPlace() {
 		state++;
@@ -206,15 +230,21 @@ app.post('/places/add', function (req, res) {
 				, addedByEmail: req.session.email
 				, photoExt: fileExt
 				, location: location
+				, isConfirmed: false
 			};
 
 			placeManager.add(data, function (err, place) {
 				if (!err) {
-					fs.rename(tempFileName, imagesPath + place._id + place.photoExt, function(err){
-						res.redirect('/message?message=placeadded');
-						res.end();
-						console.log('renamed');
-					});
+					if (tempFileName) {
+						fs.rename(tempFileName, imagesPath + place._id + place.photoExt, function (err) {
+							console.log('renamed');
+							finishRequest(place._id);
+						});
+					}
+					else {
+						console.log('saved without photo');
+						finishRequest(place._id);
+					}
 				}
 				else {
 					console.log(err.stack);
@@ -227,11 +257,16 @@ app.post('/places/add', function (req, res) {
 
 	if (req.busboy) {
 		req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-			fileExt = '.' + filename.split('.').pop();
-			tempFileName = imagesPath + Date.now() + fileExt;
-			var fstream = fs.createWriteStream(tempFileName);
-			file.pipe(fstream);
-			fstream.on('close', addPlace);
+			if (filename.length) {
+				fileExt = '.' + filename.split('.').pop();
+				tempFileName = imagesPath + Date.now() + fileExt;
+				var fstream = fs.createWriteStream(tempFileName);
+				file.pipe(fstream);
+				fstream.on('close', addPlace);
+			}
+			else {
+				addPlace();
+			}
 			file.resume();
 		});
 		req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
@@ -239,6 +274,23 @@ app.post('/places/add', function (req, res) {
 		});
 		req.busboy.on('finish', addPlace);
 	}
+});
+
+
+
+app.get('/places/confirm/:id', function (req, res) {
+	var id = req.params.id;
+	console.log(id);
+	placeManager.markAsConfirmed(id, function(err, place){
+		console.log (err ,place);
+		if (!err && place) {
+			console.log('Place with ' + id + ' was confirmed');
+			res.redirect('/message?message=placeconfirmed');
+		}
+		else {
+			res.redirect('/error?message=placeconfirmationerror');
+		}
+	});
 });
 
 app.use(function(req, res) {

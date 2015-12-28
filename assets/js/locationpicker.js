@@ -18,8 +18,6 @@ $.fn.locationpicker = function(options) {
 	// This hack makes coordinates available in form
 
 	var $coordsEl = options.locationField;
-
-	console.log($coordsEl)
 	function showResults() {
 		$rootEl.addClass('location-picker-active');
 		var offset = $inputEl.offset();

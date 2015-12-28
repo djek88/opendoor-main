@@ -1,7 +1,7 @@
 #content.content
 	.container.bg-white.p-t-10
 		h3.text-center.m-b-30 Add new place
-		form.form-horizontal(method="POST", action="/places/add", novalidate name="form", enctype="multipart/form-data")
+		form.form-horizontal(method="POST", action="/places/add", novalidate, name="form", enctype="multipart/form-data")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
 				label.col-md-3.control-label Place name
 				.col-md-9
@@ -35,7 +35,7 @@
 			.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && form.email.$error.required}")
 				label.col-md-3.control-label Email address
 				.col-md-9
-					input.form-control(type="text", name="email", ng-model="email", required)
+					input.form-control(type="text", name="email", ng-model="email")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.photo.$touched) && form.photo.$error.required}")
 				label.col-md-3.control-label Photo
 				.col-md-9

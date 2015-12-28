@@ -6,7 +6,7 @@
 
 
 
-var opendoorControllers = angular.module('opendoorControllers', []);
+var opendoorControllers = angular.module('opendoorControllers', ['uiGmapgoogle-maps']);
 
 
 opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
@@ -59,6 +59,17 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		function setData($place) {
 			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
 			$scope.$place = $place;
+			$scope.$map = {
+					center: {
+							latitude: $place.location.coordinates[0]
+						, longitude: $place.location.coordinates[1]
+					}
+				,	marker: { // Map overrides 'center' field, what moves marker to center of map
+							latitude: $place.location.coordinates[0]
+						, longitude: $place.location.coordinates[1]
+					}
+				, zoom: 18
+			};
 		}
 		if ($rootScope.$selectedPlace) {
 			setData($rootScope.$selectedPlace);
@@ -70,7 +81,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				, method: 'GET'
 			}).
 			success(function (data, status, headers, config) {
-				console.log(data);
 				if (typeof data== 'object') {
 					setData(data);
 				}
@@ -120,7 +130,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			if ($scope.form.$valid) {
 				var location = document.forms.form.location.value.split(',');
 				if (location.length) {
-					console.log($scope.form.faiths.$modelValue);
 					$scope.$message = 'Searching…';
 					$http({
 							url: '/ajax/places/search'
@@ -212,7 +221,17 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 			case 'placeaddded':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Location was added successfully';
+				$scope.$alertMessage = 'Place was added successfully';
+				break;
+			case 'placeconfirmed':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Place was confirmed successfully';
+				break;
+			case 'placeconfirmationerror':
+				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
+				$scope.$alertMessage = 'Error during place confirmation';
 				break;
 			default:
 				$scope.$alertType = 'danger';

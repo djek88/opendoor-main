@@ -106,3 +106,6 @@ img.place-photo {
 	width: 96%;
 	text-align: center;
 }
+
+
+.angular-google-map-container { height: 400px; }

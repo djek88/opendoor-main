@@ -22,6 +22,7 @@ module.exports = function(mongoose) {
 			},
 			coordinates: [Number]
 		}
+		, isConfirmed: Boolean
 	});
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
@@ -44,6 +45,7 @@ module.exports = function(mongoose) {
 							type : "Point"
 						,	coordinates : data.location
 					}
+				, isConfirmed: data.isConfirmed
 			});
 			place.save(function (err, place) {
 				if (typeof callback == 'function') {
@@ -52,7 +54,7 @@ module.exports = function(mongoose) {
 			});
 		};
 
-		this.find = function(data, callback) {
+		this.findNearby = function(data, callback) {
 			var options = [
 				{
 					"$geoNear": {
@@ -70,10 +72,15 @@ module.exports = function(mongoose) {
 				},
 				{
 					"$sort": {"distance": 1} // Sort the nearest first
+				},
+				{
+					"$match": {
+						'isConfirmed': true
+					}
 				}
 			];
 			if (data.faiths && data.faiths != '*') {
-				options.push( {"$match": {'faith': data.faiths}});
+				options[2]['$match']['faith'] = data.faiths;
 			}
 			Place.aggregate(options,
 			function(err, places) {
@@ -87,6 +94,15 @@ module.exports = function(mongoose) {
 					callback(err, places);
 				});
 		}
+
+		this.markAsConfirmed = function(id, callback) {
+			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true},
+				function(err, places) {
+					callback(err, places);
+				});
+		}
+
+
 	}
 	return PlaceManager;
 };
