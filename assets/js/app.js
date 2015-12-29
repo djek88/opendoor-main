@@ -65,6 +65,10 @@ opendoorApp.config(
 			templateUrl: 'assets/templates/partials/placeview.html'
 			, controller: 'PlaceViewCtrl'
 		}).
+		when('/places/review/:id', {
+			templateUrl: 'assets/templates/partials/reviewadd.html'
+			, controller: 'ReviewAddCtrl'
+		}).
 		when('/login', {
 			templateUrl: 'assets/templates/partials/login.html'
 			, controller: 'LoginCtrl'
@@ -84,6 +88,10 @@ opendoorApp.config(
 		when('/feedback', {
 			templateUrl: 'assets/templates/partials/feedback.html'
 			, controller: 'FeedbackCtrl'
+		}).
+		when('/about', {
+			templateUrl: 'assets/templates/partials/about.html'
+			//, controller: 'FeedbackCtrl'
 		}).
 		when('/notfound', {
 			templateUrl: 'assets/templates/partials/error.html'

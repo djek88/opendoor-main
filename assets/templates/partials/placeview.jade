@@ -1,7 +1,7 @@
 #content.content
 	.container.bg-white
 		.row.p-10
-			.col-lg-6
+			.col-lg-6(ng-show="$place.photoExt")
 				img.place-photo.center-block(ng-src="{{$imageSrc}}")
 			.col-lg-6
 				h3 {{$place.name}}
@@ -18,8 +18,14 @@
 					dd {{$place.address}}
 					dt(ng-show="$place.email") Email
 					dd {{$place.email}}
+					dt(ng-show="$place.openingTime") Opening time
+					dd {{$place.openingTime | date:'shortTime'}}
+					dt(ng-show="$place.closingTime") Closing time
+					dd {{$place.closingTime | date:'shortTime'}}
+
 		.row.p-10
 			.col-lg-12
 				h4 Location
 				ui-gmap-google-map(center="$map.center", zoom="$map.zoom")
-					ui-gmap-marker(idkey="1", coords="$map.marker")
+					ui-gmap-marker(idkey="1", coords="$map.$userLocation", options="{icon: '/assets/img/mylocation.png'}")
+					ui-gmap-marker(idkey="2", coords="$map.marker")

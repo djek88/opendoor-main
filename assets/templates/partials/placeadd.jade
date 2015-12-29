@@ -36,6 +36,20 @@
 				label.col-md-3.control-label Email address
 				.col-md-9
 					input.form-control(type="text", name="email", ng-model="email")
+			.form-group(ng-class="{'has-error': (form.$submitted || form.openingTime.$touched) && form.openingTime.$error.required}")
+				label.col-md-3.control-label Opening time
+				.col-md-9
+					.input-group.bootstrap-timepicker.timepicker
+						input.timepicker-input.form-control.input-small(type='text', name="openingTime", ng-model="openingTime")
+						span.input-group-addon
+							i.glyphicon.glyphicon-time
+			.form-group(ng-class="{'has-error': (form.$submitted || form.closingTime.$touched) && form.closingTime.$error.required}")
+				label.col-md-3.control-label Closing time
+				.col-md-9
+					.input-group.bootstrap-timepicker.timepicker
+						input.timepicker-input.form-control.input-small(type='text', name="closingTime", ng-model="closingTime")
+						span.input-group-addon
+							i.glyphicon.glyphicon-time
 			.form-group(ng-class="{'has-error': (form.$submitted || form.photo.$touched) && form.photo.$error.required}")
 				label.col-md-3.control-label Photo
 				.col-md-9

@@ -5,6 +5,12 @@
 
 module.exports = function(mongoose) {
 
+	var reviewSchema = new mongoose.Schema({
+			email: String
+		,	rating: Number
+		,	text: String
+	});
+
 	var placeSchema = new mongoose.Schema({
 			name: String
 		, faith: String
@@ -22,8 +28,20 @@ module.exports = function(mongoose) {
 			},
 			coordinates: [Number]
 		}
-		, isConfirmed: Boolean
-	});
+			, isConfirmed: {
+				type: Boolean
+				,	default: false
+			}
+		, openingTime: Date
+		, closingTime: Date
+		, reviews: {
+			type: [reviewSchema]
+			,	default: []
+		}
+	}
+	, {
+			timestamps: true
+		});
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
 
@@ -45,7 +63,8 @@ module.exports = function(mongoose) {
 							type : "Point"
 						,	coordinates : data.location
 					}
-				, isConfirmed: data.isConfirmed
+				, openingTime: data.openingTime ? new Date(data.openingTime + ' 01.01.1970') : null
+				, closingTime: data.closingTime ? new Date(data.closingTime + ' 01.01.1970') : null
 			});
 			place.save(function (err, place) {
 				if (typeof callback == 'function') {

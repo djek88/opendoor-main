@@ -56,6 +56,7 @@ opendoorControllers.controller('ToolbarCtrl', ['$scope', '$cookies',
 
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
+		$scope.$map = {};
 		function setData($place) {
 			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
 			$scope.$place = $place;
@@ -64,12 +65,14 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 							latitude: $place.location.coordinates[0]
 						, longitude: $place.location.coordinates[1]
 					}
-				,	marker: { // Map overrides 'center' field, what moves marker to center of map
+				,	marker: { // Map overrides 'center' field, what moves marker to center of map, so we need to clone it
 							latitude: $place.location.coordinates[0]
 						, longitude: $place.location.coordinates[1]
 					}
-				, zoom: 18
+				, $userLocation: $scope.$map.$userLocation
+				, zoom: 16
 			};
+			console.log($scope.$map.$userLocation);
 		}
 		if ($rootScope.$selectedPlace) {
 			setData($rootScope.$selectedPlace);
@@ -92,11 +95,23 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				$location.url('/notfound');
 			});
 		}
+
+
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(location) {
+				$scope.$apply(function(){
+					$scope.$map.$userLocation = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+				})
+				console.log($scope.$map.$userLocation);
+			});
+		}
+
 	}
 ]);
 
 opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
+		$('.timepicker-input').timepicker({defaultTime: false});
 		$scope.$faiths = $rootScope.$faiths;
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
@@ -107,6 +122,16 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$locati
 	}
 ]);
 
+opendoorControllers.controller('ReviewAddCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
+	}
+]);
 
 opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
@@ -208,20 +233,15 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Page not found';
 				break;
-			case 'placeadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Place was added successfully';
-				break;
 			case 'feedbacksaved':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Success';
 				$scope.$alertMessage = 'Thank you for the feedback';
 				break;
-			case 'placeaddded':
+			case 'placeadded':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Place was added successfully';
+				$scope.$alertMessage = 'Place was added successfully. Confirmation link was sent to your mail';
 				break;
 			case 'placeconfirmed':
 				$scope.$alertType = 'info';

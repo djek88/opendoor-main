@@ -108,4 +108,12 @@ img.place-photo {
 }
 
 
-.angular-google-map-container { height: 400px; }
+.angular-google-map-container { height: 500px; }
+
+
+
+.rating-group .fa {
+	font-size: 120%;
+	color: #FFBE00;
+	padding-top: 3px;
+}

@@ -27,6 +27,7 @@ if (config.mailConfig.transport == 'gmail') {
 	var transporter = nodemailer.createTransport(config.mailConfig);
 }
 else if (config.mailConfig.transport == 'smtp') {
+	var smtpTransport = require('nodemailer-smtp-transport');
 	var transporter = nodemailer.createTransport(smtpTransport(config.mailConfig));
 }
 else {
@@ -230,7 +231,8 @@ app.post('/places/add', function (req, res) {
 				, addedByEmail: req.session.email
 				, photoExt: fileExt
 				, location: location
-				, isConfirmed: false
+				, openingTime: fields.openingTime
+				, closingTime: fields.closingTime
 			};
 
 			placeManager.add(data, function (err, place) {
