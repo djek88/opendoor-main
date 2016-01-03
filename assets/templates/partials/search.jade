@@ -23,10 +23,14 @@
 							option(value="{{$name}}", ng-repeat="$name in $faithsList") {{$name}}
 					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
+			.col-12(ng-hide='$message.length')
+				ui-gmap-google-map(center="$map.center", zoom="18")
+					//ui-gmap-marker(idkey="1", coords="$map.$userLocation", options="{icon: '/assets/img/mylocation.png'}")
+					//ui-gmap-marker(idkey="$index", coords="{latitude: $place.location.coordinates[0], longitude: $place.location.coordinates[1]}", ng-repeat="$place in $places")
 			.col-12.m-t-40
 				h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
 				.table-wrap.bg-white(ng-show='$places.length')
-					table.table
+					table#search-table.table
 						thead
 							tr
 								th Name
@@ -34,7 +38,7 @@
 								th Distance
 								th
 						tbody
-							tr.place-link(ng-repeat="$place in $places", ng-click="$openPlace($event, $place)")
+							tr.place-link(ng-repeat="$place in $places", ng-click="$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
 								td {{$place.name}}
 								td.hidden-sm-down {{$place.faith}}
 								td {{$place.distance}}m

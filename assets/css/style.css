@@ -87,6 +87,7 @@ img.place-photo {
 }
 
 
+.place-link.hover,
 .place-link:hover {
 	background-color: #EFFBFF;
 }
