@@ -141,44 +141,53 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		var addMarkersState = 0;
 		var mapInstange = null;
 		var markers = [];
+		var $table = $('#search-table');
 
 		var removeMarkers = function() {
-
 			for (var i = 0; i < markers.length; i++) {
 				markers[i].setMap(null);
 			}
-		}
+			markers = [];
+		};
+
+		var mirrorPoint = function(p, o){
+			var px = p[0]
+				,	py = p[1]
+				,	ox = o[0]
+				,	oy = o[1];
+			return [ox - px + ox, oy - py + oy];
+		};
 
 
 		var addMarkers = function(data) {
 			if (++addMarkersState==2) {
-				console.log('add markers');
-				var $table = $('#search-table');
 				var bounds = new google.maps.LatLngBounds();
 
 				removeMarkers();
-				markers = [];
 
-				console.log($scope.$location)
-
-				var myLocationMarker = new google.maps.Marker({
-					position: {lat: parseFloat($scope.$location[0]), lng: parseFloat($scope.$location[1])}
+				new google.maps.Marker({
+					position: {lat: $scope.$location[0], lng: $scope.$location[1]}
 					,	map: mapInstange
 					,	icon: '/assets/img/mylocation.png'
 					,	title: 'My location'
 				});
 
+
 				for (var i=0; i<data.length; i++) {
 					var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
+
+					// I mirror all markers against search position in order to keep it in center of map
+					var mirroredPoint = mirrorPoint(data[i].location.coordinates, $scope.$location);
+					var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
 					var marker = new google.maps.Marker({
 							position: pos
-							//position: {lat: data[i].location.coordinates[0], lng: data[i].location.coordinates[1]}
 						,	map: mapInstange
 						,	icon: normalIcon
 						,	title: data[i].name
 					});
 					markers.push(marker);
 					bounds.extend(pos);
+					bounds.extend(mirroredPos);
 
 					(function(marker, i) {
 						google.maps.event.addListener(marker, 'mouseover', function () {
@@ -193,14 +202,12 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				}
 				mapInstange.fitBounds(bounds);
-				console.log(mapInstange)
-				addMarkersState--;
+				addMarkersState=1;
 			}
 
 
 		};
 		uiGmapIsReady.promise(1).then(function(instances) {
-			console.log('i')
 			instances.forEach(function(inst) {
 				mapInstange = inst.map;
 				addMarkers($scope.$places);
@@ -232,7 +239,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
 				var location = document.forms.form.location.value.split(',');
-				$scope.$location = location;
+				$scope.$location = [parseFloat(location[0]), parseFloat(location[1])];
 				if (location.length) {
 					$scope.$message = 'Searching…';
 					$http({
@@ -251,23 +258,27 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 							}
 							$scope.$message = '';
 							$place = data[0];
-							$scope.$map = {
-								center: {
-									latitude: $place.location.coordinates[0]
-									, longitude: $place.location.coordinates[1]
-								}
-								,	marker: { // Map overrides 'center' field, what moves marker to center of map, so we need to clone it
-									latitude: $place.location.coordinates[0]
-									, longitude: $place.location.coordinates[1]
-								}
-								//, zoom: 16
-							};
+							if (!$scope.$map) {
+								$scope.$map = {
+									center: {
+										latitude: $place.location.coordinates[0]
+										, longitude: $place.location.coordinates[1]
+									}
+									//,	marker: { // Map overrides 'center' field, what moves marker to center of map, so we need to clone it
+									//	latitude: $place.location.coordinates[0]
+									//	, longitude: $place.location.coordinates[1]
+									//}
+									, zoom: 16
+								};
+							}
 						}
 						else {
 							$scope.$message = 'There are no places nearby';
 						}
 						$scope.$places = data;
-						addMarkers($scope.$places);
+						setTimeout(function(){
+							addMarkers($scope.$places);
+						},200)
 					}).
 					error(function (data, status, headers, config) {
 						$scope.$message = 'Error processing request';
