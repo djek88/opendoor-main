@@ -185,7 +185,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				,	py = p[1]
 				,	ox = o[0]
 				,	oy = o[1];
-			return [ox - px + ox, oy - py + oy];
+			return [ox*2 - px, oy*2 - py];
 		};
 
 
