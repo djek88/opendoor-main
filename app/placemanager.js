@@ -84,7 +84,7 @@ module.exports = function(mongoose) {
 								, parseFloat(data.lng)]
 						}
 						,	"distanceField": "distance"
-						,	"maxDistance": 20000
+						,	"maxDistance": 2000
 						,	"spherical": true
 						,	"query": { "location.type": "Point" }
 					}

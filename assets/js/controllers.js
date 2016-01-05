@@ -282,18 +282,25 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 							, faiths: $scope.form.faiths.$modelValue
 						}
 					}).
-					success(function (data, status, headers, config) {
-						if (data.length) {
-							for (var i=0; i<data.length; i++) {
-								data[i].distance = Math.round(data[i].distance);
+					success(function (data, status, headers, config){
+						if (Array.isArray(data)) {
+							if (data.length) {
+								for (var i = 0; i < data.length; i++) {
+									data[i].distance = Math.round(data[i].distance);
+								}
+								$scope.$message = '';
+								$place = data[0];
 							}
-							$scope.$message = '';
-							$place = data[0];
+							else {
+								$scope.$message = 'There are no places nearby';
+							}
+							$scope.$places = data;
 						}
 						else {
-							$scope.$message = 'There are no places nearby';
+							$scope.$message = 'An error happened during request';
+							$scope.$places = [];
+							console.err(data);
 						}
-						$scope.$places = data;
 						if (!map) {
 							createMap();
 						}
