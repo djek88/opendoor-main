@@ -79,7 +79,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					lat: $place.location.coordinates[0]
 					, lng: $place.location.coordinates[1]
 				}
-				, zoom: 16
+				, zoom: 17
 			});
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				addUserPositionMarker();
@@ -160,16 +160,17 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		var map;
 
 		function createMap() {
-			console.log('createMap');
 			map = new google.maps.Map(document.getElementById('results-map'), {
-				//center: {lat: 0, lng: 0},
-				//zoom: 1
+				center: {
+					lat: $scope.$location[0]
+					, lng: $scope.$location[1]
+				}
+				,	zoom: 17
 			});
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				addMarkers($scope.$places);
 			});
 		}
-		console.log('afterinit');
 		var markers = [];
 		var $table = $('#search-table');
 
@@ -180,20 +181,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			markers = [];
 		};
 
-		var mirrorPoint = function(p, o){
-			var px = p[0]
-				,	py = p[1]
-				,	ox = o[0]
-				,	oy = o[1];
-			return [ox - px + ox, oy - py + oy];
-		};
-
 
 		var addMarkers = function(data) {
 			if (++addMarkersState==2) {
-				console.log('addmarkets');
-				var bounds = new google.maps.LatLngBounds();
-
 				removeMarkers();
 
 				new google.maps.Marker({
@@ -205,10 +195,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				for (var i=0; i<data.length; i++) {
 					var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
-
-					// I mirror all markers against search position in order to keep it in center of map
-					var mirroredPoint = mirrorPoint(data[i].location.coordinates, $scope.$location);
-					var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
 					var marker = new google.maps.Marker({
 							position: pos
 						,	map: map
@@ -216,8 +202,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						,	title: data[i].name
 					});
 					markers.push(marker);
-					bounds.extend(pos);
-					bounds.extend(mirroredPos);
 
 					(function(marker, i) {
 						google.maps.event.addListener(marker, 'mouseover', function () {
@@ -231,14 +215,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 					})(marker, i);
 
 				}
-				setTimeout(function(){
-					map.fitBounds(bounds);
-				},200);
-
-				//Try to do it one more time because sometimes it doesn't work
-				setTimeout(function(){
-					map.fitBounds(bounds);
-				},1000);
 				addMarkersState=1;
 			}
 
