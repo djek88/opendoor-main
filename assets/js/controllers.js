@@ -191,6 +191,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 		var addMarkers = function(data) {
 			if (++addMarkersState==2) {
+				console.log('addmarkets');
 				var bounds = new google.maps.LatLngBounds();
 
 				removeMarkers();
@@ -218,21 +219,26 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 					bounds.extend(pos);
 					bounds.extend(mirroredPos);
 
-					//(function(marker, i) {
-					//	google.maps.event.addListener(marker, 'mouseover', function () {
-					//		marker.setIcon(hoverIcon);
-					//		$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
-					//	});
-					//	google.maps.event.addListener(marker, 'mouseout', function () {
-					//		marker.setIcon(normalIcon);
-					//		$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
-					//	});
-					//})(marker, i);
+					(function(marker, i) {
+						google.maps.event.addListener(marker, 'mouseover', function () {
+							marker.setIcon(hoverIcon);
+							$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
+						});
+						google.maps.event.addListener(marker, 'mouseout', function () {
+							marker.setIcon(normalIcon);
+							$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
+						});
+					})(marker, i);
 
 				}
 				setTimeout(function(){
 					map.fitBounds(bounds);
-				},100);
+				},200);
+
+				//Try to do it one more time because sometimes it doesn't work
+				setTimeout(function(){
+					map.fitBounds(bounds);
+				},1000);
 				addMarkersState=1;
 			}
 
@@ -253,11 +259,11 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 
 		$scope.$mouseOver = function(i) {
-			//markers[i].setIcon(hoverIcon);
-		}
+			markers[i].setIcon(hoverIcon);
+		};
 		$scope.$mouseOut = function(i) {
-			//markers[i].setIcon(normalIcon);
-		}
+			markers[i].setIcon(normalIcon);
+		};
 
 
 		$scope.$searchPlaces = function() {
