@@ -13,13 +13,16 @@
     "connect-busboy": "0.0.2",
     "cookie-parser": "^1.4.0",
     "cookie-session": "^1.2.0",
+    "csv": "^0.4.6",
     "express": "^4.13.3",
     "file-type": "^3.3.1",
+    "geocoder": "^0.2.2",
     "jade": "^1.11.0",
     "mongoose": "^4.3.1",
     "nodemailer": "^1.10.0",
     "nodemailer-smtp-transport": "^1.1.0",
     "read-chunk": "^1.0.1",
+    "seq-queue": "0.0.5",
     "sha1": "^1.1.1"
   }
 }

@@ -210,6 +210,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		uiGmapIsReady.promise(1).then(function(instances) {
 			instances.forEach(function(inst) {
 				mapInstange = inst.map;
+				console.log('gmapready');
 				addMarkers($scope.$places);
 			});
 		});
@@ -276,6 +277,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 							$scope.$message = 'There are no places nearby';
 						}
 						$scope.$places = data;
+						console.log('dataloaded');
 						setTimeout(function(){
 							addMarkers($scope.$places);
 						},200)
