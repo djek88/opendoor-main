@@ -94,7 +94,7 @@ else {
 							name: place[0]
 						,	faith: place[9]
 						, denomination: place[10]
-					}
+					};
 
 					var address = place.splice(2, 7);
 					address.splice(2,1);
