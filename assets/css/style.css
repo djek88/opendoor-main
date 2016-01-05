@@ -109,7 +109,10 @@ img.place-photo {
 }
 
 
-.angular-google-map-container { height: 500px; }
+.angular-google-map-container,
+#results-map {
+	height: 500px;
+}
 
 
 

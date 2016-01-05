@@ -26,6 +26,4 @@
 		.row.p-10
 			.col-lg-12
 				h4 Location
-				ui-gmap-google-map(center="$map.center", zoom="$map.zoom")
-					ui-gmap-marker(idkey="1", coords="$map.$userLocation", options="{icon: '/assets/img/mylocation.png'}")
-					ui-gmap-marker(idkey="2", coords="$map.marker")
+				#results-map
