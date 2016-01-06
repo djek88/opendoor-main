@@ -24,8 +24,7 @@
 					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 			.col-12(ng-hide='$message.length')
-				#results-map-wrap
-					#results-map
+				#results-map
 			.col-12.m-t-40
 				h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
 				.table-wrap.bg-white(ng-show='$places.length')

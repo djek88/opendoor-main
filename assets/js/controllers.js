@@ -6,7 +6,7 @@
 
 
 
-var opendoorControllers = angular.module('opendoorControllers', ['uiGmapgoogle-maps']);
+var opendoorControllers = angular.module('opendoorControllers', []);
 
 
 opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
@@ -56,40 +56,42 @@ opendoorControllers.controller('ToolbarCtrl', ['$scope', '$cookies',
 
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
-		var addMarkersStates = 0;
 		var userPosition = 0;
 		var map;
 		function addUserPositionMarker() {
-
-			if (++addMarkersStates==2) {
-				//console.log(userPosition)
-				new google.maps.Marker({
+			console.log({lat: userPosition.latitude, lng: userPosition.longitude})
+			map.addMarker({
 					position: {lat: userPosition.latitude, lng: userPosition.longitude}
-					,	map: map
-					,	icon: '/assets/img/mylocation.png'
-					,	title: 'My location'
-				});
-			}
+				,	icon: '/assets/img/mylocation.png'
+				,	title: 'My location'
+			});
 		}
 		function setData($place) {
 			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
 			$scope.$place = $place;
-			map = new google.maps.Map(document.getElementById('results-map'), {
-				center: {
-					lat: $place.location.coordinates[0]
-					, lng: $place.location.coordinates[1]
-				}
-				, zoom: 16
-			});
-			google.maps.event.addListenerOnce(map, 'idle', function(){
-				addUserPositionMarker();
-				new google.maps.Marker({
-					position: {lat: $place.location.coordinates[0], lng: $place.location.coordinates[1]}
-					,	map: map
+			map = $rootScope.$getMapInstance($('#results-map'));
+
+			function afterInit() {
+
+				var pos = new google.maps.LatLng($place.location.coordinates[0], $place.location.coordinates[1]);
+				map.setCenter(pos);
+				map.setZoom(16);
+				map.addMarker({
+						position: pos
 					,	icon: '/assets/img/spotlight-poi.png'
 					,	title: $place.name
 				});
-			});
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(location) {
+						$scope.$apply(function(){
+							userPosition = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+							addUserPositionMarker();
+						});
+					});
+				}
+			}
+			//google.maps.event.addListenerOnce(map, 'idle', afterInit);
+			afterInit();
 		}
 		if ($rootScope.$selectedPlace) {
 			setData($rootScope.$selectedPlace);
@@ -114,14 +116,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		}
 
 
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function(location) {
-				$scope.$apply(function(){
-					userPosition = {latitude: location.coords.latitude, longitude: location.coords.longitude};
-					addUserPositionMarker();
-				});
-			});
-		}
+
 
 	}
 ]);
@@ -150,39 +145,25 @@ opendoorControllers.controller('ReviewAddCtrl', ['$scope', '$rootScope', '$locat
 	}
 ]);
 
-opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window', 'uiGmapIsReady',
-	function($scope, $http, $rootScope, $location, $window, uiGmapIsReady) {
+opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
 		$scope.$places = [];
 		$scope.$message = 'Press "Search" to find nearest places';
 		var normalIcon = '/assets/img/spotlight-poi-bright.png';
 		var hoverIcon = '/assets/img/spotlight-poi.png';
-		var addMarkersState = 0;
+		var $table = $('#search-table');
+		var map;
+		var markers = [];
 
 		function createMap() {
-			if ($scope.$places.length) {
-				if (!$rootScope.$map) {
-					$rootScope.$map = new google.maps.Map($('#results-map')[0], {});
-				}
-				else {
-					$('#results-map-wrap').empty();
-					$('#results-map-wrap').append($rootScope.$map.getDiv());
-				}
-
-				google.maps.event.addListenerOnce($rootScope.$map, 'idle', function(){
-					google.maps.event.trigger($rootScope.$map, "resize");
+			if (!$scope.$message.length) {
+				map = $rootScope.$getMapInstance($('#results-map'));
+				google.maps.event.addListenerOnce(map, 'idle', function(){
 					addMarkers($scope.$places);
 				});
+				addMarkers($scope.$places);
 			}
 		}
-		var markers = [];
-		var $table = $('#search-table');
-
-		var removeMarkers = function() {
-			for (var i = 0; i < markers.length; i++) {
-				markers[i].setMap(null);
-			}
-			markers = [];
-		};
 
 		var mirrorPoint = function(p, o){
 			var px = p[0]
@@ -194,62 +175,46 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 
 		var addMarkers = function(data) {
-			if (++addMarkersState==2) {
-				console.log('addmarkets');
-				var bounds = new google.maps.LatLngBounds();
+			var bounds = new google.maps.LatLngBounds();
 
-				removeMarkers();
+			map.markers.push(new google.maps.Marker({
+				position: {lat: $scope.$location[0], lng: $scope.$location[1]}
+				,	map: map
+				,	icon: '/assets/img/mylocation.png'
+				,	title: 'My location'
+			}));
 
-				markers.push(new google.maps.Marker({
-					position: {lat: $scope.$location[0], lng: $scope.$location[1]}
-					,	map: $rootScope.$map
-					,	icon: '/assets/img/mylocation.png'
-					,	title: 'My location'
-				}));
+			for (var i=0; i<data.length; i++) {
+				var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
 
-				for (var i=0; i<data.length; i++) {
-					var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
+				// I mirror all markers against search position in order to keep it in center of map
+				var mirroredPoint = mirrorPoint(data[i].location.coordinates, $scope.$location);
+				var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
+				var marker = map.addMarker({
+						position: pos
+					,	map: map
+					,	icon: normalIcon
+					,	title: data[i].name
+				});
+				bounds.extend(pos);
+				bounds.extend(mirroredPos);
 
-					// I mirror all markers against search position in order to keep it in center of map
-					var mirroredPoint = mirrorPoint(data[i].location.coordinates, $scope.$location);
-					var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
-					var marker = new google.maps.Marker({
-							position: pos
-						,	map: $rootScope.$map
-						,	icon: normalIcon
-						,	title: data[i].name
+				(function(marker, i) {
+					google.maps.event.addListener(marker, 'mouseover', function () {
+						marker.setIcon(hoverIcon);
+						$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
 					});
-					markers.push(marker);
-					bounds.extend(pos);
-					bounds.extend(mirroredPos);
+					google.maps.event.addListener(marker, 'mouseout', function () {
+						marker.setIcon(normalIcon);
+						$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
+					});
+				})(marker, i);
 
-					(function(marker, i) {
-						google.maps.event.addListener(marker, 'mouseover', function () {
-							marker.setIcon(hoverIcon);
-							$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
-						});
-						google.maps.event.addListener(marker, 'mouseout', function () {
-							marker.setIcon(normalIcon);
-							$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
-						});
-					})(marker, i);
-
-				}
-				//google.maps.event.addListenerOnce($rootScope.$map, 'idle', function(){
-				//	$rootScope.$map.fitBounds(bounds);
-				//});
-				setTimeout(function(){
-					$rootScope.$map.fitBounds(bounds);
-				},200);
-
-				//Try to do it one more time because sometimes it doesn't work
-				setTimeout(function(){
-					$rootScope.$map.fitBounds(bounds);
-				},1000);
-				addMarkersState=1;
 			}
-
-
+			google.maps.event.addListenerOnce(map, 'idle', function(){
+				map.fitBounds(bounds);
+			});
+			map.fitBounds(bounds);
 		};
 
 		$scope.$faithsList = $rootScope.$faiths;
@@ -266,10 +231,10 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 
 		$scope.$mouseOver = function(i) {
-			markers[i].setIcon(hoverIcon);
+			map.markers[i+1].setIcon(hoverIcon);
 		};
 		$scope.$mouseOut = function(i) {
-			markers[i].setIcon(normalIcon);
+			map.markers[i+1].setIcon(normalIcon);
 		};
 
 
@@ -309,7 +274,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 							console.error(data);
 						}
 						createMap();
-						addMarkers($scope.$places);
 					}).
 					error(function (data, status, headers, config) {
 						$scope.$message = 'Error processing request';

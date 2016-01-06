@@ -42,7 +42,35 @@ opendoorApp.run(function($rootScope) {
 		,	'Judaism'
 		,	'Taoism'
 		,	'Islam'
-	]
+	];
+
+	$rootScope.$getMapInstance = function(targetEl) {
+		if (!$rootScope.$map) {
+			$div = $('<div id="map"></div>');
+			$(targetEl).append($div);
+			var map = $rootScope.$map = new google.maps.Map($div[0], {});
+			map.markers=[];
+
+			map.removeMarkers=function(){
+				var marker;
+				while (marker = map.markers.pop()) {
+					marker.setMap(null);
+				}
+			}
+
+			map.addMarker=function(opts){
+				opts.map = map;
+				var marker = new google.maps.Marker(opts);
+				map.markers.push(marker);
+				return marker;
+			}
+		}
+		else {
+			$(targetEl).append($rootScope.$map.getDiv());
+			$rootScope.$map.removeMarkers();
+		}
+		return $rootScope.$map;
+	}
 });
 
 opendoorApp.config(['$httpProvider', function($httpProvider) {
