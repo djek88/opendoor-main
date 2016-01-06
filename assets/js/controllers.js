@@ -59,7 +59,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		var userPosition = 0;
 		var map;
 		function addUserPositionMarker() {
-			console.log({lat: userPosition.latitude, lng: userPosition.longitude})
 			map.addMarker({
 					position: {lat: userPosition.latitude, lng: userPosition.longitude}
 				,	icon: '/assets/img/mylocation.png'
