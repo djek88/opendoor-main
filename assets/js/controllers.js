@@ -79,7 +79,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					lat: $place.location.coordinates[0]
 					, lng: $place.location.coordinates[1]
 				}
-				, zoom: 16
+				, zoom: 17
 			});
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				addUserPositionMarker();
@@ -192,12 +192,8 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			return [ox*2 - px, oy*2 - py];
 		};
 
-
 		var addMarkers = function(data) {
 			if (++addMarkersState==2) {
-				console.log('addmarkets');
-				var bounds = new google.maps.LatLngBounds();
-
 				removeMarkers();
 
 				markers.push(new google.maps.Marker({
@@ -209,10 +205,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				for (var i=0; i<data.length; i++) {
 					var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
-
-					// I mirror all markers against search position in order to keep it in center of map
-					var mirroredPoint = mirrorPoint(data[i].location.coordinates, $scope.$location);
-					var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
 					var marker = new google.maps.Marker({
 							position: pos
 						,	map: $rootScope.$map
@@ -220,8 +212,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						,	title: data[i].name
 					});
 					markers.push(marker);
-					bounds.extend(pos);
-					bounds.extend(mirroredPos);
 
 					(function(marker, i) {
 						google.maps.event.addListener(marker, 'mouseover', function () {
