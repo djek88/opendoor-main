@@ -157,19 +157,23 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		var normalIcon = '/assets/img/spotlight-poi-bright.png';
 		var hoverIcon = '/assets/img/spotlight-poi.png';
 		var addMarkersState = 0;
-		var map;
 
 		function createMap() {
-			console.log('createMap');
-			map = new google.maps.Map(document.getElementById('results-map'), {
-				//center: {lat: 0, lng: 0},
-				//zoom: 1
-			});
-			google.maps.event.addListenerOnce(map, 'idle', function(){
-				addMarkers($scope.$places);
-			});
+			if ($scope.$places.length) {
+				if (!$rootScope.$map) {
+					$rootScope.$map = new google.maps.Map($('#results-map')[0], {});
+				}
+				else {
+					$('#results-map-wrap').empty();
+					$('#results-map-wrap').append($rootScope.$map.getDiv());
+				}
+
+				google.maps.event.addListenerOnce($rootScope.$map, 'idle', function(){
+					google.maps.event.trigger($rootScope.$map, "resize");
+					addMarkers($scope.$places);
+				});
+			}
 		}
-		console.log('afterinit');
 		var markers = [];
 		var $table = $('#search-table');
 
@@ -196,12 +200,12 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				removeMarkers();
 
-				new google.maps.Marker({
+				markers.push(new google.maps.Marker({
 					position: {lat: $scope.$location[0], lng: $scope.$location[1]}
-					,	map: map
+					,	map: $rootScope.$map
 					,	icon: '/assets/img/mylocation.png'
 					,	title: 'My location'
-				});
+				}));
 
 				for (var i=0; i<data.length; i++) {
 					var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
@@ -211,7 +215,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 					var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
 					var marker = new google.maps.Marker({
 							position: pos
-						,	map: map
+						,	map: $rootScope.$map
 						,	icon: normalIcon
 						,	title: data[i].name
 					});
@@ -231,13 +235,16 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 					})(marker, i);
 
 				}
+				//google.maps.event.addListenerOnce($rootScope.$map, 'idle', function(){
+				//	$rootScope.$map.fitBounds(bounds);
+				//});
 				setTimeout(function(){
-					map.fitBounds(bounds);
+					$rootScope.$map.fitBounds(bounds);
 				},200);
 
 				//Try to do it one more time because sometimes it doesn't work
 				setTimeout(function(){
-					map.fitBounds(bounds);
+					$rootScope.$map.fitBounds(bounds);
 				},1000);
 				addMarkersState=1;
 			}
@@ -299,11 +306,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						else {
 							$scope.$message = 'An error happened during request';
 							$scope.$places = [];
-							console.err(data);
+							console.error(data);
 						}
-						if (!map) {
-							createMap();
-						}
+						createMap();
 						addMarkers($scope.$places);
 					}).
 					error(function (data, status, headers, config) {
