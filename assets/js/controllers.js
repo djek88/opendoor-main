@@ -173,7 +173,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			return [ox*2 - px, oy*2 - py];
 		};
 
-
 		var addMarkers = function(data) {
 			var bounds = new google.maps.LatLngBounds();
 
