@@ -37,11 +37,23 @@ opendoorApp.directive('ngLocation', function() {
 
 
 opendoorApp.run(function($rootScope) {
-	$rootScope.$faiths = [
-			'Christian'
-		,	'Judaism'
-		,	'Taoism'
-		,	'Islam'
+	$rootScope.$religions = [
+		'Christianity'
+	,	'Islam'
+	,	'Hinduism'
+	,	'Chinese'
+	,	'Buddism'
+	,	'Taoism'
+	,	'Shinto'
+	,	'Sikhism'
+	,	'Judaism'
+	,	'Korean Shamanism'
+	,	'Caodaism'
+	,	'Bahá\'í Faith'
+	,	'Jainism'
+	,	'Cheondoism'
+	,	'Hoahaoism'
+	,	'Tenriism'
 	];
 
 	$rootScope.$getMapInstance = function(targetEl) {

@@ -12,15 +12,15 @@
 					//			button.btn.btn-inverse(type='button') Detect location
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
 						.input-group.location-picker
-							input.form-control(name="address", ng-location, ng-location-autodetect, ng-model="location", placeholder="Location")
+							input.form-control(name="address", ng-location, ng-model="location", placeholder="Location")
 							input.hidden(name="location")
 							.input-group-btn
 								button.btn.btn-inverse Detect location
 					span.inline-spacer
-					.form-group(ng-class="{'has-error': (form.$submitted || form.faiths.$touched) && form.faiths.$error.required}")
-						select.form-control(name="faiths", ng-model="faiths", required)
-							option(value="*", selected) All faiths
-							option(value="{{$name}}", ng-repeat="$name in $faithsList") {{$name}}
+					.form-group(ng-class="{'has-error': (form.$submitted || form.religions.$touched) && form.religions.$error.required}")
+						select.form-control(name="religions", ng-model="religions", required)
+							option(value="*", selected) All religions
+							option(value="{{$name}}", ng-repeat="$name in $religionsList") {{$name}}
 					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 			.col-12(ng-hide='$message.length')
@@ -38,7 +38,7 @@
 						tbody
 							tr.place-link(ng-repeat="$place in $places", ng-click="$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
 								td {{$place.name}}
-								td.hidden-sm-down {{$place.faith}}
+								td.hidden-sm-down {{$place.religion}}
 								td {{$place.distance}}m
 								td.text-right
 									i.fa.fa-chevron-right

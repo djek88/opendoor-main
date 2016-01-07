@@ -222,7 +222,7 @@ app.post('/places/add', function (req, res) {
 			var location = fields.location.split(',');
 			var data = {
 					name: fields.name
-				, faith: fields.faith
+				, religion: fields.religion
 				, pastorName: fields.pastorName
 				, phone: fields.phone
 				, postalCode: fields.postalCode

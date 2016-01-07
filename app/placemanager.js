@@ -13,7 +13,7 @@ module.exports = function(mongoose) {
 
 	var placeSchema = new mongoose.Schema({
 			name: String
-		, faith: String
+		, religion: String
 		, pastorName: String
 		, phone: String
 		, postalCode: String
@@ -51,7 +51,7 @@ module.exports = function(mongoose) {
 		this.add = function(data, callback) {
 			var place = new Place({
 					name: data.name
-				, faith: data.faith
+				, religion: data.religion
 				, pastorName: data.pastorName
 				, phone: data.phone
 				, postalCode: data.postalCode
@@ -98,8 +98,8 @@ module.exports = function(mongoose) {
 					}
 				}
 			];
-			if (data.faiths && data.faiths != '*') {
-				options[2]['$match']['faith'] = data.faiths;
+			if (data.religions && data.religions != '*') {
+				options[2]['$match']['religion'] = data.religions;
 			}
 			Place.aggregate(options,
 			function(err, places) {

@@ -1,19 +1,20 @@
 #content.content
 	.container.bg-white.p-t-10
-		h3.text-center.m-b-30 Leave feedback
+		h3.m-b-15 Your feedback helps improve this resource
+		h5.m-b-30 We welcome any corrections, questions, suggestions, comments or even a hello! We always reply and normally within 24 hours.
 		form.form-horizontal(method="POST", action="/feedback", novalidate name="form")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
-				label.col-md-3.control-label Name
+				label.col-md-3.control-label Your Name
 				.col-md-9
 					input.form-control(type="text", name="name", ng-model="name", required)
 			.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.$error.email)}")
-				label.col-md-3.control-label Email address
+				label.col-md-3.control-label Your Email address
 				.col-md-9
 					input.form-control(type="email", name="email", ng-model="email", required)
 			.form-group(ng-class="{'has-error': (form.$submitted || form.note.$touched) && form.note.$error.required}")
-				label.col-md-3.control-label Note
+				label.col-md-3.control-label Your Message
 				.col-md-9
-					textarea.form-control(placeholder='Write your feedback', rows='5', name="note", ng-model="note", required)
+					textarea.form-control(placeholder='Write your feedback, question, suggestion, message here', rows='5', name="note", ng-model="note", required)
 			input.hidden(name="target" ng-value="$targetPage")
 			.form-group
 				label.col-md-3.control-label

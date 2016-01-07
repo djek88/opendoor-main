@@ -128,7 +128,7 @@ fs.readFile(outFileName, 'utf8', function (err, data) {
 						var placeObject = {
 								name: place[0]
 							, postalCode: place[7]
-							,	faith: place[9]
+							,	religion: place[9]
 							, denomination: place[10]
 							,	isConfirmed: true
 						};

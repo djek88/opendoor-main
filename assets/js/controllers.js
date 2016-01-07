@@ -123,7 +123,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
 		$('.timepicker-input').timepicker({defaultTime: false});
-		$scope.$faiths = $rootScope.$faiths;
+		$scope.$religions = $rootScope.$religions;
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
@@ -215,8 +215,8 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			map.fitBounds(bounds);
 		};
 
-		$scope.$faithsList = $rootScope.$faiths;
-		$scope.faiths = '*';
+		$scope.$religionsList = $rootScope.$religions;
+		$scope.religions = '*';
 		$scope.$openPlace = function($event, $place) {
 			$rootScope.$selectedPlace = $place;
 			if ($event.which == 2) {
@@ -249,7 +249,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						, params: {
 								lat: location[0]
 							, lng: location[1]
-							, faiths: $scope.form.faiths.$modelValue
+							, religions: $scope.form.religions.$modelValue
 						}
 					}).
 					success(function (data, status, headers, config){
@@ -332,8 +332,8 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				break;
 			case 'feedbacksaved':
 				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Thank you for the feedback';
+				$scope.$alertTitle = 'Your message has been received';
+				$scope.$alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
 				break;
 			case 'placeadded':
 				$scope.$alertType = 'info';
