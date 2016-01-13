@@ -92,7 +92,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					});
 				}
 			}
-			//google.maps.event.addListenerOnce(map, 'idle', afterInit);
 			afterInit();
 		}
 		if ($rootScope.$selectedPlace) {
@@ -104,7 +103,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					url: '/ajax/places/' + id
 				, method: 'GET'
 			}).
-			success(function (data, status, headers, config) {
+			success(function (data) {
 				if (typeof data== 'object') {
 					setData(data);
 				}
@@ -112,7 +111,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					$location.url('/notfound');
 				}
 			}).
-			error(function (data, status, headers, config) {
+			error(function () {
 				$location.url('/notfound');
 			});
 		}
@@ -129,38 +128,6 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
 
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 
-		//$.fn.select2.amd.require([
-		//	'select2/data/array',
-		//	'select2/utils'
-		//], function (ArrayData, Utils) {
-		//	function CustomData ($element, options) {
-		//		CustomData.__super__.constructor.call(this, $element, options);
-		//	}
-		//
-		//	Utils.Extend(CustomData, ArrayData);
-		//
-		//	CustomData.prototype.query = function (params, callback) {
-		//		var data = {
-		//			results: []
-		//		};
-		//		console.log(params)
-		//
-		//		//for (var i = 1; i < 5; i++) {
-		//		//	var s = "";
-		//		//
-		//		//	for (var j = 0; j < i; j++) {
-		//		//		s = s + params.term;
-		//		//	}
-		//		//
-		//		//	data.results.push({
-		//		//		id: params.term + i,
-		//		//		text: s
-		//		//	});
-		//		//}
-		//
-		//		callback(data);
-		//	};
-
 
 			$('select[name="groupName"]').select2({
 				ajax: {
@@ -169,7 +136,7 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
 					delay: 250,
 					data: function (params) {
 						return {
-							name: params.term, // search term
+							name: params.term,
 							religion: 'Christianity'
 						};
 					}
@@ -193,8 +160,8 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
 	}
 ]);
 
-opendoorControllers.controller('ReviewAddCtrl', ['$scope', '$rootScope', '$location', '$http',
-	function($scope, $rootScope, $location, $http) {
+opendoorControllers.controller('ReviewAddCtrl', ['$scope',
+	function($scope) {
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
@@ -212,7 +179,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		var hoverIcon = '/assets/img/spotlight-poi.png';
 		var $table = $('#search-table');
 		var map;
-		var markers = [];
 
 		function createMap() {
 			if (!$scope.$message.length) {
@@ -271,10 +237,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				})(marker, i);
 
 			}
-			//google.maps.event.addListenerOnce(map, 'idle', function(){
-			//	map.fitBounds(bounds);
-			//	console.log('fitBounds-idle')
-			//});
 			map.fitBounds(bounds);
 		};
 
@@ -337,7 +299,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				, method: 'GET'
 				, params: requestParams
 			}).
-			success(function (data, status, headers, config){
+			success(function (data){
 				if (Array.isArray(data)) {
 					if (data.length) {
 						for (var i = 0; i < data.length; i++) {
@@ -358,7 +320,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				}
 				createMap();
 			}).
-			error(function (data, status, headers, config) {
+			error(function () {
 				$scope.$message = 'Error processing request';
 			});
 		}
@@ -366,8 +328,8 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 	}
 ]);
 
-opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location', '$http',
-	function($scope, $rootScope, $location, $http) {
+opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location',
+	function($scope, $rootScope, $location) {
 		$scope.$targetPage = $location.hash();
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
