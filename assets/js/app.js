@@ -56,6 +56,22 @@ opendoorApp.run(function($rootScope) {
 	,	'Tenriism'
 	];
 
+	$rootScope.getTime = function(date) {
+		var formattedTime = '';
+		if (date.getHours() < 10) {
+			formattedTime += '0';
+		}
+		formattedTime += date.getHours();
+		formattedTime += ':';
+
+		if (date.getMinutes() < 10) {
+			formattedTime += '0';
+		}
+		formattedTime += date.getMinutes();
+		return formattedTime;
+	}
+
+
 	$rootScope.$getMapInstance = function(targetEl) {
 		if (!$rootScope.$map) {
 			$div = $('<div id="map"></div>');

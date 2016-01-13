@@ -2,6 +2,7 @@
 	.container.bg-white.p-t-10
 		h3.text-center.m-b-30 Add a new Place of Worship
 		form.form-horizontal(method="POST", action="/places/add", novalidate, name="form", enctype="multipart/form-data")
+			// Main info
 			.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
 				label.col-md-3.control-label Place name
 				.col-md-9
@@ -11,15 +12,124 @@
 				.col-md-9
 					select.form-control(name="religion", ng-model="religion", required)
 						option(value="",selected, disabled)
-						option(value="{{religion}}", ng-repeat="$religion in $religions") {{$religion}}
+						option(value="{{$religion}}", ng-repeat="$religion in $religions") {{$religion}}
+			.form-group(ng-class="{'has-error': (form.$submitted || form.groupName.$touched) && form.groupName.$error.required}")
+				label.col-md-3.control-label Group name
+				.col-md-9
+					select.test.form-control(name="groupName", ng-model="groupName")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
-				label.col-md-3.control-label Location
+				label.col-md-3.control-label Meeting venue
 				.col-md-9
 					.input-group.location-picker
 						input.form-control(name="address", ng-location, ng-model="address")
 						input.hidden(name="location")
 						.input-group-btn
 							button.btn.btn-inverse Detect my location
+
+			// Additional info
+			.form-group#additional-info-link(ng-hide="$additionalFieldsAreVisible", ng-click="$additionalFieldsAreVisible=true")
+				label.col-md-3
+				.col-md-9.m-t-10
+					span.link
+						.fa.fa-plus-square
+						|  Add additional information
+			#additional-info(ng-show="$additionalFieldsAreVisible")
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-30 Classification details
+				.form-group
+					label.col-md-3.control-label Denomination
+					.col-md-9
+						input.form-control(type="text", name="denominations", ng-model="denominations")
+
+
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-40 Leader`s information
+				.form-group
+					label.col-md-3.control-label Leader`s name
+					.col-md-9
+						input.form-control(type="text", name="leaderName", ng-model="leaderName")
+				.form-group
+					label.col-md-3.control-label Leader`s role title
+					.col-md-9
+						input.form-control(type="text", name="leaderRole", ng-model="leaderRole")
+
+
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-30 Contact information
+				.form-group
+					label.col-md-3.control-label Phone number
+					.col-md-9
+						input.form-control(type="text", name="phone", ng-model="phone")
+				.form-group
+					label.col-md-3.control-label Website URL
+					.col-md-9
+						input.form-control(type="text", name="url", ng-model="url")
+				.form-group(ng-class="{'has-error': form.email.$error.email}")
+					label.col-md-3.control-label Email
+					.col-md-9
+						input.form-control(type="email", name="email", ng-model="email")
+						label.control-label(ng-show="form.email.$error.email") This is not a valid email.
+
+
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-30 Main meeting information
+				.form-group
+					label.col-md-3.control-label Main meeting day
+					.col-md-9
+						select.form-control(name="mainMeetingDay", ng-model="mainMeetingDay")
+							option(value="")
+							option Sunday
+							option Monday
+							option Tuesday
+							option Wednesday
+							option Thursday
+							option Friday
+							option Saturday
+
+				.form-group
+					label.col-md-3.control-labelMain Main meeting time
+					.col-md-9
+						.input-group.bootstrap-timepicker.timepicker
+							input.timepicker-input.form-control.input-small(type='text', name="mainMeetingTime", ng-model="mainMeetingTime")
+							span.input-group-addon
+								i.glyphicon.glyphicon-time
+
+
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-30 Photos
+				.form-group
+					label.col-md-3.control-label Banner photo
+					.col-md-9
+						input.form-control(type="file", name="bannerPhoto", ng-model="bannerPhoto")
+				.form-group
+					label.col-md-3.control-label Leader photo
+					.col-md-9
+						input.form-control(type="file", name="leaderPhoto", ng-model="leaderPhoto")
+
+
+				.form-group
+					.col-md-3
+					.col-md-9
+						h4.m-t-30 Other details
+				.form-group
+					label.col-md-3.control-label About
+					.col-md-9
+						textarea.form-control(rows="4", name="about", ng-model="about")
+				.form-group
+					label.col-md-3.control-label Travel information
+					.col-md-9
+						textarea.form-control(rows="4", name="travelInformation", ng-model="travelInformation")
+
 			.form-group
 				label.col-md-3.control-label
 				.col-md-9

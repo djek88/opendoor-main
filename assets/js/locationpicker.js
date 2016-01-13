@@ -28,6 +28,7 @@ $.fn.locationpicker = function(options) {
 	}
 
 	function removeResults() {
+		console.log(22);
 		$rootEl.removeClass('location-picker-active');
 		$resultsEl.remove();
 	}

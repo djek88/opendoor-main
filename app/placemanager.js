@@ -1,9 +1,10 @@
 /**
  * Created by Vavooon on 18.12.2015.
  */
-
+var AbstractManager = require('./abstractmanager.js');
 
 module.exports = function(mongoose) {
+
 
 	var reviewSchema = new mongoose.Schema({
 			email: String
@@ -11,61 +12,80 @@ module.exports = function(mongoose) {
 		,	text: String
 	});
 
-	var placeSchema = new mongoose.Schema({
-			name: String
-		, religion: String
-		, pastorName: String
-		, phone: String
-		, postalCode: String
-		, address: String
-		, email: String
-		, addedByEmail: String
-		, photoExt: String
-		, location : {
-			type: {
+	var placeFields = {
+		name: {
 					type: String
-				,	default: 'Point'
-			},
-			coordinates: [Number]
-		}
-			, isConfirmed: {
-				type: Boolean
-				,	default: false
+				,	required: true
 			}
-		, openingTime: Date
-		, closingTime: Date
+		, religion: {
+					type: String
+				,	required: true
+			}
+		, groupName: {
+					type: String
+				,	required: true
+			}
+		, address: {
+					type: String
+				,	required: true
+			}
+		, location : {
+				//required: true
+				type: {
+					type: String
+					,	default: 'Point'
+				}
+			,	coordinates: [Number]
+		}
+		, denominations: [String]
+		, leaderName: String
+		, leaderRole: String
+		, phone: String
+		, url: String
+		, email: String
+		, mainMeetingDay: String
+		, mainMeetingTime: Date
+		, bannerPhoto: String
+		, leaderPhoto: String
+		, about: String
+		, travelInformation: String
+		, addedByEmail: String
+		, isConfirmed: {
+			type: Boolean
+			,	default: false
+		}
 		, reviews: {
 			type: [reviewSchema]
 			,	default: []
 		}
-	}
-	, {
-			timestamps: true
-		});
+	};
+
+	var placeSchema = new mongoose.Schema(placeFields, {
+		timestamps: true
+	});
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
 
 	var Place = mongoose.model('place', placeSchema);
 
 	function PlaceManager() {
+		this.fields = placeFields;
+		AbstractManager.apply(this, arguments);
+
 		this.add = function(data, callback) {
-			var place = new Place({
-					name: data.name
-				, religion: data.religion
-				, pastorName: data.pastorName
-				, phone: data.phone
-				, postalCode: data.postalCode
-				, address: data.address
-				, email: data.email
-				, addedByEmail: data.addedByEmail
-				, photoExt: data.photoExt
-				, location : {
-							type : "Point"
-						,	coordinates : data.location
-					}
-				, openingTime: data.openingTime ? new Date(data.openingTime + ' 01.01.1970') : null
-				, closingTime: data.closingTime ? new Date(data.closingTime + ' 01.01.1970') : null
+			var place = new Place(data);
+
+			var religionGroup = {name: place.groupName, religion: place.religion};
+			religionGroupManager.find(religionGroup, function(err, religionGroups){
+				if (!err && !religionGroups.length) {
+					global.religionGroupManager.add(religionGroup);
+					console.log('add religionGroup', religionGroup);
+				}
 			});
+
+			global.denominationManager.addIfNotExists(place.denominations, place.religion);
+
+
 			place.save(function (err, place) {
 				if (typeof callback == 'function') {
 					callback(err, place);

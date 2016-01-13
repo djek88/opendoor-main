@@ -8,21 +8,28 @@ html(ng-app="opendoorApp")
 		link(href='assets/color_admin/plugins/bootstrap/css/bootstrap.min.css', rel='stylesheet')
 		link(href='assets/color_admin/plugins/font-awesome/css/font-awesome.min.css', rel='stylesheet')
 		link(href='assets/color_admin/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css', rel='stylesheet')
+		link(href='assets/color_admin/plugins/jquery-tag-it/css/jquery.tagit.css', rel='stylesheet')
 		link(href='assets/color_admin/css/animate.min.css', rel='stylesheet')
 		link(href='assets/color_admin/css/style.min.css', rel='stylesheet')
 		link(href='assets/color_admin/css/style-responsive.min.css', rel='stylesheet')
 		link(href='assets/color_admin/css/theme/default.css', rel='stylesheet')
+		link(href='bower_components/select2/dist/css/select2.min.css', rel='stylesheet')
 
 		link(href='assets/css/style.css', rel='stylesheet')
 
 		script(src="bower_components/jquery/jquery.min.js")
+		script(src="bower_components/jquery-ui/jquery-ui.min.js")
 		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}')
 		script(src="bower_components/bootstrap/dist/js/bootstrap.min.js")
+		script(src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js")
+		script(src="bower_components/select2/dist/js/select2.min.js")
+		script(src="bower_components/tag-it/js/tag-it.min.js")
+
+
 		script(src="bower_components/angular/angular.js")
 		script(src="bower_components/angular-route/angular-route.js")
 		script(src="bower_components/angular-cookies/angular-cookies.js")
 
-		script(src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js")
 
 		script(src="assets/js/locationpicker.js")
 		script(src="assets/js/app.js")
@@ -48,7 +55,7 @@ html(ng-app="opendoorApp")
 							li(ng-show="$isLoggedIn")
 								a(href='/places/add') ADD A PLACE
 							li(ng-show="$isLoggedIn")
-								a.pointer(data-toggle='dropdown' ng-disabled)
+								a.link(data-toggle='dropdown' ng-disabled)
 									| MY PROFILE
 									b.caret
 								ul.dropdown-menu

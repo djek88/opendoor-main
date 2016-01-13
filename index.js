@@ -1,6 +1,7 @@
 var config = require('./config.js');
 var http = require('http');
 var fs = require('fs');
+var extend = require('util')._extend;
 var querystring = require('querystring');
 var express = require('express');
 var nodemailer = require('nodemailer');
@@ -12,10 +13,23 @@ var bodyParser = require('body-parser');
 var session = require('cookie-session');
 var busboy = require('connect-busboy');
 var jade = require('jade');
+
+
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
+
 var PlaceManager = require('./app/placemanager.js')(mongoose);
 var placeManager = new PlaceManager;
+
+var ReligionGroupManager = require('./app/religiongroupmanager.js')(mongoose);
+var religionGroupManager = new ReligionGroupManager;
+
+var DenominationManager = require('./app/denominationmanager.js')(mongoose);
+var denominationManager = new DenominationManager;
+
+global.religionGroupManager = religionGroupManager;
+global.denominationManager = denominationManager;
+
 var sha1 = require('sha1');
 
 app.use(cookieParser(config.cookieKeys));
@@ -143,6 +157,61 @@ app.get('/ajax/places/:id', function (req, res) {
 	});
 });
 
+app.get('/ajax/religionGroups', function (req, res) {
+	var query = extend({}, req.query);
+
+	if (query.name) {
+		query.name = {
+			$regex : '.*' + query.name + '.*'
+		};
+	}
+
+	religionGroupManager.find(query, function(err, religionGroups){
+		var groupNames= {
+			results: []
+		};
+
+		for (var i=0; i<religionGroups.length; i++) {
+			groupNames.results.push({
+					id: religionGroups[i].name
+				,	text: religionGroups[i].name
+			});
+		}
+		if (req.query.name && req.query.name.length && !religionGroups.length) {
+			groupNames.results.push({id: req.query.name, text: req.query.name});
+		}
+		res.send(JSON.stringify(groupNames));
+	});
+});
+
+
+app.get('/ajax/denominations', function (req, res) {
+	var query = {};
+
+	if (req.query.term) {
+		query.name = {$regex: '.*' + req.query.term + '.*'};
+	}
+
+	if (req.query.religion) {
+		query.name = req.query.religion;
+	}
+
+
+	denominationManager.find(query, function(err, religionGroups){
+		console.log(religionGroups);
+		var denominations = [];
+
+		for (var i=0; i<religionGroups.length; i++) {
+			denominations.push(religionGroups[i].name);
+		}
+
+		if (!denominations.length) {
+			denominations.push(req.query.term);
+		}
+		res.send(JSON.stringify(denominations));
+	});
+});
+
 
 app.post('/feedback', function (req, res) {
 	userManager.find({isAdmin: true}, function(err, users){
@@ -219,22 +288,20 @@ app.post('/places/add', function (req, res) {
 	function addPlace() {
 		state++;
 		if (state == 2) {
-			var location = fields.location.split(',');
-			var data = {
-					name: fields.name
-				, religion: fields.religion
-				, pastorName: fields.pastorName
-				, phone: fields.phone
-				, postalCode: fields.postalCode
-				, address: fields.address
-				, email: fields.email
-				, addedByEmail: req.session.email
-				, photoExt: fileExt
-				, location: location
-				, openingTime: fields.openingTime
-				, closingTime: fields.closingTime
-			};
+			var data = extend({}, fields);
+			data.location = {coordinates: fields.location.split(',')};
+			data.isConfirmed = false;
 
+			if (data.denominations) {
+				data.denominations = data.denominations.split(',');
+			}
+
+			if (data.mainMeetingTime) {
+				data.mainMeetingTime = new Date(data.mainMeetingTime + ' 01.01.1970');
+			}
+			placeManager.dropUndeclaredFields(data);
+
+			console.log('after dropUndeclaredFields', data)
 			placeManager.add(data, function (err, place) {
 				if (!err) {
 					if (tempFileName) {
@@ -282,7 +349,6 @@ app.post('/places/add', function (req, res) {
 
 app.get('/places/confirm/:id', function (req, res) {
 	var id = req.params.id;
-	console.log(id);
 	placeManager.markAsConfirmed(id, function(err, place){
 		console.log (err ,place);
 		if (!err && place) {

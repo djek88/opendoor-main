@@ -6,6 +6,7 @@
 	.form-inline .location-picker input {
 		min-width: 300px;
 	}
+
 }
 
 @media (max-width: 420px) {
@@ -24,8 +25,13 @@ html, body {
 	margin-top: 80px;
 }
 
-.pointer {
+.link {
 	cursor: pointer;
+	color: #666;
+}
+
+.link:hover {
+	color: black;
 }
 
 .table {
@@ -66,8 +72,11 @@ html, body {
 
 
 select.form-control,
+.select2-dropdown,
+.select2-container--default .select2-selection--single,
+.tagit.ui-widget,
 .form-control {
-	border-color: #2A72B5;
+	border-color: #2A72B5!important;
 }
 
 .search-placeholder {
@@ -120,5 +129,9 @@ img.place-photo {
 	font-size: 120%;
 	color: #FFBE00;
 	padding-top: 3px;
+}
+
+#additional-info-link {
+	font-size: 120%;
 }
 

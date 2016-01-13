@@ -8,22 +8,30 @@
 				dl
 					dt(ng-show="$place.religion") Religion
 					dd {{$place.religion}}
-					dt(ng-show="$place.pastorName") Pastor name
-					dd {{$place.pastorName}}
-					dt(ng-show="$place.phone") Phone
-					dd {{$place.phone}}
-					dt(ng-show="$place.postalCode") Postal code
-					dd {{$place.postalCode}}
+					dt(ng-show="$place.groupName") Group name
+					dd {{$place.groupName}}
 					dt(ng-show="$place.address") Address
 					dd {{$place.address}}
-					dt(ng-show="$place.email") Email
-					dd {{$place.email}}
-					dt(ng-show="$place.openingTime") Opening time
-					dd {{$place.openingTime | date:'shortTime'}}
-					dt(ng-show="$place.closingTime") Closing time
-					dd {{$place.closingTime | date:'shortTime'}}
+					dt(ng-show="$place.denominations.length") Denomination
+					dd {{$place.denominations.join(', ')}}
+					dt(ng-show="$place.leaderName") Leader name
+					dd {{$place.leaderName}}
+					dt(ng-show="$place.leaderRole") Leader role
+					dd {{$place.leaderRole}}
+					dt(ng-show="$place.phone") Phone
+					dd {{$place.phone}}
+					dt(ng-show="$place.phone") URL
+					dd {{$place.url}}
+					dt(ng-show="$place.mainMeetingDay") Main meeting day
+					dd {{$place.mainMeetingDay}}
+					dt(ng-show="$place.mainMeetingTime") Main meeting time
+					dd {{$place.mainMeetingTime}}
+					dt(ng-show="$place.about") About
+					dd {{$place.about}}
+					dt(ng-show="$place.travelInformation") Travel information
+					dd {{$place.travelInformation}}
 
-		.row.p-10
+		.row.p-b-15
 			.col-lg-12
 				h4 Location
 				#results-map

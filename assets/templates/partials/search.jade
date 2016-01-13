@@ -15,13 +15,13 @@
 							input.form-control(name="address", ng-location, ng-model="location", placeholder="Location")
 							input.hidden(name="location")
 							.input-group-btn
-								button.btn.btn-inverse Detect location
+								button.btn.btn-inverse Detect my location
 					span.inline-spacer
 					.form-group(ng-class="{'has-error': (form.$submitted || form.religions.$touched) && form.religions.$error.required}")
 						select.form-control(name="religions", ng-model="religions", required)
 							option(value="*", selected) All religions
 							option(value="{{$name}}", ng-repeat="$name in $religionsList") {{$name}}
-					button.btn.btn-md.btn-primary.pull-right(type='submit', ng-click="$searchPlaces()") Search
+					button.btn.btn-md.btn-primary(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 			.col-12(ng-hide='$message.length')
 				#results-map

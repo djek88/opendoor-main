@@ -67,6 +67,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		}
 		function setData($place) {
 			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
+			var mainMeetingTime = new Date($place.mainMeetingTime);
+			$place.mainMeetingTime = $rootScope.getTime(mainMeetingTime);
+
 			$scope.$place = $place;
 			map = $rootScope.$getMapInstance($('#results-map'));
 
@@ -120,9 +123,66 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 	}
 ]);
 
-opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope', '$location', '$http',
-	function($scope, $rootScope, $location, $http) {
-		$('.timepicker-input').timepicker({defaultTime: false});
+opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
+	function($scope, $rootScope) {
+		$scope.$additionalFieldsAreVisible = false;
+
+		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
+
+		//$.fn.select2.amd.require([
+		//	'select2/data/array',
+		//	'select2/utils'
+		//], function (ArrayData, Utils) {
+		//	function CustomData ($element, options) {
+		//		CustomData.__super__.constructor.call(this, $element, options);
+		//	}
+		//
+		//	Utils.Extend(CustomData, ArrayData);
+		//
+		//	CustomData.prototype.query = function (params, callback) {
+		//		var data = {
+		//			results: []
+		//		};
+		//		console.log(params)
+		//
+		//		//for (var i = 1; i < 5; i++) {
+		//		//	var s = "";
+		//		//
+		//		//	for (var j = 0; j < i; j++) {
+		//		//		s = s + params.term;
+		//		//	}
+		//		//
+		//		//	data.results.push({
+		//		//		id: params.term + i,
+		//		//		text: s
+		//		//	});
+		//		//}
+		//
+		//		callback(data);
+		//	};
+
+
+			$('select[name="groupName"]').select2({
+				ajax: {
+					url: '/ajax/religionGroups',
+					dataType: 'json',
+					delay: 250,
+					data: function (params) {
+						return {
+							name: params.term, // search term
+							religion: 'Christianity'
+						};
+					}
+				}
+			});
+		//});
+
+		$('input[name="denominations"]').tagit({
+			autocomplete: {
+				source: '/ajax/denominations'
+			}
+		});
+
 		$scope.$religions = $rootScope.$religions;
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
@@ -158,8 +218,10 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			if (!$scope.$message.length) {
 				map = $rootScope.$getMapInstance($('#results-map'));
 				google.maps.event.addListenerOnce(map, 'idle', function(){
+					console.log('addMarkers-idle');
 					addMarkers($scope.$places);
 				});
+				console.log('addMarkers');
 				addMarkers($scope.$places);
 			}
 		}
@@ -209,9 +271,10 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				})(marker, i);
 
 			}
-			google.maps.event.addListenerOnce(map, 'idle', function(){
-				map.fitBounds(bounds);
-			});
+			//google.maps.event.addListenerOnce(map, 'idle', function(){
+			//	map.fitBounds(bounds);
+			//	console.log('fitBounds-idle')
+			//});
 			map.fitBounds(bounds);
 		};
 
@@ -239,46 +302,66 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		$scope.$searchPlaces = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
+
+
 				var location = document.forms.form.location.value.split(',');
-				$scope.$location = [parseFloat(location[0]), parseFloat(location[1])];
 				if (location.length) {
-					$scope.$message = 'Searching…';
-					$http({
-							url: '/ajax/places/search'
-						, method: 'GET'
-						, params: {
-								lat: location[0]
-							, lng: location[1]
-							, religions: $scope.form.religions.$modelValue
-						}
-					}).
-					success(function (data, status, headers, config){
-						if (Array.isArray(data)) {
-							if (data.length) {
-								for (var i = 0; i < data.length; i++) {
-									data[i].distance = Math.round(data[i].distance);
-								}
-								$scope.$message = '';
-								$place = data[0];
-							}
-							else {
-								$scope.$message = 'There are no places nearby';
-							}
-							$scope.$places = data;
-						}
-						else {
-							$scope.$message = 'An error happened during request';
-							$scope.$places = [];
-							console.error(data);
-						}
-						createMap();
-					}).
-					error(function (data, status, headers, config) {
-						$scope.$message = 'Error processing request';
-					});
+
+					var requestParams = {
+						lat: location[0]
+						, lng: location[1]
+						, religions: $scope.form.religions.$modelValue
+					};
+
+					$location.search('lat', requestParams.lat);
+					$location.search('lng', requestParams.lng);
+					$location.search('religions', requestParams.religions);
+					$rootScope.$address = document.forms.form.address.value;
+
 				}
 			}
 		};
+
+		function validateCoordinate(val) {
+			val = parseFloat(val);
+			return (!isNaN(val) && val <= 90 && val >= -90);
+		}
+
+		var requestParams = $location.search();
+		if (validateCoordinate(requestParams.lat) && validateCoordinate(requestParams.lng)) {
+			$scope.location = $rootScope.$address || requestParams.lat + ', ' + requestParams.lng;
+			$scope.$location = [parseFloat(requestParams.lat), parseFloat(requestParams.lng)];
+			$scope.$message = 'Searching…';
+			$http({
+				url: '/ajax/places/search'
+				, method: 'GET'
+				, params: requestParams
+			}).
+			success(function (data, status, headers, config){
+				if (Array.isArray(data)) {
+					if (data.length) {
+						for (var i = 0; i < data.length; i++) {
+							data[i].distance = Math.round(data[i].distance);
+						}
+						$scope.$message = '';
+						$place = data[0];
+					}
+					else {
+						$scope.$message = 'There are no places nearby';
+					}
+					$scope.$places = data;
+				}
+				else {
+					$scope.$message = 'An error happened during request';
+					$scope.$places = [];
+					console.error(data);
+				}
+				createMap();
+			}).
+			error(function (data, status, headers, config) {
+				$scope.$message = 'Error processing request';
+			});
+		}
 
 	}
 ]);
