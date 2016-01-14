@@ -88,7 +88,7 @@ opendoorApp.run(function($rootScope) {
 				while (marker = map.markers.pop()) {
 					marker.setMap(null);
 				}
-			}
+			};
 
 			map.addMarker=function(opts){
 				opts.map = map;
@@ -118,12 +118,12 @@ opendoorApp.config(
 			, controller: 'SearchCtrl'
 		}).
 		when('/places/add', {
-			templateUrl: 'assets/templates/partials/placeadd.html'
-			, controller: 'PlaceAddCtrl'
+			templateUrl: 'assets/templates/partials/placeform.html'
+			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/edit/:id', {
-			templateUrl: 'assets/templates/partials/placeadd.html'
-			, controller: 'PlaceEditCtrl'
+			templateUrl: 'assets/templates/partials/placeform.html'
+			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/:id', {
 			templateUrl: 'assets/templates/partials/placeview.html'
@@ -141,14 +141,6 @@ opendoorApp.config(
 				templateUrl: 'assets/templates/partials/register.html'
 			, controller: 'RegisterCtrl'
 		}).
-		when('/error', {
-				templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
-		when('/message', {
-			templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
 		when('/feedback', {
 			templateUrl: 'assets/templates/partials/feedback.html'
 			, controller: 'FeedbackCtrl'
@@ -156,6 +148,14 @@ opendoorApp.config(
 		when('/about', {
 			templateUrl: 'assets/templates/partials/about.html'
 			//, controller: 'FeedbackCtrl'
+		}).
+		when('/error', {
+				templateUrl: 'assets/templates/partials/error.html'
+			, controller: 'ErrorCtrl'
+		}).
+		when('/message', {
+			templateUrl: 'assets/templates/partials/error.html'
+			, controller: 'ErrorCtrl'
 		}).
 		when('/notfound', {
 			templateUrl: 'assets/templates/partials/error.html'

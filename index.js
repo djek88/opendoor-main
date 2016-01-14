@@ -172,27 +172,13 @@ app.get('/ajax/religionGroups', function (req, res) {
 
 
 app.get('/ajax/denominations', function (req, res) {
-	var query = {};
-
-	if (req.query.term) {
-		query.name = {$regex: '.*' + req.query.term + '.*'};
-	}
-
-	if (req.query.religion) {
-		query.name = req.query.religion;
-	}
-
+	var query = req.query;
 
 	denominationManager.find(query, function(err, religionGroups){
-		console.log(religionGroups);
 		var denominations = [];
 
 		for (var i=0; i<religionGroups.length; i++) {
 			denominations.push(religionGroups[i].name);
-		}
-
-		if (!denominations.length) {
-			denominations.push(req.query.term);
 		}
 		res.send(JSON.stringify(denominations));
 	});
@@ -286,8 +272,6 @@ app.post('/places/add', function (req, res) {
 				data.mainMeetingTime = new Date(data.mainMeetingTime + ' 01.01.1970');
 			}
 			placeManager.dropUndeclaredFields(data);
-
-			console.log('after dropUndeclaredFields', data)
 			placeManager.add(data, function (err, place) {
 				if (!err) {
 					if (tempFileName) {

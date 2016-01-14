@@ -122,158 +122,30 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 	}
 ]);
 
-opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
-	function($scope, $rootScope) {
-		$scope.$additionalFieldsAreVisible = false;
-
-		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
-
-			//
-			//$('select[name="groupName"]').select2({
-			//	ajax: {
-			//		url: '/ajax/religionGroups',
-			//		dataType: 'json',
-			//		delay: 250,
-			//		data: function (params) {
-			//			return {
-			//				name: params.term,
-			//				religion: 'Christianity'
-			//			};
-			//		}
-			//	}
-			//});
-
-		$('input[name="denominations"]').tagit({
-			autocomplete: {
-				source: '/ajax/denominations'
-			}
-		});
-
-		$scope.$religions = $rootScope.$religions;
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
-	}
-]);
-
-
-
-opendoorControllers.controller('PlaceEditCtrl', ['$scope', '$rootScope', '$location', '$http',
+opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
-		$scope.$additionalFieldsAreVisible = true;
 
+		var placeId = $location.url().split('/').pop();
+		if (placeId == 'add') {
+			placeId = 0;
+		}
+		else {
+			$scope.$submitPath = '/places/edit/' + placeId;
+		}
+
+		$scope.$additionalFieldsAreVisible = true;
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 
-//
-//$.fn.select2.amd.require([
-//	'select2/data/array',
-//	'select2/utils'
-//], function (ArrayData, Utils) {
-//	var results = [];
-//	var termIsAdded = false;
-//
-//	function CustomData($element, options) {
-//		CustomData.__super__.constructor.call(this, $element, options);
-//	}
-//
-//	Utils.Extend(CustomData, ArrayData);
-//
-//	CustomData.prototype.select = function (data) {
-//		console.log('se', data);
-//		var $option = this.$element.find('option').filter(function (i, elm) {
-//			return elm.value == data.id.toString();
-//		});
-//
-//		if ($option.length === 0) {
-//			$option = this.option(data);
-//
-//			this.addOptions($option);
-//		}
-//
-//		CustomData.__super__.select.call(this, data);
-//	};
-//
-//
-//	CustomData.prototype.query = function (params, callback) {
-//		var data = {
-//			results: []
-//		};
-//		console.log(params)
-//
-//		results.pop();
-//		termIsAdded = false;
-//
-//		if (params.term) {
-//			var regExp = new RegExp(".*" + params.term + ".*");
-//		}
-//		else {
-//			var regExp = new RegExp(".*");
-//		}
-//		for (var i = 0; i<results.length; i++) {
-//			if (regExp.test(results[i].text)) {
-//				data.results.push(results[i]);
-//			}
-//		}
-//
-//		if (!data.results.length) {
-//			data.results.push({id: params.term, text: params.term});
-//			termIsAdded = true;
-//		}
-//		//for (var i = 1; i < 5; i++) {
-//		//	var s = "";
-//		//
-//		//	for (var j = 0; j < i; j++) {
-//		//		s = s + params.term;
-//		//	}
-//		//
-//		//	data.results.push({
-//		//		id: params.term + i,
-//		//		text: s
-//		//	});
-//		//}
-//
-//		console.log(data)
-//		callback(data);
-//	};
-//
-//	CustomData.prototype.current = function (callback) {
-//		$http({
-//				url: '/ajax/religionGroups'
-//			, method: 'GET'
-//		}).
-//		success(function (data){
-//			results = data.results;
-//			termIsAdded = false;
-//			callback(results);
-//		});
-//	};
-//
-//			//
-//			//$('select[name="groupName"]').select2({
-//			//	dataAdapter: CustomData
-//			//	//ajax: {
-//			//	//	url: '/ajax/religionGroups',
-//			//	//	dataType: 'json',
-//			//	//	delay: 250,
-//			//	//	data: function (params) {
-//			//	//		return {
-//			//	//			name: params.term,
-//			//	//			religion: 'Christianity'
-//			//	//		};
-//			//	//	}
-//			//	//}
-//			//});
-//		});
 
 		var $denominationsEl = $('input[name="denominations"]');
 
+		var denominations = [];
+		console.log(denominations)
 		$denominationsEl.tagit({
-			autocomplete: {
-				source: '/ajax/denominations'
-			}
+				availableTags: denominations
+			,	autocomplete: {
+						delay: 0
+				}
 		});
 
 		$scope.$religions = $rootScope.$religions;
@@ -292,19 +164,14 @@ opendoorControllers.controller('PlaceEditCtrl', ['$scope', '$rootScope', '$locat
 			style: 'form-control btn-white',
 			liveSearch: true
 		});
-
 		var $newReligionGroupOption;
 		var $bsSearchbox = $('.bs-searchbox input');
-		$bsSearchbox.on('input', function(e){
+		$bsSearchbox.on('input', function(){
 			var value = $bsSearchbox.val();
-
 			if ($newReligionGroupOption) {
 				$newReligionGroupOption.detach();
 			}
-
-
 			if (value) {
-
 				var regExp = new RegExp(".*" + RegExp.escape(value) + ".*");
 				var matchesWasFound = false;
 				for (var i = 0; i<groups.length; i++) {
@@ -332,15 +199,32 @@ opendoorControllers.controller('PlaceEditCtrl', ['$scope', '$rootScope', '$locat
 			}).
 			success(function (data){
 				$groupsEl.empty();
-				$denominationsEl.tagit('removeAll');
 				groups = data;
 				for (var i=0; i<data.length; i++) {
 					$groupsEl.append('<option value="' + data[i] + '">' + data[i] + '</option>');
-					$denominationsEl.tagit("createTag", data[i]);
 				}
 				$groupsEl.selectpicker('refresh');
-
 				$groupsEl.selectpicker('val', $scope.$place.groupName);
+			});
+
+
+			$http({
+				url: '/ajax/denominations'
+				, method: 'GET'
+				, params: {
+					religion: religion
+				}
+			}).
+			success(function (data){
+				$denominationsEl.tagit('removeAll');
+				while (denominations.pop()) {
+				}
+				for (var i=0; i<data.length; i++) {
+					denominations.push(data[i]);
+					if ($scope.$place.denominations && $scope.$place.denominations.indexOf(data[i]) != -1) {
+						$denominationsEl.tagit('createTag', data[i]);
+					}
+				}
 			});
 		}
 
@@ -355,39 +239,44 @@ opendoorControllers.controller('PlaceEditCtrl', ['$scope', '$rootScope', '$locat
 		});
 
 
-		function setData($place) {
-			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
-			var mainMeetingTime = new Date($place.mainMeetingTime);
-			$place.mainMeetingTime = $rootScope.getTime(mainMeetingTime);
+		if (placeId) {
 
-			$scope.$place = $place;
+			function setData($place) {
+				$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
+				var mainMeetingTime = new Date($place.mainMeetingTime);
+				$place.mainMeetingTime = $rootScope.getTime(mainMeetingTime);
 
-			loadOptionsForReligion($place.religion);
-			$groupsEl.selectpicker('val', $place.groupName);
-		}
+				$scope.$place = $place;
+
+				loadOptionsForReligion($place.religion);
+				$groupsEl.selectpicker('val', $place.groupName);
+			}
 
 
 
-		if ($rootScope.$selectedPlace) {
-			setData($rootScope.$selectedPlace);
+			if ($rootScope.$selectedPlace) {
+				setData($rootScope.$selectedPlace);
+			}
+			else {
+				$http({
+					url: '/ajax/places/' + placeId
+					, method: 'GET'
+				}).
+				success(function (data) {
+					if (typeof data== 'object') {
+						setData(data);
+					}
+					else {
+						$location.url('/notfound');
+					}
+				}).
+				error(function () {
+					$location.url('/notfound');
+				});
+			}
 		}
 		else {
-			var id = $location.url().split('/').pop();
-			$http({
-				url: '/ajax/places/' + id
-				, method: 'GET'
-			}).
-			success(function (data) {
-				if (typeof data== 'object') {
-					setData(data);
-				}
-				else {
-					$location.url('/notfound');
-				}
-			}).
-			error(function () {
-				$location.url('/notfound');
-			});
+			$scope.$place = {};
 		}
 	}
 ]);
