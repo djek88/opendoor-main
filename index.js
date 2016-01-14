@@ -160,25 +160,11 @@ app.get('/ajax/places/:id', function (req, res) {
 app.get('/ajax/religionGroups', function (req, res) {
 	var query = extend({}, req.query);
 
-	if (query.name) {
-		query.name = {
-			$regex : '.*' + query.name + '.*'
-		};
-	}
-
 	religionGroupManager.find(query, function(err, religionGroups){
-		var groupNames= {
-			results: []
-		};
+		var groupNames= [];
 
 		for (var i=0; i<religionGroups.length; i++) {
-			groupNames.results.push({
-					id: religionGroups[i].name
-				,	text: religionGroups[i].name
-			});
-		}
-		if (req.query.name && req.query.name.length && !religionGroups.length) {
-			groupNames.results.push({id: req.query.name, text: req.query.name});
+			groupNames.push(religionGroups[i].name);
 		}
 		res.send(JSON.stringify(groupNames));
 	});

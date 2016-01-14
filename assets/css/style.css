@@ -71,10 +71,15 @@ html, body {
 }
 
 
+.input-group-addon {
+	border: 1px solid;
+}
+
 select.form-control,
 .select2-dropdown,
 .select2-container--default .select2-selection--single,
 .tagit.ui-widget,
+.input-group-addon,
 .form-control {
 	border-color: #2A72B5!important;
 }

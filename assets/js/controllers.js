@@ -128,21 +128,20 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
 
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 
-
-			$('select[name="groupName"]').select2({
-				ajax: {
-					url: '/ajax/religionGroups',
-					dataType: 'json',
-					delay: 250,
-					data: function (params) {
-						return {
-							name: params.term,
-							religion: 'Christianity'
-						};
-					}
-				}
-			});
-		//});
+			//
+			//$('select[name="groupName"]').select2({
+			//	ajax: {
+			//		url: '/ajax/religionGroups',
+			//		dataType: 'json',
+			//		delay: 250,
+			//		data: function (params) {
+			//			return {
+			//				name: params.term,
+			//				religion: 'Christianity'
+			//			};
+			//		}
+			//	}
+			//});
 
 		$('input[name="denominations"]').tagit({
 			autocomplete: {
@@ -159,6 +158,240 @@ opendoorControllers.controller('PlaceAddCtrl', ['$scope', '$rootScope',
 		};
 	}
 ]);
+
+
+
+opendoorControllers.controller('PlaceEditCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		$scope.$additionalFieldsAreVisible = true;
+
+		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
+
+//
+//$.fn.select2.amd.require([
+//	'select2/data/array',
+//	'select2/utils'
+//], function (ArrayData, Utils) {
+//	var results = [];
+//	var termIsAdded = false;
+//
+//	function CustomData($element, options) {
+//		CustomData.__super__.constructor.call(this, $element, options);
+//	}
+//
+//	Utils.Extend(CustomData, ArrayData);
+//
+//	CustomData.prototype.select = function (data) {
+//		console.log('se', data);
+//		var $option = this.$element.find('option').filter(function (i, elm) {
+//			return elm.value == data.id.toString();
+//		});
+//
+//		if ($option.length === 0) {
+//			$option = this.option(data);
+//
+//			this.addOptions($option);
+//		}
+//
+//		CustomData.__super__.select.call(this, data);
+//	};
+//
+//
+//	CustomData.prototype.query = function (params, callback) {
+//		var data = {
+//			results: []
+//		};
+//		console.log(params)
+//
+//		results.pop();
+//		termIsAdded = false;
+//
+//		if (params.term) {
+//			var regExp = new RegExp(".*" + params.term + ".*");
+//		}
+//		else {
+//			var regExp = new RegExp(".*");
+//		}
+//		for (var i = 0; i<results.length; i++) {
+//			if (regExp.test(results[i].text)) {
+//				data.results.push(results[i]);
+//			}
+//		}
+//
+//		if (!data.results.length) {
+//			data.results.push({id: params.term, text: params.term});
+//			termIsAdded = true;
+//		}
+//		//for (var i = 1; i < 5; i++) {
+//		//	var s = "";
+//		//
+//		//	for (var j = 0; j < i; j++) {
+//		//		s = s + params.term;
+//		//	}
+//		//
+//		//	data.results.push({
+//		//		id: params.term + i,
+//		//		text: s
+//		//	});
+//		//}
+//
+//		console.log(data)
+//		callback(data);
+//	};
+//
+//	CustomData.prototype.current = function (callback) {
+//		$http({
+//				url: '/ajax/religionGroups'
+//			, method: 'GET'
+//		}).
+//		success(function (data){
+//			results = data.results;
+//			termIsAdded = false;
+//			callback(results);
+//		});
+//	};
+//
+//			//
+//			//$('select[name="groupName"]').select2({
+//			//	dataAdapter: CustomData
+//			//	//ajax: {
+//			//	//	url: '/ajax/religionGroups',
+//			//	//	dataType: 'json',
+//			//	//	delay: 250,
+//			//	//	data: function (params) {
+//			//	//		return {
+//			//	//			name: params.term,
+//			//	//			religion: 'Christianity'
+//			//	//		};
+//			//	//	}
+//			//	//}
+//			//});
+//		});
+
+		var $denominationsEl = $('input[name="denominations"]');
+
+		$denominationsEl.tagit({
+			autocomplete: {
+				source: '/ajax/denominations'
+			}
+		});
+
+		$scope.$religions = $rootScope.$religions;
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
+
+
+
+		var groups;
+		var $groupsEl = $('select[name="groupName"]');
+		$groupsEl.selectpicker({
+			style: 'form-control btn-white',
+			liveSearch: true
+		});
+
+		var $newReligionGroupOption;
+		var $bsSearchbox = $('.bs-searchbox input');
+		$bsSearchbox.on('input', function(e){
+			var value = $bsSearchbox.val();
+
+			if ($newReligionGroupOption) {
+				$newReligionGroupOption.detach();
+			}
+
+
+			if (value) {
+
+				var regExp = new RegExp(".*" + RegExp.escape(value) + ".*");
+				var matchesWasFound = false;
+				for (var i = 0; i<groups.length; i++) {
+					if (regExp.test(groups[i])) {
+						matchesWasFound = true;
+						break;
+					}
+				}
+				if (!matchesWasFound) {
+					$newReligionGroupOption = $('<option value="' + value + '">' + value + '</option>');
+					$groupsEl.append($newReligionGroupOption)
+				}
+			}
+			$groupsEl.selectpicker('refresh');
+		});
+
+
+		function loadOptionsForReligion(religion) {
+			$http({
+				url: '/ajax/religionGroups'
+				, method: 'GET'
+				, params: {
+					religion: religion
+				}
+			}).
+			success(function (data){
+				$groupsEl.empty();
+				$denominationsEl.tagit('removeAll');
+				groups = data;
+				for (var i=0; i<data.length; i++) {
+					$groupsEl.append('<option value="' + data[i] + '">' + data[i] + '</option>');
+					$denominationsEl.tagit("createTag", data[i]);
+				}
+				$groupsEl.selectpicker('refresh');
+
+				$groupsEl.selectpicker('val', $scope.$place.groupName);
+			});
+		}
+
+
+		var $religionEl = $('select[name="religion"]');
+		$religionEl.on('change', function(){
+			loadOptionsForReligion($religionEl.val());
+		});
+
+		$groupsEl.on('change', function(){
+			$scope.$place.groupName = $groupsEl.val();
+		});
+
+
+		function setData($place) {
+			$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
+			var mainMeetingTime = new Date($place.mainMeetingTime);
+			$place.mainMeetingTime = $rootScope.getTime(mainMeetingTime);
+
+			$scope.$place = $place;
+
+			loadOptionsForReligion($place.religion);
+			$groupsEl.selectpicker('val', $place.groupName);
+		}
+
+
+
+		if ($rootScope.$selectedPlace) {
+			setData($rootScope.$selectedPlace);
+		}
+		else {
+			var id = $location.url().split('/').pop();
+			$http({
+				url: '/ajax/places/' + id
+				, method: 'GET'
+			}).
+			success(function (data) {
+				if (typeof data== 'object') {
+					setData(data);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function () {
+				$location.url('/notfound');
+			});
+		}
+	}
+]);
+
 
 opendoorControllers.controller('ReviewAddCtrl', ['$scope',
 	function($scope) {

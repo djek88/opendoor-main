@@ -2,6 +2,10 @@
  *
  * Created by Vavooon on 17.12.2015.
  */
+
+
+
+
 var opendoorApp = angular.module('opendoorApp', [
 	'ngRoute',
 	'ngCookies',
@@ -69,7 +73,7 @@ opendoorApp.run(function($rootScope) {
 		}
 		formattedTime += date.getMinutes();
 		return formattedTime;
-	}
+	};
 
 
 	$rootScope.$getMapInstance = function(targetEl) {
@@ -116,6 +120,10 @@ opendoorApp.config(
 		when('/places/add', {
 			templateUrl: 'assets/templates/partials/placeadd.html'
 			, controller: 'PlaceAddCtrl'
+		}).
+		when('/places/edit/:id', {
+			templateUrl: 'assets/templates/partials/placeadd.html'
+			, controller: 'PlaceEditCtrl'
 		}).
 		when('/places/:id', {
 			templateUrl: 'assets/templates/partials/placeview.html'
