@@ -93,6 +93,27 @@ module.exports = function(mongoose) {
 			});
 		};
 
+		this.update = function(id, data, callback) {
+			var place = (new Place(data)).toObject();
+			delete place._id;
+			var religionGroup = {name: place.groupName, religion: place.religion};
+			religionGroupManager.find(religionGroup, function(err, religionGroups){
+				if (!err && !religionGroups.length) {
+					global.religionGroupManager.add(religionGroup);
+					console.log('add religionGroup', religionGroup);
+				}
+			});
+
+			global.denominationManager.addIfNotExists(place.denominations, place.religion);
+
+			console.log('findOneAndUpdate', {_id: id}, place)
+			Place.findOneAndUpdate({_id: id}, place, function(err, place){
+				if (typeof callback == 'function') {
+					callback(err, place);
+				}
+			});
+		};
+
 		this.findNearby = function(data, callback) {
 			var options = [
 				{
@@ -132,12 +153,19 @@ module.exports = function(mongoose) {
 				function(err, places) {
 					callback(err, places);
 				});
-		}
+		};
 
 		this.markAsConfirmed = function(id, callback) {
 			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true},
 				function(err, places) {
 					callback(err, places);
+				});
+		}
+
+		this.addReview = function(id, data, callback) {
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)},
+				function(err, place) {
+					console.log(place);
 				});
 		}
 

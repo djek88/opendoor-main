@@ -15,6 +15,8 @@ var busboy = require('connect-busboy');
 var jade = require('jade');
 
 
+var getUniqueFileName = require('./app/utils.js').getUniqueFileName;
+
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
 
@@ -226,70 +228,63 @@ app.post('/feedback', function (req, res) {
 	res.end();
 });
 
-app.post('/places/add', function (req, res) {
+app.post(['/places/add', '/places/edit/:id'], function (req, res) {
+	var isAdding = !req.params.id;
 	var fields = {};
-	var imagesPath =__dirname + '/photos/';
-	var fileExt = null;
-	var tempFileName = null;
-	var state = 0;
+	var imagesPath = '/photos/';
+	var files = {};
+
+	var allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
+	var allowedFileExtensions = ['jpg', 'png'];
 
 	function finishRequest(id) {
-		var userMail = req.session.email;
-		var mailText = 'Thank you for adding a place!\n' +
+		if (isAdding){
+			var userMail = req.session.email;
+			var mailText = 'Thank you for adding a place!\n' +
 				'Please confirm it by passing the link: ' +
 				config.url + '/places/confirm/' + id;
-		var mailOptions = {
-			from: config.mailConfig.senderAddress, // sender address
-			to: userMail, // list of receivers
-			subject: 'Place confirmation', // Subject line
-			text: mailText
-		};
+			var mailOptions = {
+				from: config.mailConfig.senderAddress,
+				to: userMail,
+				subject: 'Place confirmation',
+				text: mailText
+			};
 
-		// send mail with defined transport object
-		transporter.sendMail(mailOptions, function(error, info){
-			if(error){
-				return console.log(error);
-			}
-			console.log('Message sent: ' + info.response);
+			transporter.sendMail(mailOptions, function(error, info){
+				if(error){
+					return console.log(error);
+				}
+				console.log('Message sent: ' + info.response);
 
-		});
-		res.redirect('/message?message=placeadded');
+			});
+			res.redirect('/message?message=placeadded');
+		}
+		else {
+			res.redirect('/message?message=placesaved');
+		}
 		res.end();
 	}
 
-	function addPlace() {
-		state++;
-		if (state == 2) {
-			var data = extend({}, fields);
-			data.location = {coordinates: fields.location.split(',')};
-			data.isConfirmed = false;
+	function storePlace() {
+		var data = extend({}, fields);
+		var data = extend(data, files);
+		data.location = {coordinates: fields.location.split(',')};
+		data.isConfirmed = false;
 
-			if (data.denominations) {
-				data.denominations = data.denominations.split(',');
-			}
+		if (data.denominations) {
+			data.denominations = data.denominations.split(',');
+		}
 
-			if (data.mainMeetingTime) {
-				data.mainMeetingTime = new Date(data.mainMeetingTime + ' 01.01.1970');
-			}
-			placeManager.dropUndeclaredFields(data);
-			placeManager.add(data, function (err, place) {
-				if (!err) {
-					if (tempFileName) {
-						fs.rename(tempFileName, imagesPath + place._id + place.photoExt, function (err) {
-							console.log('renamed');
-							finishRequest(place._id);
-						});
-					}
-					else {
-						console.log('saved without photo');
-						finishRequest(place._id);
-					}
-				}
-				else {
-					console.log(err.stack);
-					res.end();
-				}
-			});
+		if (data.mainMeetingTime) {
+			data.mainMeetingTime = new Date(data.mainMeetingTime + ' 01.01.1970');
+		}
+
+		placeManager.dropUndeclaredFields(data);
+		if (isAdding) {
+			placeManager.add(data, finishRequest);
+		}
+		else {
+			placeManager.update(req.params.id, data, finishRequest);
 		}
 	}
 
@@ -297,25 +292,48 @@ app.post('/places/add', function (req, res) {
 	if (req.busboy) {
 		req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
 			if (filename.length) {
-				fileExt = '.' + filename.split('.').pop();
-				tempFileName = imagesPath + Date.now() + fileExt;
-				var fstream = fs.createWriteStream(tempFileName);
-				file.pipe(fstream);
-				fstream.on('close', addPlace);
-			}
-			else {
-				addPlace();
+				var extension = filename.toLowerCase().split('.').pop();
+				if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
+					var imgFileName = files[fieldname] = imagesPath + getUniqueFileName() + '.' + extension;
+					var fstream = fs.createWriteStream(__dirname + imgFileName);
+					file.pipe(fstream);
+				}
+				else {
+					console.warn('wrong extendion or field name:', fieldname, extension);
+				}
 			}
 			file.resume();
 		});
-		req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
+		req.busboy.on('field', function(key, value) {
 			fields[key] = value;
 		});
-		req.busboy.on('finish', addPlace);
+		req.busboy.on('finish', storePlace);
+	}
+	else {
+		res.end();
 	}
 });
 
 
+app.get('/places/review/:id', function (req, res) {
+	if (req.session.email) {
+		var id = req.params.id;
+		var data = req.query;
+		data.email = req.session.email;
+		placeManager.dropUndeclaredFields(data);
+		console.log(data);
+		placeManager.addReview(id, data, function(err, place){
+			console.log (err ,place);
+			if (!err && place) {
+				console.log('Review for place ' + id + ' was added');
+				res.redirect('/message?message=reviewsaved');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
 
 app.get('/places/confirm/:id', function (req, res) {
 	var id = req.params.id;

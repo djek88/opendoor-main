@@ -3,7 +3,7 @@
  * Created by Vavooon on 17.12.2015.
  */
 
-
+var titlePostfix = ' - OpenDoor';
 
 
 var opendoorApp = angular.module('opendoorApp', [
@@ -26,15 +26,13 @@ opendoorApp.directive('ngLocation', function() {
 				options.locationField = $element.next();
 			}
 			$element.locationpicker(options);
-
-			ctrl.$setValidity('valid', false);
-
 			function customValidator(ngModelValue) {
 				ctrl.$setValidity('valid', !!$element.val());
 				return ngModelValue;
 			}
+			customValidator();
 			ctrl.$parsers.push(customValidator);
-
+			scope.$watch(attr['ngModel'], customValidator);
 		}
 	};
 });
@@ -109,56 +107,75 @@ opendoorApp.config(['$httpProvider', function($httpProvider) {
 	$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }]);
 
+
+opendoorApp.run(['$rootScope', '$route', function($rootScope, $route) {
+	$rootScope.$on('$routeChangeSuccess', function() {
+		document.title = $route.current.title + titlePostfix;
+	});
+}]);
+
 opendoorApp.config(
 	function($locationProvider, $routeProvider) {
 		$locationProvider.html5Mode(true);
 		$routeProvider.
 		when('/', {
-			templateUrl: 'assets/templates/partials/search.html'
+				title: 'Find nearest places'
+			,	templateUrl: 'assets/templates/partials/search.html'
 			, controller: 'SearchCtrl'
 		}).
 		when('/places/add', {
-			templateUrl: 'assets/templates/partials/placeform.html'
+				title: 'Add place'
+			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/edit/:id', {
-			templateUrl: 'assets/templates/partials/placeform.html'
+				title: 'Edit place'
+			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/:id', {
-			templateUrl: 'assets/templates/partials/placeview.html'
+				title: 'View place'
+			,	templateUrl: 'assets/templates/partials/placeview.html'
 			, controller: 'PlaceViewCtrl'
 		}).
 		when('/places/review/:id', {
-			templateUrl: 'assets/templates/partials/reviewadd.html'
+				title: 'Add review'
+			,	templateUrl: 'assets/templates/partials/reviewadd.html'
 			, controller: 'ReviewAddCtrl'
 		}).
 		when('/login', {
-			templateUrl: 'assets/templates/partials/login.html'
+				title: 'Login'
+			,	templateUrl: 'assets/templates/partials/login.html'
 			, controller: 'LoginCtrl'
 		}).
 		when('/register', {
-				templateUrl: 'assets/templates/partials/register.html'
+				title: 'Register'
+			,	templateUrl: 'assets/templates/partials/register.html'
 			, controller: 'RegisterCtrl'
 		}).
 		when('/feedback', {
-			templateUrl: 'assets/templates/partials/feedback.html'
+				title: 'Leave feedback'
+			,	templateUrl: 'assets/templates/partials/feedback.html'
 			, controller: 'FeedbackCtrl'
 		}).
 		when('/about', {
-			templateUrl: 'assets/templates/partials/about.html'
+				title: 'About'
+			,	templateUrl: 'assets/templates/partials/about.html'
 			//, controller: 'FeedbackCtrl'
 		}).
 		when('/error', {
-				templateUrl: 'assets/templates/partials/error.html'
+				title: 'Error'
+			,	templateUrl: 'assets/templates/partials/error.html'
 			, controller: 'ErrorCtrl'
 		}).
 		when('/message', {
-			templateUrl: 'assets/templates/partials/error.html'
+				title: 'Server message'
+			,	templateUrl: 'assets/templates/partials/error.html'
 			, controller: 'ErrorCtrl'
 		}).
 		when('/notfound', {
-			templateUrl: 'assets/templates/partials/error.html'
+			title: 'Not found'
+			,	templateUrl: 'assets/templates/partials/error.html'
 			, controller: 'ErrorCtrl'
 		}).
 		otherwise({

@@ -7,8 +7,7 @@ function AbstractManager() {
 			throw new Error('Manager should contain this.fields property');
 		}
 		for (var i in fields) {
-			if(!this.fields.hasOwnProperty(i) ||
-				(typeof fields[i] == 'string' && !fields[i].length)) {
+			if(!this.fields.hasOwnProperty(i)) {
 				delete fields[i];
 			}
 		}

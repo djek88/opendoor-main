@@ -1,6 +1,7 @@
 #content.content
 	.container.bg-white.p-t-10
-		h3.text-center.m-b-30 Add a new Place of Worship
+		h3.text-center.m-b-30(ng-hide="$edit") Add a new Place of Worship
+		h3.text-center.m-b-30(ng-show="$edit") Edit place
 		form.form-horizontal(method="POST", action="{{$submitPath}}", novalidate, name="form", enctype="multipart/form-data")
 			// Main info
 			.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
@@ -22,7 +23,7 @@
 				.col-md-9
 					.input-group.location-picker
 						input.form-control(name="address", ng-location, ng-model="$place.address")
-						input.hidden(name="location")
+						input.hidden(name="location", ng-model="$place.location.coordinates")
 						.input-group-btn
 							button.btn.btn-inverse Detect my location
 

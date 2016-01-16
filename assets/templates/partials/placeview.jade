@@ -1,13 +1,45 @@
 #content.content
 	.container.bg-white
-		.row.p-10
-			.col-lg-6(ng-show="$place.photoExt")
-				img.place-photo.center-block(ng-src="{{$imageSrc}}")
-			.col-lg-6
-				h3 {{$place.name}}
+		.row.p-l-40.p-r-40
+			.col-sm-8
+				h1 {{$place.name}}
+			.col-sm-4.text-right
+				h3 {{$place.religion}}
+					span(ng-show="$place.groupName") , {{$place.groupName}}
+				h4(ng-show="$place.denominations.length") {{$place.denominations.join(', ')}}
+
+		.row
+			.place-photo-wrap
+				img.place-photo(ng-src="{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
+			.leader-photo-wrap
+				img.leader-photo(ng-src="{{$place.leaderPhoto}}", ng-show="$place.leaderPhoto")
+			h4.leader-title {{$place.leaderRole}} {{$place.leaderName}}
+		.row
+			.col-sm-12.p-l-40
+				a.btn.btn-primary(href="/places/edit/{{$placeId}}") Edit place
+		.row.p-40
+			#contacts-block.col-sm-6
+				h3 Contacts
+				div
+					.fa.fa-home
+					|  {{$place.address}}
+				div
+					.fa.fa-phone
+					|  {{$place.phone}}
+				div
+					.fa.fa-link
+					a(href="http://{{$place.url}}")  {{$place.url}}
+				div
+
+		.row.p-40
+			.col-lg-12
+				h3 About
+				p {{$place.about}}
+				h3 Travel information
+				p {{$place.travelInformation}}
+
+			.col-lg-12.p-l-40.p-r-40.hidden
 				dl
-					dt(ng-show="$place.religion") Religion
-					dd {{$place.religion}}
 					dt(ng-show="$place.groupName") Group name
 					dd {{$place.groupName}}
 					dt(ng-show="$place.address") Address
@@ -26,12 +58,10 @@
 					dd {{$place.mainMeetingDay}}
 					dt(ng-show="$place.mainMeetingTime") Main meeting time
 					dd {{$place.mainMeetingTime}}
-					dt(ng-show="$place.about") About
-					dd {{$place.about}}
-					dt(ng-show="$place.travelInformation") Travel information
-					dd {{$place.travelInformation}}
-
-		.row.p-b-15
+		.row
 			.col-lg-12
-				h4 Location
-				#results-map
+				h3.p-40.p-b-10 Location
+			#results-map
+		.row
+			.col-lg-12.p-l-40.p-r-40(ng-controller="ReviewAddCtrl")
+				ng-include(src="'assets/templates/partials/reviewadd.html'")

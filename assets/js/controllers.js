@@ -56,6 +56,9 @@ opendoorControllers.controller('ToolbarCtrl', ['$scope', '$cookies',
 
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
+		console.log($scope)
+		var placeId = $location.url().split('/').pop();
+		$scope.$placeId = placeId;
 		var userPosition = 0;
 		var map;
 		function addUserPositionMarker() {
@@ -124,8 +127,18 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
+		console.log($scope)
+
+		var denominations = [];
+		var groups;
+		var $denominationsEl = $('input[name="denominations"]');
+		var $groupsEl = $('select[name="groupName"]');
+		var $religionEl = $('select[name="religion"]');
+		var $newReligionGroupOption;
+
 
 		var placeId = $location.url().split('/').pop();
+
 		if (placeId == 'add') {
 			placeId = 0;
 		}
@@ -137,10 +150,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 
 
-		var $denominationsEl = $('input[name="denominations"]');
 
-		var denominations = [];
-		console.log(denominations)
 		$denominationsEl.tagit({
 				availableTags: denominations
 			,	autocomplete: {
@@ -156,15 +166,10 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 		};
 
-
-
-		var groups;
-		var $groupsEl = $('select[name="groupName"]');
 		$groupsEl.selectpicker({
 			style: 'form-control btn-white',
 			liveSearch: true
 		});
-		var $newReligionGroupOption;
 		var $bsSearchbox = $('.bs-searchbox input');
 		$bsSearchbox.on('input', function(){
 			var value = $bsSearchbox.val();
@@ -229,7 +234,6 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		}
 
 
-		var $religionEl = $('select[name="religion"]');
 		$religionEl.on('change', function(){
 			loadOptionsForReligion($religionEl.val());
 		});
@@ -240,7 +244,8 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 
 		if (placeId) {
-
+			$scope.$edit = true;
+			$scope.$mode = 'edit';
 			function setData($place) {
 				$scope.$imageSrc = 'photos/' + $place._id + $place.photoExt;
 				var mainMeetingTime = new Date($place.mainMeetingTime);
@@ -276,6 +281,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 		}
 		else {
+			$scope.$mode = 'add';
 			$scope.$place = {};
 		}
 	}
@@ -285,6 +291,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 opendoorControllers.controller('ReviewAddCtrl', ['$scope',
 	function($scope) {
 		$scope.submitForm = function() {
+			console.log($scope)
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
 				document.forms.form.submit();
@@ -502,10 +509,20 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertTitle = 'Your message has been received';
 				$scope.$alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
 				break;
+			case 'reviewsaved':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Your review has been saved';
+				$scope.$alertMessage = 'Thank you for taking the time to place a review.';
+				break;
 			case 'placeadded':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Success';
 				$scope.$alertMessage = 'Place was added successfully. Confirmation link was sent to your mail';
+				break;
+			case 'placesaved':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Place was saved successfully.';
 				break;
 			case 'placeconfirmed':
 				$scope.$alertType = 'info';
