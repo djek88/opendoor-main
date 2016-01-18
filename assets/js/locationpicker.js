@@ -3,21 +3,20 @@
  */
 $.fn.locationpicker = function(options) {
 	var defaults = {
-			autoDetect: false
-		, locationField: null
 	}
 	options = $.extend({}, defaults, options);
 	var geocoder = new google.maps.Geocoder();
+
+	var $rootEl = this;
+	var $inputEl = $('.location-picker-address', this);
+	var $coordsEl = $('.location-picker-location', this);
+	var $autoDetectEl = $('.location-picker-detect-button', this);
 	var $resultsEl = $('<div class="location-picker-results"></div>');
-	var $rootEl = this.parent();
-	var $inputEl = this;
-	var $autoDetectEl = $('button', $rootEl);
+
 	var location = null;
 
 
-	// This hack makes coordinates available in form
 
-	var $coordsEl = options.locationField;
 	function showResults() {
 		$rootEl.addClass('location-picker-active');
 		var offset = $inputEl.offset();
@@ -38,7 +37,7 @@ $.fn.locationpicker = function(options) {
 			$inputEl.val(location.formatted_address);
 			var locationArray = [location.geometry.location.lat(), location.geometry.location.lng()];
 			if ($coordsEl) {
-				$coordsEl.val(locationArray.join(','));
+				$coordsEl.val(locationArray.join(', '));
 			}
 		}
 		else {
@@ -63,6 +62,7 @@ $.fn.locationpicker = function(options) {
 	}
 	$inputEl.keypress(function(e){
 		if(e.which == 13) {
+			e.stopPropagation();
 			geocoder.geocode({'address': $inputEl.val()}, function (results, status) {
 				if (status === google.maps.GeocoderStatus.OK) {
 					$resultsEl.empty();

@@ -15,8 +15,6 @@ var busboy = require('connect-busboy');
 var jade = require('jade');
 
 
-var getUniqueFileName = require('./app/utils.js').getUniqueFileName;
-
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
 
@@ -82,17 +80,14 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
-	if (req.session.id) {
+	if (req.session.user) {
 		res.redirect('/');
 	}
 	else {
-
 		if(req.body.email && req.body.password) {
-			userManager.find({email: req.body.email, password: sha1(req.body.password)}, function (err, users) {
-				if (users.length) {
-					var user = users[0];
-					req.session.id = user._id;
-					req.session.email = user.email;
+			userManager.findOne({email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
+				if (user) {
+					req.session.user = user;
 					res.cookie('email', user.email);
 					res.redirect('/');
 				}
@@ -105,19 +100,18 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
-	delete req.session.id;
-	delete req.session.email;
+	delete req.session.user;
 	res.clearCookie('email');
 	res.redirect('/');
 });
 
 app.post('/register', function (req, res) {
-	if (req.session.id) {
+	if (req.session.user) {
 		res.redirect('/');
 	}
 	else {
 		if(req.body.email && req.body.password) {
-			userManager.register({email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
+			userManager.register({name: req.body.name, email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
 				if (err) {
 					switch (err.message) {
 						case 'alreadyregistered':
@@ -163,12 +157,7 @@ app.get('/ajax/religionGroups', function (req, res) {
 	var query = extend({}, req.query);
 
 	religionGroupManager.find(query, function(err, religionGroups){
-		var groupNames= [];
-
-		for (var i=0; i<religionGroups.length; i++) {
-			groupNames.push(religionGroups[i].name);
-		}
-		res.send(JSON.stringify(groupNames));
+		res.send(JSON.stringify(religionGroups));
 	});
 });
 
@@ -176,12 +165,7 @@ app.get('/ajax/religionGroups', function (req, res) {
 app.get('/ajax/denominations', function (req, res) {
 	var query = req.query;
 
-	denominationManager.find(query, function(err, religionGroups){
-		var denominations = [];
-
-		for (var i=0; i<religionGroups.length; i++) {
-			denominations.push(religionGroups[i].name);
-		}
+	denominationManager.find(query, function(err, denominations){
 		res.send(JSON.stringify(denominations));
 	});
 });
@@ -205,15 +189,15 @@ app.post('/feedback', function (req, res) {
 											'\nEmail: ' + req.body.email +
 											'\nTarget page: ' + req.body.target +
 											'\nNote: ' + req.body.note;
+
 			var mailOptions = {
-				from: config.mailConfig.senderAddress, // sender address
-				to: adminEmails.join(', '), // list of receivers
-				subject: 'Feedback about OpenDoor', // Subject line
+				from: config.mailConfig.senderAddress,
+				to: adminEmails.join(', '),
+				subject: 'Feedback about OpenDoor',
 				text: mailText
 				//html: '<b>Hello world ✔</b>' // html body
 			};
 
-			// send mail with defined transport object
 			transporter.sendMail(mailOptions, function(error, info){
 				if(error){
 					return console.log(error);
@@ -229,6 +213,10 @@ app.post('/feedback', function (req, res) {
 });
 
 app.post(['/places/add', '/places/edit/:id'], function (req, res) {
+	if (!req.session.user) {
+		return res.end();
+	}
+	var id = mongoose.Types.ObjectId();
 	var isAdding = !req.params.id;
 	var fields = {};
 	var imagesPath = '/photos/';
@@ -237,9 +225,9 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 	var allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
 	var allowedFileExtensions = ['jpg', 'png'];
 
-	function finishRequest(id) {
+	function finishRequest() {
 		if (isAdding){
-			var userMail = req.session.email;
+			var userMail = req.session.user.email;
 			var mailText = 'Thank you for adding a place!\n' +
 				'Please confirm it by passing the link: ' +
 				config.url + '/places/confirm/' + id;
@@ -266,25 +254,26 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 	}
 
 	function storePlace() {
-		var data = extend({}, fields);
-		var data = extend(data, files);
-		data.location = {coordinates: fields.location.split(',')};
-		data.isConfirmed = false;
+		var place = extend({}, fields);
+		place = extend(place, files);
+		place.location = {coordinates: fields.location.split(',')};
+		place.isConfirmed = false;
+		place.maintainerName = req.session.user.name;
 
-		if (data.denominations) {
-			data.denominations = data.denominations.split(',');
+		if (place.denominations) {
+			place.denominations = place.denominations.split(',');
 		}
 
-		if (data.mainMeetingTime) {
-			data.mainMeetingTime = new Date(data.mainMeetingTime + ' 01.01.1970');
+		if (place.mainMeetingTime) {
+			place.mainMeetingTime = new Date(place.mainMeetingTime + ' 01.01.1970');
 		}
 
-		placeManager.dropUndeclaredFields(data);
 		if (isAdding) {
-			placeManager.add(data, finishRequest);
+			place._id = id;
+			placeManager.add(place, finishRequest);
 		}
 		else {
-			placeManager.update(req.params.id, data, finishRequest);
+			placeManager.update(req.params.id, place, finishRequest);
 		}
 	}
 
@@ -294,7 +283,7 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 			if (filename.length) {
 				var extension = filename.toLowerCase().split('.').pop();
 				if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
-					var imgFileName = files[fieldname] = imagesPath + getUniqueFileName() + '.' + extension;
+					var imgFileName = files[fieldname] = imagesPath + id + '_' + fieldname + '.' + extension;
 					var fstream = fs.createWriteStream(__dirname + imgFileName);
 					file.pipe(fstream);
 				}
@@ -315,15 +304,16 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 });
 
 
-app.get('/places/review/:id', function (req, res) {
-	if (req.session.email) {
+app.post('/places/review/:id', function (req, res) {
+	if (req.session.user) {
 		var id = req.params.id;
-		var data = req.query;
-		data.email = req.session.email;
-		placeManager.dropUndeclaredFields(data);
-		console.log(data);
+		var data = {
+				rating: req.body.rating
+			,	text: req.body.text
+			,	name: req.session.user.name
+		};
+
 		placeManager.addReview(id, data, function(err, place){
-			console.log (err ,place);
 			if (!err && place) {
 				console.log('Review for place ' + id + ' was added');
 				res.redirect('/message?message=reviewsaved');
@@ -335,10 +325,47 @@ app.get('/places/review/:id', function (req, res) {
 	}
 });
 
+app.post('/places/message', function (req, res) {
+	var id = req.body.id;
+	var data = {
+		subject: req.body.subject
+		,	text: req.body.text
+	};
+
+	if (req.session.user) {
+		var senderEmail = req.session.user.email;
+	}
+	else {
+		var senderEmail = req.body.email;
+	}
+
+	placeManager.findOne({_id: id}, function(err, place) {
+		if (place && place.email) {
+			var mailText = 'Sender: ' + senderEmail + '\n' +
+					'Subject: ' + data.subject + '\n' +
+					'Message: ' + data.text;
+			var mailOptions = {
+				from: config.mailConfig.senderAddress,
+				to: place.email,
+				subject: 'Message from OpenDoor.ooo',
+				text: mailText
+			};
+
+
+			transporter.sendMail(mailOptions, function(error, info){
+				if(error){
+					return console.log(error);
+				}
+				console.log('Message sent: ' + info.response);
+				res.redirect('/message?message=messagesent');
+			});
+		}
+	});
+});
+
 app.get('/places/confirm/:id', function (req, res) {
 	var id = req.params.id;
 	placeManager.markAsConfirmed(id, function(err, place){
-		console.log (err ,place);
 		if (!err && place) {
 			console.log('Place with ' + id + ' was confirmed');
 			res.redirect('/message?message=placeconfirmed');

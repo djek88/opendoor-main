@@ -1,7 +1,7 @@
 #content.content
 	.container
 		.row
-			.col-12
+			.col-lg-12
 				form.form-inline(name="form")
 					//.form-group
 					//	//label.control-label Location
@@ -12,27 +12,29 @@
 					//			button.btn.btn-inverse(type='button') Detect location
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
 						.input-group.location-picker
-							input.form-control(name="address", ng-location, ng-model="location", placeholder="Location")
-							input.hidden(name="location")
+							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off")
+							input.location-picker-location.hidden(name="location", ng-model="location")
 							.input-group-btn
-								button.btn.btn-inverse Detect my location
+								button.location-picker-detect-button.btn.btn-inverse Detect my location
 					span.inline-spacer
-					.form-group(ng-class="{'has-error': (form.$submitted || form.religions.$touched) && form.religions.$error.required}")
-						select.form-control(name="religions", ng-model="religions", required)
+					.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
+						select.form-control(name="religion", ng-model="religion", required)
 							option(value="*", selected) All religions
 							option(value="{{$name}}", ng-repeat="$name in $religionsList") {{$name}}
 					button.btn.btn-md.btn-primary(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
-			.col-12(ng-hide='$message.length')
+		.row
+			.col-lg-12(ng-hide='$message.length')
 				#results-map
-			.col-12.m-t-40
+		.row
+			.col-lg-12.m-t-40
 				h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
 				.table-wrap.bg-white(ng-show='$places.length')
 					table#search-table.table
 						thead
 							tr
 								th Name
-								th.hidden-sm-down Faith
+								th.hidden-sm-down Religion
 								th Distance
 								th
 						tbody

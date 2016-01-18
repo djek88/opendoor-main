@@ -18,6 +18,7 @@ opendoorApp.directive('ngLocation', function() {
 		require: 'ngModel',
 
 		link: function(scope, element, attr, ctrl) {
+			console.log('link')
 			var $element = $(element);
 			var options = {
 				autoDetect: !!attr.ngLocationAutodetect
@@ -58,21 +59,6 @@ opendoorApp.run(function($rootScope) {
 	,	'Tenriism'
 	];
 
-	$rootScope.getTime = function(date) {
-		var formattedTime = '';
-		if (date.getHours() < 10) {
-			formattedTime += '0';
-		}
-		formattedTime += date.getHours();
-		formattedTime += ':';
-
-		if (date.getMinutes() < 10) {
-			formattedTime += '0';
-		}
-		formattedTime += date.getMinutes();
-		return formattedTime;
-	};
-
 
 	$rootScope.$getMapInstance = function(targetEl) {
 		if (!$rootScope.$map) {
@@ -108,10 +94,15 @@ opendoorApp.config(['$httpProvider', function($httpProvider) {
 }]);
 
 
-opendoorApp.run(['$rootScope', '$route', function($rootScope, $route) {
+opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route, $cookies) {
 	$rootScope.$on('$routeChangeSuccess', function() {
 		document.title = $route.current.title + titlePostfix;
 	});
+
+	$rootScope.$email = $cookies.get('email');
+	$rootScope.$isLoggedIn = !!$rootScope.$email;
+
+	console.log($rootScope.$email)
 }]);
 
 opendoorApp.config(
@@ -141,7 +132,7 @@ opendoorApp.config(
 		when('/places/review/:id', {
 				title: 'Add review'
 			,	templateUrl: 'assets/templates/partials/reviewadd.html'
-			, controller: 'ReviewAddCtrl'
+			, controller: 'FormCtrl'
 		}).
 		when('/login', {
 				title: 'Login'

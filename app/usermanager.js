@@ -20,9 +20,9 @@ module.exports = function(mongoose) {
 			this.find({email: data.email}, function(err, users) {
 				if (!err) {
 					if (!users.length) {
-						var User = mongoose.model('user', userSchema);
 						var user = new User({
-								email: data.email
+								name: data.name
+							,	email: data.email
 							, password: data.password
 						});
 						user.save(function (err, user) {
@@ -44,12 +44,12 @@ module.exports = function(mongoose) {
 		};
 
 		this.find = function(options, callback) {
-			User.find(options, function(err, user){
-				if (typeof callback == 'function') {
-					callback(err, user);
-				}
-			});
-		}
+			User.find(options, callback);
+		};
+
+		this.findOne = function(options, callback) {
+			User.findOne(options, callback);
+		};
 	}
 	return UserManager;
 };

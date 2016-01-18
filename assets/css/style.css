@@ -15,6 +15,12 @@
 	}
 }
 
+@media (min-width: 1200px) {
+	.place-sidebar {
+		margin-left: 10px;
+	}
+}
+
 
 html, body {
 	height: auto;
@@ -25,9 +31,6 @@ html, body {
 	margin-top: 80px;
 }
 
-.row {
-	margin: 0 -15px;
-}
 
 .link {
 	cursor: pointer;
@@ -60,6 +63,8 @@ html, body {
 	cursor: default;
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
+	max-height: 400px;
+	overflow: auto;
 }
 
 .location-picker-result {
@@ -192,7 +197,17 @@ select.form-control,
 .rating-group .fa {
 	font-size: 120%;
 	color: #FFBE00;
+}
+.form-group.rating-group .fa {
 	padding-top: 3px;
+}
+
+a.rating-group {
+
+	color: #FFBE00;
+}
+a.rating-group:hover .fa {
+	color: #FF9B00;
 }
 
 #additional-info-link {

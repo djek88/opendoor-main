@@ -20,6 +20,7 @@ html(ng-app="opendoorApp")
 
 		script(src="bower_components/jquery/jquery.min.js")
 		script(src="bower_components/jquery-ui/jquery-ui.min.js")
+		script(src="bower_components/Datejs/build/date.js")
 		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}')
 		script(src="bower_components/bootstrap/dist/js/bootstrap.min.js")
 		script(src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js")
@@ -33,13 +34,13 @@ html(ng-app="opendoorApp")
 		script(src="bower_components/angular-cookies/angular-cookies.js")
 
 
-		script(src="assets/js/Utils.js")
+		script(src="assets/js/utils.js")
 		script(src="assets/js/locationpicker.js")
 		script(src="assets/js/app.js")
 		script(src="assets/js/controllers.js")
 	block body
 		body
-			#header.header.navbar.navbar-default.navbar-fixed-top(ng-controller="ToolbarCtrl")
+			#header.header.navbar.navbar-default.navbar-fixed-top
 				.container
 					.navbar-header
 						button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#header-navbar')
@@ -55,20 +56,24 @@ html(ng-app="opendoorApp")
 							li.dropdown
 								a(href='/')
 									| HOME
-							li(ng-show="$isLoggedIn")
+							li(ng-show="$root.$isLoggedIn")
 								a(href='/places/add') ADD A PLACE
-							li(ng-show="$isLoggedIn")
-								a.link(data-toggle='dropdown' ng-disabled)
-									| MY PROFILE
-									b.caret
-								ul.dropdown-menu
-									li
-										a(href='/profile/edit') Edit profile
-									li
-										a(target="_self" href='/logout') Log out
-							li(ng-hide="$isLoggedIn")
+							//li(ng-show="$isLoggedIn")
+							//	a.link(data-toggle='dropdown' ng-disabled)
+							//		| MY PROFILE
+							//		b.caret
+							//	ul.dropdown-menu
+							//		li
+							//			a(href='/profile/edit') Edit profile
+							//		li
+							//			a(target="_self", href='/logout') Log out
+							li(ng-show="$root.$isLoggedIn")
+								a(href='/logout', target="_self") LOG OUT
+
+
+							li(ng-hide="$root.$isLoggedIn")
 								a(href='/login') LOG IN
-							li(ng-hide="$isLoggedIn")
+							li(ng-hide="$root.$isLoggedIn")
 								a(href='/register') REGISTER
 			#wrap.ng-view
 			footer#footer.my-footer(ng-controller="FooterCtrl")

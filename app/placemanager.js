@@ -1,14 +1,16 @@
 /**
  * Created by Vavooon on 18.12.2015.
  */
-var AbstractManager = require('./abstractmanager.js');
 
 module.exports = function(mongoose) {
 
 
 	var reviewSchema = new mongoose.Schema({
-			email: String
-		,	rating: Number
+			name: String
+		,	rating: {
+				type: Number
+			,	required: true
+			}
 		,	text: String
 	});
 
@@ -50,6 +52,7 @@ module.exports = function(mongoose) {
 		, about: String
 		, travelInformation: String
 		, addedByEmail: String
+		, maintainerName: String
 		, isConfirmed: {
 			type: Boolean
 			,	default: false
@@ -57,6 +60,14 @@ module.exports = function(mongoose) {
 		, reviews: {
 			type: [reviewSchema]
 			,	default: []
+		}
+		,	averageRating: {
+				type: Number
+			,	default: 0
+		}
+		,	ratingsCount: {
+				type: Number
+			,	default: 0
 		}
 	};
 
@@ -67,10 +78,10 @@ module.exports = function(mongoose) {
 	placeSchema.set('autoIndex', true);
 
 	var Place = mongoose.model('place', placeSchema);
+	var Review = mongoose.model('review', reviewSchema);
 
 	function PlaceManager() {
 		this.fields = placeFields;
-		AbstractManager.apply(this, arguments);
 
 		this.add = function(data, callback) {
 			var place = new Place(data);
@@ -86,11 +97,7 @@ module.exports = function(mongoose) {
 			global.denominationManager.addIfNotExists(place.denominations, place.religion);
 
 
-			place.save(function (err, place) {
-				if (typeof callback == 'function') {
-					callback(err, place);
-				}
-			});
+			place.save(callback);
 		};
 
 		this.update = function(id, data, callback) {
@@ -107,11 +114,7 @@ module.exports = function(mongoose) {
 			global.denominationManager.addIfNotExists(place.denominations, place.religion);
 
 			console.log('findOneAndUpdate', {_id: id}, place)
-			Place.findOneAndUpdate({_id: id}, place, function(err, place){
-				if (typeof callback == 'function') {
-					callback(err, place);
-				}
-			});
+			Place.findOneAndUpdate({_id: id}, place, callback);
 		};
 
 		this.findNearby = function(data, callback) {
@@ -139,35 +142,49 @@ module.exports = function(mongoose) {
 					}
 				}
 			];
-			if (data.religions && data.religions != '*') {
-				options[2]['$match']['religion'] = data.religions;
+			if (data.religion && data.religion != '*') {
+				options[2]['$match']['religion'] = data.religion;
 			}
-			Place.aggregate(options,
-			function(err, places) {
-				callback(err, places);
-			});
+			Place.aggregate(options, callback);
 		};
 
 		this.getById = function(id, callback) {
-			Place.findOne({'_id': mongoose.Types.ObjectId(id)},
-				function(err, places) {
-					callback(err, places);
-				});
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, callback);
 		};
 
 		this.markAsConfirmed = function(id, callback) {
-			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true},
-				function(err, places) {
-					callback(err, places);
-				});
-		}
+			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, callback);
+		};
 
 		this.addReview = function(id, data, callback) {
-			Place.findOne({'_id': mongoose.Types.ObjectId(id)},
-				function(err, place) {
-					console.log(place);
-				});
+			console.log(data);
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
+				place.reviews.push(data);
+				var averageRating = 0;
+				for (var i=0; i < place.reviews.length; i++) {
+					averageRating += place.reviews[i].rating;
+				}
+				place.ratingsCount = place.reviews.length;
+				place.averageRating = averageRating / place.reviews.length;
+				place.save();
+				console.log(place.reviews);
+				if (typeof callback=='function') {
+					callback(err, place);
+				}
+			});
+
+
+				//{$push: {reviews: data}}, callback);
 		}
+
+
+		this.find = function(options, callback) {
+			Place.find(options, callback);
+		};
+
+		this.findOne = function(options, callback) {
+			Place.findOne(options, callback);
+		};
 
 
 	}
