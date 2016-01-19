@@ -3,13 +3,6 @@
 		.row
 			.col-lg-12
 				form.form-inline(name="form")
-					//.form-group
-					//	//label.control-label Location
-					//	.input-group.location-picker
-					//		input.form-control(type='text' placeholder="Location")
-					//		.input-group-btn
-					//			ul.dropdown-menu.pull-right
-					//			button.btn.btn-inverse(type='button') Detect location
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
 						.input-group.location-picker
 							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off")
@@ -38,7 +31,7 @@
 								th Distance
 								th
 						tbody
-							tr.place-link(ng-repeat="$place in $places", ng-click="$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
+							tr.place-link(ng-repeat="$place in $places", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
 								td {{$place.name}}
 								td.hidden-sm-down {{$place.religion}}
 								td {{$place.distance}}m

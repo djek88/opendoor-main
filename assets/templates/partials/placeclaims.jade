@@ -1,0 +1,22 @@
+#content.content
+	.container
+		.row
+			.col-lg-12.m-t-40
+				h1.m-b-40 Claims
+				h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
+				.table-wrap.bg-white(ng-show='$claims.length')
+					table#search-table.table
+						thead
+							tr
+								th User
+								th Place
+								th Action
+						tbody
+							tr(ng-repeat="$claim in $claims")
+								td {{$claim.user.name}}
+								td
+									a(href="/places/{{$claim.place._id}}") {{$claim.place.name}}
+								td
+									a.btn.btn-sm.btn-primary(href="/claims/{{$claim._id}}/accept", target="self") Accept
+									span &nbsp;
+									a.btn.btn-sm.btn-danger(href="/claims/{{$claim._id}}/deny", target="self") Deny

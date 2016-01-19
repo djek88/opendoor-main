@@ -14,64 +14,65 @@ module.exports = function(mongoose) {
 		,	text: String
 	});
 
-	var placeFields = {
-		name: {
-					type: String
+	var placeSchema = new mongoose.Schema({
+			name: {
+				type: String
 				,	required: true
 			}
-		, religion: {
-					type: String
+			, religion: {
+				type: String
 				,	required: true
 			}
-		, groupName: {
-					type: String
+			, groupName: {
+				type: String
 				,	required: true
 			}
-		, address: {
-					type: String
+			, address: {
+				type: String
 				,	required: true
 			}
-		, location : {
-				//required: true
+			, location : {
 				type: {
 					type: String
 					,	default: 'Point'
 				}
-			,	coordinates: [Number]
-		}
-		, denominations: [String]
-		, leaderName: String
-		, leaderRole: String
-		, phone: String
-		, url: String
-		, email: String
-		, mainMeetingDay: String
-		, mainMeetingTime: Date
-		, bannerPhoto: String
-		, leaderPhoto: String
-		, about: String
-		, travelInformation: String
-		, addedByEmail: String
-		, maintainerName: String
-		, isConfirmed: {
-			type: Boolean
-			,	default: false
-		}
-		, reviews: {
-			type: [reviewSchema]
-			,	default: []
-		}
-		,	averageRating: {
+				,	coordinates: [Number]
+			}
+			, denominations: [String]
+			, leaderName: String
+			, leaderRole: String
+			, phone: String
+			, homepage: String
+			, email: String
+			, mainMeetingDay: String
+			, mainMeetingTime: Date
+			, bannerPhoto: String
+			, leaderPhoto: String
+			, about: String
+			, travelInformation: String
+			, addedByEmail: String
+			, maintainer: {
+				type: mongoose.Schema.Types.ObjectId
+				, ref: 'user'
+			}
+			, isConfirmed: {
+				type: Boolean
+				,	default: false
+			}
+			, reviews: {
+				type: [reviewSchema]
+				,	default: []
+			}
+			,	averageRating: {
 				type: Number
-			,	default: 0
-		}
-		,	ratingsCount: {
+				,	default: 0
+			}
+			,	ratingsCount: {
 				type: Number
-			,	default: 0
+				,	default: 0
+			}
 		}
-	};
-
-	var placeSchema = new mongoose.Schema(placeFields, {
+		, {
 		timestamps: true
 	});
 	placeSchema.index({location: '2dsphere'});
@@ -81,7 +82,7 @@ module.exports = function(mongoose) {
 	var Review = mongoose.model('review', reviewSchema);
 
 	function PlaceManager() {
-		this.fields = placeFields;
+		this.model = Place;
 
 		this.add = function(data, callback) {
 			var place = new Place(data);
@@ -90,7 +91,6 @@ module.exports = function(mongoose) {
 			religionGroupManager.find(religionGroup, function(err, religionGroups){
 				if (!err && !religionGroups.length) {
 					global.religionGroupManager.add(religionGroup);
-					console.log('add religionGroup', religionGroup);
 				}
 			});
 
@@ -103,18 +103,20 @@ module.exports = function(mongoose) {
 		this.update = function(id, data, callback) {
 			var place = (new Place(data)).toObject();
 			delete place._id;
+			delete place.isConfirmed;
 			var religionGroup = {name: place.groupName, religion: place.religion};
 			religionGroupManager.find(religionGroup, function(err, religionGroups){
 				if (!err && !religionGroups.length) {
 					global.religionGroupManager.add(religionGroup);
-					console.log('add religionGroup', religionGroup);
 				}
 			});
 
 			global.denominationManager.addIfNotExists(place.denominations, place.religion);
+			Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
+		};
 
-			console.log('findOneAndUpdate', {_id: id}, place)
-			Place.findOneAndUpdate({_id: id}, place, callback);
+		this.setMaintainer = function(id, maintainerId, callback) {
+			Place.findOneAndUpdate({_id: id}, {'$set': {maintainer: mongoose.Types.ObjectId(maintainerId)}}, callback);
 		};
 
 		this.findNearby = function(data, callback) {
@@ -123,9 +125,7 @@ module.exports = function(mongoose) {
 					"$geoNear": {
 						"near": {
 							"type": "Point"
-							,	"coordinates": [
-								parseFloat(data.lat)
-								, parseFloat(data.lng)]
+							,	"coordinates": data.coordinates
 						}
 						,	"distanceField": "distance"
 						,	"maxDistance": 2000
@@ -145,12 +145,14 @@ module.exports = function(mongoose) {
 			if (data.religion && data.religion != '*') {
 				options[2]['$match']['religion'] = data.religion;
 			}
-			Place.aggregate(options, callback);
+			Place.aggregate(options, function(err, places){
+				Place.populate(places, {path: "maintainer"}, callback);
+			});
 		};
 
 		this.getById = function(id, callback) {
-			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, callback);
-		};
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}).populate('maintainer', 'name').exec(callback);
+	};
 
 		this.markAsConfirmed = function(id, callback) {
 			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, callback);
@@ -167,7 +169,6 @@ module.exports = function(mongoose) {
 				place.ratingsCount = place.reviews.length;
 				place.averageRating = averageRating / place.reviews.length;
 				place.save();
-				console.log(place.reviews);
 				if (typeof callback=='function') {
 					callback(err, place);
 				}
@@ -178,9 +179,12 @@ module.exports = function(mongoose) {
 		}
 
 
+
 		this.find = function(options, callback) {
 			Place.find(options, callback);
 		};
+
+		this.find = Place.find.bind(Place);
 
 		this.findOne = function(options, callback) {
 			Place.findOne(options, callback);

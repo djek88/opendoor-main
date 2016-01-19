@@ -12,13 +12,26 @@ var opendoorApp = angular.module('opendoorApp', [
 	'opendoorControllers'
 ]);
 
+opendoorApp.directive('ngImageLoad', ['$parse', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attrs) {
+			var fn = $parse(attrs.ngImageLoad);
+			elem.on('load', function (event) {
+				scope.$apply(function() {
+					fn(scope, { $event: event });
+				});
+			});
+		}
+	};
+}]);
+
 opendoorApp.directive('ngLocation', function() {
 	return {
 		restrict: 'A',
 		require: 'ngModel',
 
 		link: function(scope, element, attr, ctrl) {
-			console.log('link')
 			var $element = $(element);
 			var options = {
 				autoDetect: !!attr.ngLocationAutodetect
@@ -39,7 +52,7 @@ opendoorApp.directive('ngLocation', function() {
 });
 
 
-opendoorApp.run(function($rootScope) {
+opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $location, $window) {
 	$rootScope.$religions = [
 		'Christianity'
 	,	'Islam'
@@ -59,6 +72,15 @@ opendoorApp.run(function($rootScope) {
 	,	'Tenriism'
 	];
 
+	$rootScope.$openPlace = function($event, $place) {
+		$rootScope.$selectedPlace = $place;
+		if ($event.which == 2) {
+			$window.open('/places/' + $place._id, '_blank');
+		}
+		else {
+			$location.url('/places/' + $place._id);
+		}
+	};
 
 	$rootScope.$getMapInstance = function(targetEl) {
 		if (!$rootScope.$map) {
@@ -87,7 +109,7 @@ opendoorApp.run(function($rootScope) {
 		}
 		return $rootScope.$map;
 	}
-});
+}]);
 
 opendoorApp.config(['$httpProvider', function($httpProvider) {
 	$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -99,10 +121,13 @@ opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route
 		document.title = $route.current.title + titlePostfix;
 	});
 
+	var id = $cookies.get('_id');
+	if (typeof id == 'string'){
+		$rootScope.$_id = id.substring(3,id.length-1);
+	}
 	$rootScope.$email = $cookies.get('email');
+	$rootScope.$isAdmin = $cookies.get('isAdmin') == 'true';
 	$rootScope.$isLoggedIn = !!$rootScope.$email;
-
-	console.log($rootScope.$email)
 }]);
 
 opendoorApp.config(
@@ -119,10 +144,30 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
 		}).
+		when('/places/claims', {
+			title: 'Place claims'
+			,	templateUrl: 'assets/templates/partials/placeclaims.html'
+			, controller: 'PlaceClaimsCtrl'
+		}).
+		when('/places/changes', {
+			title: 'Suggested changes'
+			,	templateUrl: 'assets/templates/partials/placechanges.html'
+			, controller: 'PlaceChangesCtrl'
+		}).
 		when('/places/edit/:id', {
 				title: 'Edit place'
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
+		}).
+		when('/places/last', {
+			title: 'Last places'
+			,	templateUrl: 'assets/templates/partials/lastplaces.html'
+			, controller: 'LastPlacesCtrl'
+		}).
+		when('/places/maintained', {
+			title: 'Maintained places'
+			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
+			, controller: 'MaintainedPlacesCtrl'
 		}).
 		when('/places/:id', {
 				title: 'View place'
@@ -152,7 +197,6 @@ opendoorApp.config(
 		when('/about', {
 				title: 'About'
 			,	templateUrl: 'assets/templates/partials/about.html'
-			//, controller: 'FeedbackCtrl'
 		}).
 		when('/error', {
 				title: 'Error'

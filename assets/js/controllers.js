@@ -48,8 +48,8 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 ]);
 
 
-opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http',
-	function($scope, $rootScope, $location, $http) {
+opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies',
+	function($scope, $rootScope, $location, $http, $cookies) {
 		var placeId = $location.url().split('/').pop();
 		$scope.$placeId = placeId;
 		var userPosition = 0;
@@ -62,13 +62,13 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			});
 		}
 
-		$scope.$openPlace = function($event, $place) {
-			$rootScope.$selectedPlace = $place;
-			if ($event.which == 2) {
-				$window.open('/places/' + $place._id, '_blank');
+		$scope.$onLeaderPhotoLoad = function() {
+			$el = $('.leader-photo');
+			if ($el.width() > $el.height()) {
+				$el.removeClass('portrait');
 			}
 			else {
-				$location.url('/places/' + $place._id);
+				$el.addClass('portrait');
 			}
 		};
 
@@ -87,7 +87,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			success(function (places){
 				var nearbyPlaces = [];
 				if (Array.isArray(places)) {
-					if (places.length) {
+					if (places.length > 1) {
 						var placesCount = places.length;
 						if (placesCount>5) {
 							placesCount=5;
@@ -116,13 +116,21 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 
 		function setData($place) {
-			$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
+			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
+			if ($place.updatedAt) {
+				$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
+			}
+
+			if (typeof $place.homepage == 'string') {
+				if ($place.homepage.substr(0, 4) != 'http') {
+					$place.homepage = 'http://' + $place.homepage;
+				}
+			}
 
 			$scope.$mainMeetingText = '';
 			if ($place.mainMeetingTime || $place.mainMeetingDay) {
 				$scope.$mainMeetingText += 'Main service ';
 				if ($place.mainMeetingTime) {
-					var mainMeetingTime = new Date($place.mainMeetingTime);
 					$scope.$mainMeetingText += (new Date($place.mainMeetingTime)).toString('HH:mm') + ' ';
 				}
 				if ($place.mainMeetingDay) {
@@ -131,29 +139,26 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			}
 
 			$scope.$place = $place;
+
+
 			map = $rootScope.$getMapInstance($('#results-map'));
-
-			function afterInit() {
-
-				google.maps.event.trigger(map, 'resize');
-				var pos = new google.maps.LatLng($place.location.coordinates[0], $place.location.coordinates[1]);
-				map.setCenter(pos);
-				map.setZoom(16);
-				map.addMarker({
-						position: pos
-					,	icon: '/assets/img/spotlight-poi.png'
-					,	title: $place.name
-				});
-				if (navigator.geolocation) {
-					navigator.geolocation.getCurrentPosition(function(location) {
-						$scope.$apply(function(){
-							userPosition = {latitude: location.coords.latitude, longitude: location.coords.longitude};
-							addUserPositionMarker();
-						});
+			google.maps.event.trigger(map, 'resize');
+			var pos = new google.maps.LatLng($place.location.coordinates[0], $place.location.coordinates[1]);
+			map.setCenter(pos);
+			map.setZoom(16);
+			map.addMarker({
+					position: pos
+				,	icon: '/assets/img/spotlight-poi.png'
+				,	title: $place.name
+			});
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(location) {
+					$scope.$apply(function(){
+						userPosition = {latitude: location.coords.latitude, longitude: location.coords.longitude};
+						addUserPositionMarker();
 					});
-				}
+				});
 			}
-			afterInit();
 		}
 		if ($rootScope.$selectedPlace) {
 			setData($rootScope.$selectedPlace);
@@ -433,16 +438,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 		$scope.$religionsList = $rootScope.$religions;
 		$scope.religion = '*';
-		$scope.$openPlace = function($event, $place) {
-			$rootScope.$selectedPlace = $place;
-			if ($event.which == 2) {
-				$window.open('/places/' + $place._id, '_blank');
-			}
-			else {
-				$location.url('/places/' + $place._id);
-			}
-		};
-
 
 		$scope.$mouseOver = function(i) {
 			map.markers[i+1].setIcon(hoverIcon);
@@ -515,6 +510,143 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 	}
 ]);
 
+
+opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+		$scope.$places = [];
+
+		$scope.$message = 'Loading…';
+		$http({
+			url: '/ajax/places/last'
+			, method: 'GET'
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					for (var i = 0; i < data.length; i++) {
+						data[i].distance = Math.round(data[i].distance);
+					}
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no places';
+				}
+				$scope.$places = data;
+			}
+			else {
+				$scope.$message = 'An error happened during request';
+				$scope.$places = [];
+			}
+		}).
+		error(function () {
+			$scope.$message = 'Error processing request';
+		});
+	}
+
+
+]);
+
+
+opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+		$scope.$places = [];
+
+		$scope.$message = 'Loading…';
+		$http({
+			url: '/ajax/places/maintained'
+			, method: 'GET'
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					for (var i = 0; i < data.length; i++) {
+						data[i].distance = Math.round(data[i].distance);
+					}
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no maintained places';
+				}
+				$scope.$places = data;
+			}
+			else {
+				$scope.$message = 'An error happened during request';
+				$scope.$places = [];
+			}
+		}).
+		error(function () {
+			$scope.$message = 'Error processing request';
+		});
+	}
+
+
+]);
+
+
+opendoorControllers.controller('PlaceClaimsCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+
+		$scope.$message = 'Loading…';
+		$http({
+				url: '/ajax/claims'
+			, method: 'GET'
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no claims';
+				}
+				$scope.$claims = data;
+			}
+			else {
+				$scope.$message = 'An error happened during request';
+			}
+		}).
+		error(function () {
+			$scope.$message = 'Error processing request';
+		});
+	}
+
+]);
+
+
+opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+
+		$scope.$message = 'Loading…';
+		$http({
+			url: '/ajax/placechanges'
+			, method: 'GET'
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					for (var i=0; i < data.length; i++) {
+						if (Array.isArray(data[i].value)) {
+							data[i].value = data[i].value.join(', ');
+						}
+					}
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no suggested changes';
+				}
+				$scope.$changes = data;
+			}
+			else {
+				$scope.$message = 'An error happened during request';
+			}
+		}).
+		error(function () {
+			$scope.$message = 'Error processing request';
+		});
+	}
+
+]);
+
 opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location',
 	function($scope, $rootScope, $location) {
 		$scope.$targetPage = $location.hash();
@@ -572,6 +704,37 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Your message has been received';
 				$scope.$alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
+				break;
+
+			case 'changesadded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Your changes has been added';
+				$scope.$alertMessage = 'Please wait until place maintainer accept your changes.';
+				break;
+			case 'claimadded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Your claim has been added';
+				$scope.$alertMessage = 'Please wait until administrator accept your claim.';
+				break;
+			case 'changeaccepted':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Change has been accepted';
+				break;
+			case 'changedenied':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Change has been denied';
+				break;
+			case 'claimaccepted':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Claim has been accepted';
+				break;
+			case 'claimdenied':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Claim has been denied';
 				break;
 			case 'reviewsaved':
 				$scope.$alertType = 'info';

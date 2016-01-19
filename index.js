@@ -27,6 +27,13 @@ var religionGroupManager = new ReligionGroupManager;
 var DenominationManager = require('./app/denominationmanager.js')(mongoose);
 var denominationManager = new DenominationManager;
 
+var ClaimManager = require('./app/claimmanager.js')(mongoose);
+var claimManager = new ClaimManager;
+
+var PlaceChangeManager = require('./app/placechangemanager.js')(mongoose);
+var placeChangeManager = new PlaceChangeManager;
+
+global.placeManager = placeManager;
 global.religionGroupManager = religionGroupManager;
 global.denominationManager = denominationManager;
 
@@ -63,7 +70,7 @@ db.once('open', function () {
 		var host = server.address().address;
 		var port = server.address().port;
 
-		console.log('App listening at http://%s:%s', host, port);
+		//console.log('App listening at http://%s:%s', host, port);
 	});
 });
 
@@ -88,7 +95,9 @@ app.post('/login', function (req, res) {
 			userManager.findOne({email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
 				if (user) {
 					req.session.user = user;
+					res.cookie('_id', user._id);
 					res.cookie('email', user.email);
+					res.cookie('isAdmin', user.isAdmin);
 					res.redirect('/');
 				}
 				else {
@@ -101,7 +110,9 @@ app.post('/login', function (req, res) {
 
 app.get('/logout', function (req, res) {
 	delete req.session.user;
+	res.clearCookie('_id');
 	res.clearCookie('email');
+	res.clearCookie('isAdmin');
 	res.redirect('/');
 });
 
@@ -132,7 +143,14 @@ app.post('/register', function (req, res) {
 
 
 app.get('/ajax/places/search', function (req, res) {
-	placeManager.findNearby(req.query, function(err, places){
+	var data = {
+			coordinates: [
+					parseFloat(req.query.lat)
+				, parseFloat(req.query.lng)
+			]
+		,	religion: req.religion
+	};
+	placeManager.findNearby(data, function(err, places){
 		if (!err) {
 			res.send(JSON.stringify(places));
 		}
@@ -142,16 +160,62 @@ app.get('/ajax/places/search', function (req, res) {
 	});
 });
 
-app.get('/ajax/places/:id', function (req, res) {
-	placeManager.getById(req.params.id, function(err, places){
+
+app.get('/ajax/places/maintained', function (req, res) {
+	if (req.session.user) {
+		placeManager.find({maintainer: mongoose.Types.ObjectId(req.session.user._id)}).populate('maintainer', 'name').exec(function (err, places) {
+			if (!err) {
+				res.send(JSON.stringify(places));
+			}
+			else {
+				res.send(JSON.stringify(err));
+			}
+		});
+	}
+});
+
+app.get('/ajax/places/last', function (req, res) {
+	placeManager.find({}).skip('-createdAt').limit(5).populate('maintainer', 'name').exec(function(err, place){
 		if (!err) {
-			res.send(JSON.stringify(places));
+			res.send(JSON.stringify(place));
 		}
 		else {
 			res.send(JSON.stringify(err));
 		}
 	});
 });
+
+
+app.get('/ajax/placechanges', function (req, res) {
+	if (req.session.user) {
+		placeManager.find({maintainer: mongoose.Types.ObjectId(req.session.user._id)}).select('_id').exec(function (err, places) {
+			if (!err) {
+				var ids = [];
+				for (var i=0; i<places.length; i++) {
+					ids.push(places[i]._id);
+				}
+				placeChangeManager.find({place: {'$in': ids}}).populate('user', 'name').populate('place').exec(function(err, changes){
+					res.send(JSON.stringify(changes));
+				});
+			}
+			else {
+				res.send(JSON.stringify(err));
+			}
+		});
+	}
+});
+
+app.get('/ajax/places/:id', function (req, res) {
+	placeManager.getById(req.params.id, function(err, place){
+		if (!err) {
+			res.send(JSON.stringify(place));
+		}
+		else {
+			res.send(JSON.stringify(err));
+		}
+	});
+});
+
 
 app.get('/ajax/religionGroups', function (req, res) {
 	var query = extend({}, req.query);
@@ -170,6 +234,18 @@ app.get('/ajax/denominations', function (req, res) {
 	});
 });
 
+app.get('/ajax/claims', function (req, res) {
+
+	if (req.session.user && req.session.user.isAdmin) {
+		claimManager.findAll(function (err, claims) {
+			res.send(JSON.stringify(claims));
+		});
+	}
+	else {
+		res.end();
+	}
+});
+
 
 app.post('/feedback', function (req, res) {
 	userManager.find({isAdmin: true}, function(err, users){
@@ -184,7 +260,6 @@ app.post('/feedback', function (req, res) {
 					adminEmails.push(user.email);
 				}
 			}
-			console.log(adminEmails);
 			var mailText = 'User: ' + req.body.name +
 											'\nEmail: ' + req.body.email +
 											'\nTarget page: ' + req.body.target +
@@ -225,7 +300,7 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 	var allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
 	var allowedFileExtensions = ['jpg', 'png'];
 
-	function finishRequest() {
+	function finishRequest(err, place) {
 		if (isAdding){
 			var userMail = req.session.user.email;
 			var mailText = 'Thank you for adding a place!\n' +
@@ -247,34 +322,75 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 			});
 			res.redirect('/message?message=placeadded');
 		}
-		else {
+		else if (place.maintainer == req.session.user._id) {
 			res.redirect('/message?message=placesaved');
 		}
-		res.end();
+		else {
+			res.redirect('/message?message=changesadded');
+		}
 	}
 
 	function storePlace() {
 		var place = extend({}, fields);
 		place = extend(place, files);
-		place.location = {coordinates: fields.location.split(',')};
-		place.isConfirmed = false;
-		place.maintainerName = req.session.user.name;
+		var locationAsString = fields.location.split(',');
+		place.location = {
+			type: 'Point',
+			coordinates: [
+					parseFloat(locationAsString[0])
+				,	parseFloat(locationAsString[1])
+			]};
 
-		if (place.denominations) {
+		if (place.denominations && place.denominations.length) {
 			place.denominations = place.denominations.split(',');
+		}
+		else {
+			place.denominations = [];
 		}
 
 		if (place.mainMeetingTime) {
 			place.mainMeetingTime = new Date(place.mainMeetingTime + ' 01.01.1970');
 		}
 
+
 		if (isAdding) {
 			place._id = id;
+			place.isConfirmed = false;
+			place.maintainer = mongoose.Types.ObjectId(req.session.user._id);
+
 			placeManager.add(place, finishRequest);
 		}
 		else {
-			placeManager.update(req.params.id, place, finishRequest);
+			placeManager.getById(req.params.id, function(err, currentPlace) {
+				if (currentPlace) {
+					if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
+						placeManager.update(req.params.id, place, finishRequest);
+					}
+					else {
+						for (var i in place) {
+							if (place.hasOwnProperty(i)){
+								if (JSON.stringify(currentPlace[i]) != JSON.stringify(place[i]) //stringify helps to compare arrays
+									&& (place[i] || currentPlace[i])) { // there is no reason to change one empty value to another
+
+									placeChangeManager.add({
+										user: mongoose.Types.ObjectId(req.session.user._id)
+										,	place: mongoose.Types.ObjectId(req.params.id)
+										,	field: i
+										,	value: place[i]
+									}, function(err, change){
+									});
+								}
+							}
+						}
+						finishRequest(err, currentPlace);
+					}
+				}
+				else {
+					res.send("Object wasn't found");
+				}
+			});
 		}
+
 	}
 
 
@@ -308,7 +424,7 @@ app.post('/places/review/:id', function (req, res) {
 	if (req.session.user) {
 		var id = req.params.id;
 		var data = {
-				rating: req.body.rating
+			rating: req.body.rating
 			,	text: req.body.text
 			,	name: req.session.user.name
 		};
@@ -324,6 +440,86 @@ app.post('/places/review/:id', function (req, res) {
 		});
 	}
 });
+
+
+
+app.get('/places/claim/:id', function (req, res) {
+	if (req.session.user) {
+		var placeId = req.params.id;
+		var data = {
+			user: mongoose.Types.ObjectId(req.session.user._id)
+			, place: mongoose.Types.ObjectId(placeId)
+		};
+
+		claimManager.add(data, function(err, place){
+			if (!err && place) {
+				console.log('Claim for place ' + placeId + ' was added');
+				res.redirect('/message?message=claimadded');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
+app.get('/claims/:id/accept', function (req, res) {
+	if (req.session.user && req.session.user.isAdmin) {
+		var id = req.params.id;
+		claimManager.acceptClaim(id, function(err, place){
+			if (!err && place) {
+				res.redirect('/message?message=claimaccepted');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
+app.get('/claims/:id/deny', function (req, res) {
+	if (req.session.user && req.session.user.isAdmin) {
+		var id = req.params.id;
+		claimManager.removeClaim(id, function(err, place){
+			if (!err && place) {
+				res.redirect('/message?message=claimdenied');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
+
+app.get('/placechanges/:id/accept', function (req, res) {
+	if (req.session.user && req.session.user.isAdmin) {
+		var id = req.params.id;
+		placeChangeManager.acceptChange(id, function(err, place){
+			if (!err && place) {
+				res.redirect('/message?message=changeaccepted');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
+app.get('/placechanges/:id/deny', function (req, res) {
+	if (req.session.user && req.session.user.isAdmin) {
+		var id = req.params.id;
+		placeChangeManager.removeChange(id, function(err, place){
+			if (!err && place) {
+				res.redirect('/message?message=changedenied');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
 
 app.post('/places/message', function (req, res) {
 	var id = req.body.id;

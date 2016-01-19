@@ -21,7 +21,7 @@ html(ng-app="opendoorApp")
 		script(src="bower_components/jquery/jquery.min.js")
 		script(src="bower_components/jquery-ui/jquery-ui.min.js")
 		script(src="bower_components/Datejs/build/date.js")
-		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}')
+		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}&language=en')
 		script(src="bower_components/bootstrap/dist/js/bootstrap.min.js")
 		script(src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js")
 		script(src="bower_components/select2/dist/js/select2.min.js")
@@ -58,6 +58,10 @@ html(ng-app="opendoorApp")
 									| HOME
 							li(ng-show="$root.$isLoggedIn")
 								a(href='/places/add') ADD A PLACE
+							li(ng-show="$root.$isAdmin")
+								a(href='/places/claims') PLACE CLAIMS
+							li(ng-show="$root.$isLoggedIn")
+								a(href='/places/maintained') MAINTAINED PLACES
 							//li(ng-show="$isLoggedIn")
 							//	a.link(data-toggle='dropdown' ng-disabled)
 							//		| MY PROFILE
