@@ -93,7 +93,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			success(function (places){
 				var nearbyPlaces = [];
 				if (Array.isArray(places)) {
-					if (places.length > 1) {
+					if (places.length) {
 						var placesCount = places.length;
 						if (placesCount>5) {
 							placesCount=5;
