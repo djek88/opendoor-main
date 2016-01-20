@@ -28,6 +28,7 @@
     "select2": "~4.0.1",
     "jquery-ui": "~1.11.4",
     "tag-it": "*",
-    "Datejs": "datejs/Datejs"
+    "Datejs": "datejs/Datejs",
+    "bootstrap-select": "~1.9.4"
   }
 }
