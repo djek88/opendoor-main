@@ -39,6 +39,20 @@ global.denominationManager = denominationManager;
 
 var sha1 = require('sha1');
 
+
+
+var frontendPages = [
+	'/'
+	,	'/login'
+	,	'/register'
+	,	'/feedback'
+	,	'/about'
+	,	'/error'
+	,	'/message'
+	,	'/notfound'
+	,	'/places/:id'
+];
+
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
@@ -71,7 +85,7 @@ db.once('open', function () {
 		var host = server.address().address;
 		var port = server.address().port;
 
-		//console.log('App listening at http://%s:%s', host, port);
+		console.log('App listening at http://%s:%s', host, port);
 	});
 });
 
@@ -585,18 +599,14 @@ app.get('/places/confirm/:id', function (req, res) {
 	});
 });
 
-app.use(function(req, res) {
-	if (req.xhr) {
-		res.status(404).end();
-	}
-	else {
-		jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys}, function (err, content) {
-			if (!err) {
-				res.send(content);
-			}
-			else {
-				console.log(err);
-			}
-		});
-	}
+
+app.get(frontendPages, function(req, res) {
+	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys}, function (err, content) {
+		if (!err) {
+			res.send(content);
+		}
+		else {
+			console.log(err);
+		}
+	});
 });

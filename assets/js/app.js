@@ -127,14 +127,13 @@ opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route
 		document.title = $route.current.title + titlePostfix;
 	});
 
-	$rootScope.$on('$routeChangeStart',function(e,next,last){
-
+	//$rootScope.$on('$routeChangeStart',function(e,next,last){
 		//if(next.$$route.controller === last.$$route.controller){
 		//	e.preventDefault();
 		//	$route.current = last.$$route;
 		//	//do whatever you want in here!
 		//}
-	});
+	//});
 
 	var id = $cookies.get('_id');
 	if (typeof id == 'string'){
