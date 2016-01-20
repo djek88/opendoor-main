@@ -2,18 +2,19 @@
 	.container
 		.row
 			.col-lg-12
-				form.form-inline(name="form")
+				form.form-inline(name="form", novalidate)
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
 						.input-group.location-picker
-							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off")
+							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off", required)
 							input.location-picker-location.hidden(name="location", ng-model="location")
 							.input-group-btn
 								button.location-picker-detect-button.btn.btn-inverse Detect my location
 					span.inline-spacer
 					.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
-						select.form-control(name="religion", ng-model="religion", required)
-							option(value="*", selected) All religions
+						select.form-control(name="religion", ng-model="religion")
+							option(value="", selected) All religions
 							option(value="{{$name}}", ng-repeat="$name in $religionsList") {{$name}}
+					input.hidden(name="maxDistance", ng-model="maxDistance", value="5000")
 					button.btn.btn-md.btn-primary(type='submit', ng-click="$searchPlaces()") Search
 					.clearfix
 		.row

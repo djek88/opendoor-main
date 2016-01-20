@@ -30,15 +30,13 @@ module.exports = function(mongoose) {
 		};
 
 		this.findAll = function(cb) {
-			Claim.find({}).populate('user', 'name').populate('place').exec(cb);
+			Claim.find({}).populate('user').populate('place').exec(cb);
 		};
 
 		this.acceptClaim = function(id, callback) {
 			Claim.findOne({_id: id}, function(err, claim){
-				console.log('acc', claim)
 				if (claim) {
 					global.placeManager.setMaintainer(claim.place, claim.user, function(err, place){
-						console.log(err)
 						if (place) {
 							claim.remove({}, callback);
 						}

@@ -19,6 +19,10 @@ module.exports = function(mongoose) {
 				type: String
 				,	required: true
 			}
+			, uri: {
+				type: String
+				,	required: true
+			}
 			, religion: {
 				type: String
 				,	required: true
@@ -28,9 +32,23 @@ module.exports = function(mongoose) {
 				,	required: true
 			}
 			, address: {
-				type: String
-				,	required: true
+					line1: {
+						type: String
+						,	required: true
+					}
+				,	line2: String
+				, city: {
+					type: String
+					,	required: true
+				}
+				,	region: String
+				,	country: {
+					type: String
+					,	required: true
+				}
+				,	postalCode: String
 			}
+			, concatenatedAddress: String
 			, location : {
 				type: {
 					type: String
@@ -75,11 +93,25 @@ module.exports = function(mongoose) {
 		, {
 		timestamps: true
 	});
+	//placeSchema.index({location: '2dsphere'});
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
 
 	var Place = mongoose.model('place', placeSchema);
-	var Review = mongoose.model('review', reviewSchema);
+
+	function preprocessFields(place) {
+
+		var religionGroup = {name: place.groupName, religion: place.religion};
+		religionGroupManager.find(religionGroup, function(err, religionGroups){
+			if (!err && !religionGroups.length) {
+				global.religionGroupManager.add(religionGroup);
+			}
+		});
+
+		global.denominationManager.addIfNotExists(place.denominations, place.religion);
+		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/');
+		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+	}
 
 	function PlaceManager() {
 		this.model = Place;
@@ -87,14 +119,7 @@ module.exports = function(mongoose) {
 		this.add = function(data, callback) {
 			var place = new Place(data);
 
-			var religionGroup = {name: place.groupName, religion: place.religion};
-			religionGroupManager.find(religionGroup, function(err, religionGroups){
-				if (!err && !religionGroups.length) {
-					global.religionGroupManager.add(religionGroup);
-				}
-			});
-
-			global.denominationManager.addIfNotExists(place.denominations, place.religion);
+			preprocessFields(place);
 
 
 			place.save(callback);
@@ -103,15 +128,9 @@ module.exports = function(mongoose) {
 		this.update = function(id, data, callback) {
 			var place = (new Place(data)).toObject();
 			delete place._id;
-			delete place.isConfirmed;
-			var religionGroup = {name: place.groupName, religion: place.religion};
-			religionGroupManager.find(religionGroup, function(err, religionGroups){
-				if (!err && !religionGroups.length) {
-					global.religionGroupManager.add(religionGroup);
-				}
-			});
 
-			global.denominationManager.addIfNotExists(place.denominations, place.religion);
+			preprocessFields(place);
+
 			Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
 		};
 
@@ -128,7 +147,7 @@ module.exports = function(mongoose) {
 							,	"coordinates": data.coordinates
 						}
 						,	"distanceField": "distance"
-						,	"maxDistance": 2000
+						//,	"maxDistance": 2000
 						,	"spherical": true
 						,	"query": { "location.type": "Point" }
 					}
@@ -142,8 +161,11 @@ module.exports = function(mongoose) {
 					}
 				}
 			];
-			if (data.religion && data.religion != '*') {
+			if (data.religion) {
 				options[2]['$match']['religion'] = data.religion;
+			}
+			if (data.maxDistance) {
+				options[0]['$geoNear'].maxDistance = parseInt(data.maxDistance);
 			}
 			Place.aggregate(options, function(err, places){
 				Place.populate(places, {path: "maintainer"}, callback);

@@ -13,7 +13,7 @@ var bodyParser = require('body-parser');
 var session = require('cookie-session');
 var busboy = require('connect-busboy');
 var jade = require('jade');
-
+require('./assets/js/utils.js');
 
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
@@ -57,6 +57,7 @@ else {
 }
 
 mongoose.connect(config.mongoURI);
+
 
 app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
@@ -148,9 +149,12 @@ app.get('/ajax/places/search', function (req, res) {
 					parseFloat(req.query.lat)
 				, parseFloat(req.query.lng)
 			]
-		,	religion: req.religion
+		,	religion: req.query.religion
+		,	maxDistance: req.query.maxDistance
 	};
+	console.log(data);
 	placeManager.findNearby(data, function(err, places){
+		console.log(arguments);
 		if (!err) {
 			res.send(JSON.stringify(places));
 		}
@@ -352,6 +356,14 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 			place.mainMeetingTime = new Date(place.mainMeetingTime + ' 01.01.1970');
 		}
 
+		place.address = {
+			line1: place.addressLine1
+			,	line2: place.addressLine2
+			,	city: place.city
+			,	region: place.region
+			,	country: place.country
+			,	postalCode: place.postalCode
+		};
 
 		if (isAdding) {
 			place._id = id;
@@ -361,6 +373,7 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 			placeManager.add(place, finishRequest);
 		}
 		else {
+			delete place.isConfirmed;
 			placeManager.getById(req.params.id, function(err, currentPlace) {
 				if (currentPlace) {
 					if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {

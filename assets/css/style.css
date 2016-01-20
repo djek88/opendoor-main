@@ -226,7 +226,6 @@ select.form-control,
 }
 
 a.rating-group {
-
 	color: #FFBE00;
 }
 
@@ -234,8 +233,8 @@ a.rating-group:hover {
 	text-decoration: none;
 }
 
-a.rating-group:hover .fa {
-	color: #FF9B00;
+a.rating-group:hover  {
+	color: #FF9B00!important;
 }
 
 

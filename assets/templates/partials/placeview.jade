@@ -3,24 +3,25 @@
 		.row
 			.col-lg-8.bg-white
 				.row.p-l-40.p-r-40.p-b-20
-					.col-sm-7
+					.col-sm-12
 						h1 {{$place.name}}
-						a.rating-group(href="#reviews")
+						a.rating-group.link.m-b-20(ng-click="scrollTo('reviews')")
 							span.fa(ng-class="$place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="$place.averageRating >= 2 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="$place.averageRating >= 3 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="$place.averageRating >= 4 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="$place.averageRating >= 5 ? 'fa-star' : 'fa-star-o'")
 							span  ({{$place.ratingsCount}})
-					.col-sm-5.text-right
-						h3 {{$place.religion}}
+						h4 {{$place.religion}}
 							span(ng-show="$place.groupName") , {{$place.groupName}}
-						h4(ng-show="$place.denominations.length") {{$place.denominations.join(', ')}}
+						h5(ng-show="$place.denominations.length")
+							.label.label-primary.m-r-5(ng-repeat="$denomination in $place.denominations") {{$denomination}}
+
+
 
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
 						img.place-photo(ng-src="{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
-					//.col-lg-12
 					a.btn.place-edit-btn.btn-primary.pull-right.m-r-40(href="/places/edit/{{$placeId}}") Edit place
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
 						img.leader-photo(ng-src="{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
@@ -47,14 +48,14 @@
 						h3 Travel information
 						p {{$place.travelInformation}}
 				.row.p-40
-					.col-sm-8
+					.col-sm-8(ng-if="$place.email")
 						h3 Contact form
 						ng-include(src="'assets/templates/partials/contactform.html'")
 					#contacts-block.col-sm-4
 						h3 Other contacts
-						div(ng-show="$place.address")
+						div(ng-show="$place.concatenatedAddress")
 							.fa.fa-home
-							|  {{$place.address}}
+							|  {{$place.concatenatedAddress}}
 						div(ng-show="$place.phone")
 							.fa.fa-phone
 							|  {{$place.phone}}
@@ -66,9 +67,10 @@
 						h6(ng-show="!$place.maintainer") There is no maintainer for this page
 						a(ng-if="!$isMaintainer", href="/places/claim/{{$placeId}}", target="_self") Claim to be the editor
 						h6(ng-show="$place.updatedAt") Last updated at {{$place.updatedAt}}
-				.row
+				#reviews.row
 					.col-lg-12.p-l-40.p-r-40.p-b-40
-						a(name="reviews")
+						a
+						//(name="reviews")
 						h3 Reviews
 							a.btn.btn-sm.btn-primary.m-l-5(href="/places/review/{{$placeId}}")  Add a review
 						span(ng-hide="$place.reviews.length") There are no reviews

@@ -48,12 +48,18 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 ]);
 
 
-opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies',
-	function($scope, $rootScope, $location, $http, $cookies) {
+opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll',
+	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll) {
 		var placeId = $location.url().split('/').pop();
 		$scope.$placeId = placeId;
 		var userPosition = 0;
 		var map;
+
+		$scope.scrollTo = function(id) {
+			$anchorScroll(id);
+			//$location.hash(id);
+		};
+
 		function addUserPositionMarker() {
 			map.addMarker({
 					position: {lat: userPosition.latitude, lng: userPosition.longitude}
@@ -121,7 +127,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
 			}
 
-			if (typeof $place.homepage == 'string') {
+			if (typeof $place.homepage == 'string' && $place.homepage) {
 				if ($place.homepage.substr(0, 4) != 'http') {
 					$place.homepage = 'http://' + $place.homepage;
 				}
@@ -193,6 +199,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
 
+		var geocoder = new google.maps.Geocoder();
 		var denominations = [];
 		var groups;
 		var $denominationsEl = $('input[name="denominations"]');
@@ -210,6 +217,16 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			$scope.$submitPath = '/places/edit/' + placeId;
 			$scope.$additionalFieldsAreVisible = true;
 		}
+		var map = $rootScope.$getMapInstance($('#results-map'));
+
+		google.maps.event.addListenerOnce(map, 'idle', function(){
+			google.maps.event.trigger(map, 'resize');
+		});
+
+
+		var pos = new google.maps.LatLng(0,0);
+		map.setCenter(pos);
+		map.setZoom(2);
 
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 		$('.location-picker').locationpicker();
@@ -257,6 +274,45 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 			$groupsEl.selectpicker('refresh');
 		});
+
+		function setMarker(location, bounds) {
+			if (bounds) {
+				map.fitBounds(bounds);
+			}
+			else {
+				map.setZoom(16);
+			}
+			var pos = new google.maps.LatLng(location[0], location[1]);
+			map.addMarker({
+				position: pos
+				,	map: map
+				,	icon: map.icons.defaultPoi
+			});
+			map.setCenter(pos);
+		}
+
+		$scope.$searchByAddress = function() {
+			var concatenatedAddress = [
+				$scope.$place.address.line1
+				, $scope.$place.address.line2
+				, $scope.$place.address.city
+				, $scope.$place.address.region
+				, $scope.$place.address.country
+				, $scope.$place.address.postalCode
+			].cleanArray().join(', ');
+			geocoder.geocode({'address': concatenatedAddress}, function (results, status) {
+				if (status === google.maps.GeocoderStatus.OK) {
+					map.removeMarkers();
+					if (results.length) {
+						var firstResult = results[0];
+						var $locationEl = $('[name="location"]');
+						$locationEl.val([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()].join(', '));
+						$locationEl.trigger('change');
+						setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
+					}
+				}
+			});
+		};
 
 
 		function loadOptionsForReligion(religion) {
@@ -309,20 +365,22 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		});
 
 
+		function setData($place) {
+			if ($place.mainMeetingTime){
+				var mainMeetingTime = new Date($place.mainMeetingTime);
+				$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
+			}
+
+			$scope.$place = $place;
+
+			loadOptionsForReligion($place.religion);
+			$groupsEl.selectpicker('val', $place.groupName);
+			setMarker($place.location.coordinates);
+		}
+
 		if (placeId) {
 			$scope.$edit = true;
 			$scope.$mode = 'edit';
-			function setData($place) {
-				if ($place.mainMeetingTime){
-					var mainMeetingTime = new Date($place.mainMeetingTime);
-					$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
-				}
-
-				$scope.$place = $place;
-
-				loadOptionsForReligion($place.religion);
-				$groupsEl.selectpicker('val', $place.groupName);
-			}
 
 			if ($rootScope.$selectedPlace) {
 				setData($rootScope.$selectedPlace);
@@ -347,7 +405,10 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		}
 		else {
 			$scope.$mode = 'add';
-			$scope.$place = {};
+			$scope.$place = {
+				address: {}
+				,	location: {}
+			};
 		}
 	}
 ]);
@@ -370,8 +431,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 		$scope.$places = [];
 		$scope.$message = 'Press "Search" to find nearest places';
-		var normalIcon = '/assets/img/spotlight-poi-bright.png';
-		var hoverIcon = '/assets/img/spotlight-poi.png';
 		var $table = $('#search-table');
 		var map;
 
@@ -400,7 +459,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			map.markers.push(new google.maps.Marker({
 				position: {lat: parseFloat(location[0]), lng: parseFloat(location[1])}
 				,	map: map
-				,	icon: '/assets/img/mylocation.png'
+				,	icon: map.icons.location
 				,	title: 'My location'
 			}));
 
@@ -413,7 +472,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				var marker = map.addMarker({
 						position: pos
 					,	map: map
-					,	icon: normalIcon
+					,	icon: map.icons.defaultPoi
 					,	title: data[i].name
 				});
 				bounds.extend(pos);
@@ -421,11 +480,11 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				(function(marker, i) {
 					google.maps.event.addListener(marker, 'mouseover', function () {
-						marker.setIcon(hoverIcon);
+						marker.setIcon(map.icons.brightPoi);
 						$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
 					});
 					google.maps.event.addListener(marker, 'mouseout', function () {
-						marker.setIcon(normalIcon);
+						marker.setIcon(map.icons.defaultPoi);
 						$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
 					});
 				})(marker, i);
@@ -437,13 +496,13 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		};
 
 		$scope.$religionsList = $rootScope.$religions;
-		$scope.religion = '*';
+		$scope.religion = '';
 
 		$scope.$mouseOver = function(i) {
-			map.markers[i+1].setIcon(hoverIcon);
+			map.markers[i+1].setIcon(map.icons.brightPoi);
 		};
 		$scope.$mouseOut = function(i) {
-			map.markers[i+1].setIcon(normalIcon);
+			map.markers[i+1].setIcon(map.icons.defaultPoi);
 		};
 
 
@@ -476,7 +535,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		if (validateCoordinate(requestParams.lat) && validateCoordinate(requestParams.lng)) {
 			$scope.location = requestParams.lat + ', ' + requestParams.lng;
 			$scope.address = $rootScope.$lastSearchAddress || $scope.location;
+			$scope.religion = requestParams.religion;
 			$scope.$message = 'Searching…';
+			requestParams.maxDistance = 5000;
 			$http({
 				url: '/ajax/places/search'
 				, method: 'GET'

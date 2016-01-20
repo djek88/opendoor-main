@@ -4,6 +4,10 @@
 		h3.text-center.m-b-30(ng-show="$edit") Edit place
 		form.form-horizontal(method="POST", action="{{$submitPath}}", novalidate, name="form", enctype="multipart/form-data")
 			// Main info
+			.form-group
+				.col-md-3
+				.col-md-9
+					h4.m-t-30 Main information
 			.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
 				label.col-md-3.control-label Place name
 				.col-md-9
@@ -18,15 +22,50 @@
 				label.col-md-3.control-label Group name
 				.col-md-9
 					select.selectpicker.form-control(name="groupName", disabled-ng-model="$place.groupName")
-			.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
-				label.col-md-3.control-label Meeting venue
+			//.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
+			//	label.col-md-3.control-label Meeting venue
+			//	.col-md-9
+			//		.input-group.location-picker
+			//			input.location-picker-address.form-control(name="address", ng-model="$place.address", autocomplete="off")
+			//			input.location-picker-location.hidden(name="location", ng-model="$place.location.coordinates")
+			//			.input-group-btn
+			//				button.location-picker-detect-button.btn.btn-inverse Detect my location
+			.form-group
+				.col-md-3
 				.col-md-9
-					.input-group.location-picker
-						input.location-picker-address.form-control(name="address", ng-model="$place.address", autocomplete="off")
-						input.location-picker-location.hidden(name="location", ng-model="$place.location.coordinates")
-						.input-group-btn
-							button.location-picker-detect-button.btn.btn-inverse Detect my location
+					h4.m-t-30 Address and location
+			.form-group(ng-class="{'has-error': (form.$submitted || form.addressLine1.$touched) && form.addressLine1.$error.required}")
+				label.col-md-3.control-label Address line 1
+				.col-md-9
+					input.form-control(type="text", name="addressLine1", ng-model="$place.address.line1", required)
+			.form-group
+				label.col-md-3.control-label Address line 2
+				.col-md-9
+					input.form-control(type="text", name="addressLine2", ng-model="$place.address.line2")
+			.form-group(ng-class="{'has-error': (form.$submitted || form.city.$touched) && form.city.$error.required}")
+				label.col-md-3.control-label City
+				.col-md-9
+					input.form-control(type="text", name="city", ng-model="$place.address.city", required)
+			.form-group(ng-class="{'has-error': (form.$submitted || form.region.$touched) && form.region.$error.required}")
+				label.col-md-3.control-label Region
+				.col-md-9
+					input.form-control(type="text", name="region", ng-model="$place.address.region", required)
+			.form-group(ng-class="{'has-error': (form.$submitted || form.country.$touched) && form.country.$error.required}")
+				label.col-md-3.control-label Country
+				.col-md-9
+					input.form-control(type="text", name="country", ng-model="$place.address.country", required)
+			.form-group(ng-class="{'has-error': (form.$submitted || form.postalCode.$touched) && form.postalCode.$error.required}")
+				label.col-md-3.control-label Postal code
+				.col-md-9
+					input.form-control(type="text", name="postalCode", ng-model="$place.address.postalCode", required)
 
+			.form-group(ng-class="{'has-error': (form.$submitted || form.location.$touched) && form.location.$error.required}")
+				label.col-md-3.control-label Location
+				.col-md-9
+					//h5.m-r-10 Type place address to find it on map
+					.btn.btn-sm.btn-primary.m-b-10(ng-click="$searchByAddress()") Find address on map
+					input.hidden(name="location", ng-model="$place.location.coordinates", required)
+					#results-map
 			// Additional info
 			.form-group#additional-info-link(ng-hide="$additionalFieldsAreVisible", ng-click="$additionalFieldsAreVisible=true")
 				label.col-md-3

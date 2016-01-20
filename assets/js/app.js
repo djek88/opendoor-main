@@ -89,6 +89,12 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 			var map = $rootScope.$map = new google.maps.Map($div[0], {});
 			map.markers=[];
 
+			map.icons = {
+				brightPoi: '/assets/img/spotlight-poi-bright.png'
+				, defaultPoi: '/assets/img/spotlight-poi.png'
+				, location: '/assets/img/mylocation.png'
+			};
+
 			map.removeMarkers=function(){
 				var marker;
 				while (marker = map.markers.pop()) {
@@ -119,6 +125,15 @@ opendoorApp.config(['$httpProvider', function($httpProvider) {
 opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route, $cookies) {
 	$rootScope.$on('$routeChangeSuccess', function() {
 		document.title = $route.current.title + titlePostfix;
+	});
+
+	$rootScope.$on('$routeChangeStart',function(e,next,last){
+
+		//if(next.$$route.controller === last.$$route.controller){
+		//	e.preventDefault();
+		//	$route.current = last.$$route;
+		//	//do whatever you want in here!
+		//}
 	});
 
 	var id = $cookies.get('_id');
