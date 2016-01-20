@@ -50,6 +50,13 @@ var frontendPages = [
 	,	'/error'
 	,	'/message'
 	,	'/notfound'
+	,	'/places/add'
+	,	'/places/claims'
+	,	'/places/changes'
+	,	'/places/edit/:id'
+	,	'/places/last'
+	,	'/places/maintained'
+	,	'/places/review/:id'
 	,	'/places/:id'
 ];
 

@@ -173,7 +173,7 @@ module.exports = function(mongoose) {
 		};
 
 		this.getById = function(id, callback) {
-			Place.findOne({'_id': mongoose.Types.ObjectId(id), isConfirmed: true}).populate('maintainer', 'name').exec(callback);
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}).populate('maintainer', 'name').exec(callback);
 	};
 
 		this.markAsConfirmed = function(id, callback) {
@@ -195,10 +195,7 @@ module.exports = function(mongoose) {
 					callback(err, place);
 				}
 			});
-
-
-				//{$push: {reviews: data}}, callback);
-		}
+		};
 
 
 

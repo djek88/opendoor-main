@@ -4,6 +4,8 @@
 			.col-lg-8.bg-white
 				.row.p-l-40.p-r-40.p-b-20
 					.col-sm-12
+						h3
+							.label.label-danger.m-t-10.pull-right(ng-if="!$place.isVerified") UNVERIFIED
 						h1 {{$place.name}}
 						a.rating-group.link.m-b-20(ng-click="scrollTo('reviews')")
 							span.fa(ng-class="$place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
@@ -22,7 +24,7 @@
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
 						img.place-photo(ng-src="{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
-					a.btn.place-edit-btn.btn-primary.pull-right.m-r-40(href="/places/edit/{{$placeId}}") Edit place
+					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$placeId}}") Edit place
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
 						img.leader-photo(ng-src="{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
 					h3.m-l-40.p-l-10(ng-if="!$place.leaderPhoto && $place.leaderName") Place leader
