@@ -174,9 +174,7 @@ app.get('/ajax/places/search', function (req, res) {
 		,	religion: req.query.religion
 		,	maxDistance: req.query.maxDistance
 	};
-	console.log(data);
 	placeManager.findNearby(data, function(err, places){
-		console.log(arguments);
 		if (!err) {
 			res.send(JSON.stringify(places));
 		}
@@ -254,9 +252,7 @@ app.get(/\/ajax\/places\/(.*)/, function (req, res) { //keep this route at botto
 	else {
 		var query = {_id: mongoose.Types.ObjectId(id)};
 	}
-	console.log(query);
-	placeManager.findOne(query, function(err, place){
-		console.log(arguments);
+	placeManager.findOne(query).populate('maintainer', 'name').exec(function(err, place){
 		if (!err) {
 			res.send(JSON.stringify(place));
 		}
@@ -371,6 +367,7 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 	var allowedFileExtensions = ['jpg', 'png'];
 
 	function finishRequest(err, place) {
+
 		if (isAdding){
 			var userMail = req.session.user.email;
 			var mailText = 'Thank you for adding a place!\n' +
@@ -442,8 +439,10 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 			delete place.isConfirmed;
 			placeManager.getById(req.params.id, function(err, currentPlace) {
 				if (currentPlace) {
+					console.log(currentPlace)
 					if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
 						placeManager.update(req.params.id, place, finishRequest);
+						console.log('upd');
 					}
 					else {
 						for (var i in place) {
@@ -461,6 +460,7 @@ app.post(['/places/add', '/places/edit/:id'], function (req, res) {
 								}
 							}
 						}
+						console.log('propose');
 						finishRequest(err, currentPlace);
 					}
 				}

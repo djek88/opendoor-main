@@ -5,6 +5,7 @@
 module.exports = function(mongoose) {
 
 
+	var sanitizeHtml = require('sanitize-html');
 	var reviewSchema = new mongoose.Schema({
 			name: String
 		,	rating: {
@@ -111,7 +112,11 @@ module.exports = function(mongoose) {
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
 		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
-		Place.find({uri: place.uri}, function(err, places){
+		place.about = sanitizeHtml(place.about);
+		place.travelInformation = sanitizeHtml(place.travelInformation);
+		console.log(place._id);
+		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
+			console.log(arguments);
 			if (places.length) {
 				err = new Error('Place with such URI already exists');
 			}
@@ -143,7 +148,7 @@ module.exports = function(mongoose) {
 
 		this.update = function(id, data, callback) {
 			var place = (new Place(data)).toObject();
-			delete place._id;
+			place._id = id;
 
 			preprocessFields(place, function(err){
 				if (!err) {
@@ -198,14 +203,13 @@ module.exports = function(mongoose) {
 
 		this.getById = function(id, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}).populate('maintainer', 'name').exec(callback);
-	};
+		};
 
 		this.markAsConfirmed = function(id, callback) {
 			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, callback);
 		};
 
 		this.addReview = function(id, data, callback) {
-			console.log(data);
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
 				place.reviews.push(data);
 				var averageRating = 0;
@@ -229,9 +233,7 @@ module.exports = function(mongoose) {
 
 		this.find = Place.find.bind(Place);
 
-		this.findOne = function(options, callback) {
-			Place.findOne(options, callback);
-		};
+		this.findOne = Place.findOne.bind(Place);
 
 
 	}

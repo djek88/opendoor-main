@@ -9,7 +9,8 @@ var titlePostfix = ' - OpenDoor';
 var opendoorApp = angular.module('opendoorApp', [
 	'ngRoute',
 	'ngCookies',
-	'opendoorControllers'
+	'opendoorControllers',
+	'trumbowyg-ng'
 ]);
 
 opendoorApp.directive('ngImageLoad', ['$parse', function ($parse) {
@@ -72,6 +73,8 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 	,	'Tenriism'
 	];
 
+	$rootScope.$year = (new Date).getFullYear();
+
 	$rootScope.$openPlace = function($event, $place) {
 		$rootScope.$selectedPlace = $place;
 		if ($event.which == 2) {
@@ -122,18 +125,15 @@ opendoorApp.config(['$httpProvider', function($httpProvider) {
 }]);
 
 
-opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route, $cookies) {
+opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
 	$rootScope.$on('$routeChangeSuccess', function() {
 		document.title = $route.current.title + titlePostfix;
 	});
-
-	//$rootScope.$on('$routeChangeStart',function(e,next,last){
-		//if(next.$$route.controller === last.$$route.controller){
-		//	e.preventDefault();
-		//	$route.current = last.$$route;
-		//	//do whatever you want in here!
-		//}
-	//});
+	$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
+		if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope.$_id) {
+			$location.url('/message?message=pleaselogin');
+		}
+	});
 
 	var id = $cookies.get('_id');
 	if (typeof id == 'string'){
@@ -156,31 +156,37 @@ opendoorApp.config(
 		}).
 		when('/places/add', {
 				title: 'Add place'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/claims', {
 			title: 'Place claims'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeclaims.html'
 			, controller: 'PlaceClaimsCtrl'
 		}).
 		when('/places/changes', {
 			title: 'Suggested changes'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placechanges.html'
 			, controller: 'PlaceChangesCtrl'
 		}).
 		when('/places/edit/:id', {
 				title: 'Edit place'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/last', {
 			title: 'Last places'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/lastplaces.html'
 			, controller: 'LastPlacesCtrl'
 		}).
 		when('/places/maintained', {
 			title: 'Maintained places'
+			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
 			, controller: 'MaintainedPlacesCtrl'
 		}).
@@ -232,5 +238,4 @@ opendoorApp.config(
 			redirectTo: '/notfound'
 		});
 		$route.routes['/places/:id'].regexp = /^\/places\/(.*)$/;
-		console.log($route.routes);
 	});

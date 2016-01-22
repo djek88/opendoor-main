@@ -14,7 +14,7 @@ html(ng-app="opendoorApp")
 		link(rel='stylesheet', href='assets/color_admin/css/style-responsive.min.css')
 		link(rel='stylesheet', href='assets/color_admin/css/theme/default.css')
 		link(rel='stylesheet', href='bower_components/bootstrap-select/dist/css/bootstrap-select.min.css')
-		//link(rel='stylesheet', href='bower_components/trumbowyg/dist/ui/trumbowyg.min.css')
+		link(rel='stylesheet', href='bower_components/trumbowyg/dist/ui/trumbowyg.min.css')
 
 		link(rel='stylesheet', href='assets/css/style.css')
 
@@ -26,12 +26,13 @@ html(ng-app="opendoorApp")
 		script(src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js")
 		script(src="bower_components/bootstrap-select/dist/js/bootstrap-select.min.js")
 		script(src="bower_components/tag-it/js/tag-it.min.js")
-		//script(src="bower_components/trumbowyg/dist/trumbowyg.min.js")
+		script(src="bower_components/trumbowyg/dist/trumbowyg.min.js")
 
 		script(src="bower_components/angular/angular.min.js")
 		script(src="bower_components/angular-route/angular-route.js")
 		script(src="bower_components/angular-cookies/angular-cookies.js")
 
+		script(src="bower_components/trumbowyg-ng/dist/trumbowyg-ng.min.js")
 
 		script(src="assets/js/utils.js")
 		script(src="assets/js/locationpicker.js")
@@ -57,28 +58,33 @@ html(ng-app="opendoorApp")
 									| HOME
 							li(ng-show="$root.$isLoggedIn")
 								a(href='/places/add') ADD A PLACE
+
 							li(ng-show="$root.$isAdmin")
-								a(href='/places/claims') PLACE CLAIMS
-							li(ng-show="$root.$isLoggedIn")
-								a(href='/places/maintained') MAINTAINED PLACES
-							//li(ng-show="$isLoggedIn")
-							//	a.link(data-toggle='dropdown' ng-disabled)
-							//		| MY PROFILE
-							//		b.caret
-							//	ul.dropdown-menu
-							//		li
-							//			a(href='/profile/edit') Edit profile
-							//		li
-							//			a(target="_self", href='/logout') Log out
+								a.link(data-toggle='dropdown' ng-disabled)
+									| ADMIN
+									b.caret
+								ul.dropdown-menu
+									li
+										a(href='/places/claims') PLACE CLAIMS
+
+							li(ng-show="$isLoggedIn")
+								a.link(data-toggle='dropdown' ng-disabled)
+									| MY PLACES
+									b.caret
+								ul.dropdown-menu
+									li
+										a(href='/places/maintained') MAINTAINED PLACES
+									li
+										a(href='/places/changes') SUGGESTED CHANGES
+
+
 							li(ng-show="$root.$isLoggedIn")
 								a(href='/logout', target="_self") LOG OUT
-
-
 							li(ng-hide="$root.$isLoggedIn")
 								a(href='/login') LOG IN
 							li(ng-hide="$root.$isLoggedIn")
 								a(href='/register') REGISTER
 			#wrap.ng-view
 			footer#footer.my-footer(ng-controller="FooterCtrl")
-				| © 2016 OpenDoor -
-				a.pointer(ng-click="$leaveFeedback($event)", ng-disabled="$isFeedbackPage")  Leave feedback
+				| © {{$root.$year}} OpenDoor -
+				a.pointer(ng-click="$leaveFeedback($event)", ng-disabled="$isFeedbackPage")  Please give us feedback no matter how small to help improve this resource

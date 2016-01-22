@@ -24,7 +24,9 @@
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
 						img.place-photo(ng-src="{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
-					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$place._id}}") Edit place
+					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$place._id}}")
+						span(ng-if="$isMaintainer") Edit place
+						span(ng-if="!$isMaintainer") Suggest changes
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
 						img.leader-photo(ng-src="{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
 					h3.m-l-40.p-l-10(ng-if="!$place.leaderPhoto && $place.leaderName") Place leader
@@ -37,7 +39,7 @@
 				.row.p-40.p-b-0(ng-show="$place.about")
 					.col-lg-12
 						h3 About
-						p {{$place.about}}
+						p(ng-bind-html="$place.about")
 
 				.row.p-40.p-b-10
 					.col-lg-12
@@ -48,7 +50,7 @@
 				.row.p-40(ng-show="$place.travelInformation")
 					.col-lg-12
 						h3 Travel information
-						p {{$place.travelInformation}}
+						p(ng-bind-html="$place.travelInformation")
 				.row.p-40
 					.col-sm-8(ng-if="$place.email")
 						h3 Contact form

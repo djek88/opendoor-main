@@ -48,11 +48,9 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 ]);
 
 
-opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll',
-	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll) {
+opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
+	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
 		var placeId = $location.url().substr(8);
-		var placeAttr = placeId.indexOf('/') != -1 ? 'uri' : '_id';
-		console.log(placeId);
 		$scope.$placeId = placeId;
 		var userPosition = 0;
 		var map;
@@ -145,6 +143,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 					$scope.$mainMeetingText += 'every ' + $place.mainMeetingDay;
 				}
 			}
+
+			$place.about = $sce.trustAsHtml($place.about);
+			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
 
 			$scope.$place = $place;
 
@@ -372,12 +373,16 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
 			}
 
+
+			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
 			$scope.$place = $place;
+			console.log($scope.$isMaintainer);
 
 			loadOptionsForReligion($place.religion);
 			$groupsEl.selectpicker('val', $place.groupName);
 			setMarker($place.location.coordinates);
 		}
+
 
 		if (placeId) {
 			$scope.$edit = true;
@@ -405,6 +410,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 		}
 		else {
+			$scope.$edit = false;
 			$scope.$mode = 'add';
 			$scope.$place = {
 				address: {}
@@ -746,6 +752,12 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 			var message = $location.search()['message'];
 		}
 		switch (message) {
+
+			case 'pleaselogin':
+				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
+				$scope.$alertMessage = 'Please login first';
+				break;
 			case 'alreadyregistered':
 				$scope.$alertType = 'danger';
 				$scope.$alertTitle = 'Error';

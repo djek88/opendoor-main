@@ -22,14 +22,6 @@
 				label.col-md-3.control-label Group name
 				.col-md-9
 					select.selectpicker.form-control(name="groupName", disabled-ng-model="$place.groupName")
-			//.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.valid}")
-			//	label.col-md-3.control-label Meeting venue
-			//	.col-md-9
-			//		.input-group.location-picker
-			//			input.location-picker-address.form-control(name="address", ng-model="$place.address", autocomplete="off")
-			//			input.location-picker-location.hidden(name="location", ng-model="$place.location.coordinates")
-			//			.input-group-btn
-			//				button.location-picker-detect-button.btn.btn-inverse Detect my location
 			.form-group
 				.col-md-3
 				.col-md-9
@@ -164,14 +156,15 @@
 				.form-group
 					label.col-md-3.control-label About
 					.col-md-9
-						textarea.form-control(rows="4", name="about", ng-model="$place.about")
+						textarea.form-control(rows="4", name="about", ng-model="$place.about", trumbowyg-ng, editor-config="{fullscreenable: false, btns: ['viewHTML', '|', 'formatting', '|', 'btnGrp-design', '|', 'btnGrp-justify',	'|', 'btnGrp-lists', '|', 'horizontalRule',	'|', 'removeformat']}")
 				.form-group
 					label.col-md-3.control-label Travel information
 					.col-md-9
-						textarea.form-control(rows="4", name="travelInformation", ng-model="$place.travelInformation")
+						textarea.form-control(rows="4", name="travelInformation", ng-model="$place.travelInformation", trumbowyg-ng, editor-config="{fullscreenable: false, btns: ['viewHTML', '|', 'formatting', '|', 'btnGrp-design', '|', 'btnGrp-justify',	'|', 'btnGrp-lists', '|', 'horizontalRule',	'|', 'removeformat']}")
 
 			.form-group
 				label.col-md-3.control-label
 				.col-md-9
-					input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Add Place of Worship", ng-hide="$edit")
-					input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Save changes", ng-show="$edit")
+					input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Add a new Place of Worship", ng-hide="$edit")
+					input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Save changes", ng-show="$edit && $isMaintainer")
+					input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Suggest changes", ng-show="$edit&& !$isMaintainer")

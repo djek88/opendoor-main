@@ -22,6 +22,7 @@
     "nodemailer": "^1.10.0",
     "nodemailer-smtp-transport": "^1.1.0",
     "read-chunk": "^1.0.1",
+    "sanitize-html": "^1.11.3",
     "seq-queue": "0.0.5",
     "sha1": "^1.1.1"
   }
