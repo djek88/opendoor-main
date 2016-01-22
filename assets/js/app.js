@@ -75,10 +75,10 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 	$rootScope.$openPlace = function($event, $place) {
 		$rootScope.$selectedPlace = $place;
 		if ($event.which == 2) {
-			$window.open('/places/' + $place._id, '_blank');
+			$window.open('/places/' + $place.uri, '_blank');
 		}
 		else {
-			$location.url('/places/' + $place._id);
+			$location.url('/places/' + $place.uri);
 		}
 	};
 
@@ -147,6 +147,7 @@ opendoorApp.run(['$rootScope', '$route', '$cookies', function($rootScope, $route
 opendoorApp.config(
 	function($locationProvider, $routeProvider) {
 		$locationProvider.html5Mode(true);
+		var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
 		$routeProvider.
 		when('/', {
 				title: 'Find nearest places'
@@ -230,4 +231,6 @@ opendoorApp.config(
 		otherwise({
 			redirectTo: '/notfound'
 		});
+		$route.routes['/places/:id'].regexp = /^\/places\/(.*)$/;
+		console.log($route.routes);
 	});

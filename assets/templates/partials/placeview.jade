@@ -24,7 +24,7 @@
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
 						img.place-photo(ng-src="{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
-					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$placeId}}") Edit place
+					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$place._id}}") Edit place
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
 						img.leader-photo(ng-src="{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
 					h3.m-l-40.p-l-10(ng-if="!$place.leaderPhoto && $place.leaderName") Place leader
@@ -67,14 +67,14 @@
 						h3 Page details
 						h6.m-t-20(ng-show="$place.maintainer") This page is maintained by {{$place.maintainer.name}}
 						h6(ng-show="!$place.maintainer") There is no maintainer for this page
-						a(ng-if="!$isMaintainer", href="/places/claim/{{$placeId}}", target="_self") Claim to be the editor
+						a(ng-if="!$isMaintainer", href="/places/claim/{{$place._id}}", target="_self") Claim to be the editor
 						h6(ng-show="$place.updatedAt") Last updated at {{$place.updatedAt}}
 				#reviews.row
 					.col-lg-12.p-l-40.p-r-40.p-b-40
 						a
 						//(name="reviews")
 						h3 Reviews
-							a.btn.btn-sm.btn-primary.m-l-5(href="/places/review/{{$placeId}}")  Add a review
+							a.btn.btn-sm.btn-primary.m-l-5(href="/places/review/{{$place._id}}")  Add a review
 						span(ng-hide="$place.reviews.length") There are no reviews
 						div.rating-group.m-b-40(ng-repeat="$review in $place.reviews")
 							h5 {{$review.name}}

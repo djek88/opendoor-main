@@ -57,7 +57,7 @@ var frontendPages = [
 	,	'/places/last'
 	,	'/places/maintained'
 	,	'/places/review/:id'
-	,	'/places/:id'
+	, /\/places\/(.*)/
 ];
 
 app.use(cookieParser(config.cookieKeys));
@@ -164,6 +164,7 @@ app.post('/register', function (req, res) {
 });
 
 
+
 app.get('/ajax/places/search', function (req, res) {
 	var data = {
 			coordinates: [
@@ -211,6 +212,60 @@ app.get('/ajax/places/last', function (req, res) {
 });
 
 
+app.get('/places/confirm/:id', function (req, res) {
+	var id = req.params.id;
+	placeManager.markAsConfirmed(id, function(err, place){
+		if (!err && place) {
+			console.log('Place with ' + id + ' was confirmed');
+			res.redirect('/message?message=placeconfirmed');
+		}
+		else {
+			res.redirect('/error?message=placeconfirmationerror');
+		}
+	});
+});
+
+
+app.get('/places/claim/:id', function (req, res) {
+	if (req.session.user) {
+		var placeId = req.params.id;
+		var data = {
+			user: mongoose.Types.ObjectId(req.session.user._id)
+			, place: mongoose.Types.ObjectId(placeId)
+		};
+
+		claimManager.add(data, function(err, place){
+			if (!err && place) {
+				console.log('Claim for place ' + placeId + ' was added');
+				res.redirect('/message?message=claimadded');
+			}
+			else {
+				res.redirect('/error');
+			}
+		});
+	}
+});
+
+app.get(/\/ajax\/places\/(.*)/, function (req, res) { //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
+	var id = req.params[0];
+	if (id.indexOf('/') != -1) { //it seems to be uri
+		var query = {uri: id};
+	}
+	else {
+		var query = {_id: mongoose.Types.ObjectId(id)};
+	}
+	console.log(query);
+	placeManager.findOne(query, function(err, place){
+		console.log(arguments);
+		if (!err) {
+			res.send(JSON.stringify(place));
+		}
+		else {
+			res.send(JSON.stringify(err));
+		}
+	});
+});
+
 app.get('/ajax/placechanges', function (req, res) {
 	if (req.session.user) {
 		placeManager.find({maintainer: mongoose.Types.ObjectId(req.session.user._id)}).select('_id').exec(function (err, places) {
@@ -230,16 +285,6 @@ app.get('/ajax/placechanges', function (req, res) {
 	}
 });
 
-app.get('/ajax/places/:id', function (req, res) {
-	placeManager.getById(req.params.id, function(err, place){
-		if (!err) {
-			res.send(JSON.stringify(place));
-		}
-		else {
-			res.send(JSON.stringify(err));
-		}
-	});
-});
 
 
 app.get('/ajax/religionGroups', function (req, res) {
@@ -477,26 +522,6 @@ app.post('/places/review/:id', function (req, res) {
 
 
 
-app.get('/places/claim/:id', function (req, res) {
-	if (req.session.user) {
-		var placeId = req.params.id;
-		var data = {
-			user: mongoose.Types.ObjectId(req.session.user._id)
-			, place: mongoose.Types.ObjectId(placeId)
-		};
-
-		claimManager.add(data, function(err, place){
-			if (!err && place) {
-				console.log('Claim for place ' + placeId + ' was added');
-				res.redirect('/message?message=claimadded');
-			}
-			else {
-				res.redirect('/error');
-			}
-		});
-	}
-});
-
 app.get('/claims/:id/accept', function (req, res) {
 	if (req.session.user && req.session.user.isAdmin) {
 		var id = req.params.id;
@@ -593,18 +618,6 @@ app.post('/places/message', function (req, res) {
 	});
 });
 
-app.get('/places/confirm/:id', function (req, res) {
-	var id = req.params.id;
-	placeManager.markAsConfirmed(id, function(err, place){
-		if (!err && place) {
-			console.log('Place with ' + id + ' was confirmed');
-			res.redirect('/message?message=placeconfirmed');
-		}
-		else {
-			res.redirect('/error?message=placeconfirmationerror');
-		}
-	});
-});
 
 
 app.get(frontendPages, function(req, res) {

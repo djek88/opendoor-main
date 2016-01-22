@@ -99,7 +99,7 @@ module.exports = function(mongoose) {
 
 	var Place = mongoose.model('place', placeSchema);
 
-	function preprocessFields(place) {
+	function preprocessFields(place, callback) {
 
 		var religionGroup = {name: place.groupName, religion: place.religion};
 		religionGroupManager.find(religionGroup, function(err, religionGroups){
@@ -109,8 +109,16 @@ module.exports = function(mongoose) {
 		});
 
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
-		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/');
+		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+		Place.find({uri: place.uri}, function(err, places){
+			if (places.length) {
+				err = new Error('Place with such URI already exists');
+			}
+			if (typeof callback=='function') {
+				callback(err, place);
+			}
+		});
 	}
 
 	function PlaceManager() {
@@ -120,18 +128,34 @@ module.exports = function(mongoose) {
 			var place = new Place(data);
 
 			preprocessFields(place);
+			preprocessFields(place, function(err){
+				if (!err) {
+					place.save(callback);
+				}
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
+				}
+			});
 
-
-			place.save(callback);
 		};
 
 		this.update = function(id, data, callback) {
 			var place = (new Place(data)).toObject();
 			delete place._id;
 
-			preprocessFields(place);
+			preprocessFields(place, function(err){
+				if (!err) {
+					Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
+				}
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
+				}
+			});
 
-			Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
 		};
 
 		this.setMaintainer = function(id, maintainerId, callback) {

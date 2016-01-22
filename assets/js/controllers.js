@@ -50,7 +50,9 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll',
 	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll) {
-		var placeId = $location.url().split('/').pop();
+		var placeId = $location.url().substr(8);
+		var placeAttr = placeId.indexOf('/') != -1 ? 'uri' : '_id';
+		console.log(placeId);
 		$scope.$placeId = placeId;
 		var userPosition = 0;
 		var map;
@@ -171,9 +173,8 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			showNearbyPlaces($rootScope.$selectedPlace);
 		}
 		else {
-			var id = $location.url().split('/').pop();
 			$http({
-					url: '/ajax/places/' + id
+					url: '/ajax/places/' + placeId
 				, method: 'GET'
 			}).
 			success(function (data) {
@@ -230,7 +231,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
 		$('.location-picker').locationpicker();
-
+		//$('textarea').trumbowyg();
 
 
 		$denominationsEl.tagit({
