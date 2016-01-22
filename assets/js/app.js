@@ -89,7 +89,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		if (!$rootScope.$map) {
 			$div = $('<div id="map"></div>');
 			$(targetEl).append($div);
-			var map = $rootScope.$map = new google.maps.Map($div[0], {});
+			var map = $rootScope.$map = new google.maps.Map($div[0], {scrollwheel: false});
 			map.markers=[];
 
 			map.icons = {
