@@ -31,14 +31,18 @@ html, body {
 	margin-top: 80px;
 }
 
+.pointer {
+	cursor: pointer;
+}
 
 .link {
 	cursor: pointer;
-	color: #666;
+	color: #337ab7;
 }
 
 .link:hover {
-	color: black;
+	color: #23527c;
+	text-decoration: underline;
 }
 
 .table {
