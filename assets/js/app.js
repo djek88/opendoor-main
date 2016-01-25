@@ -195,6 +195,11 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/placeview.html'
 			, controller: 'PlaceViewCtrl'
 		}).
+		when('/subscribefornotification', {
+			title: 'Subscribe fo notification'
+			,	templateUrl: 'assets/templates/partials/subscribefornotification.html'
+			, controller: 'SubscribeForNotificationFormCtrl'
+		}).
 		when('/places/review/:id', {
 				title: 'Add review'
 			,	templateUrl: 'assets/templates/partials/reviewadd.html'

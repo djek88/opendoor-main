@@ -21,7 +21,7 @@ function Email (config, transporter) {
 	}
 	this.send = transporter.sendMail.bind(transporter);
 
-	this.sendNotificationAboutNewPlace = function(id, callback) {
+	this.sendNotificationAboutNewPlaceToAdmin = function(id, callback) {
 		getAdminEmails(function(err, adminEmails) {
 			var mailText = 'New place was added: ' +
 				config.url + '/places/' + id;
@@ -35,6 +35,20 @@ function Email (config, transporter) {
 			self.send(mailOptions, callback);
 		});
 	};
+
+	this.sendNotificationAboutNewPlace = function(id, email, callback) {
+		var mailText = 'New place near you was added: ' +
+			config.url + '/places/' + id;
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: email,
+			subject: 'New place notification',
+			text: mailText
+		};
+
+		self.send(mailOptions, callback);
+	};
+
 	this.sendConfirmationLink = function(id, email, callback) {
 		var mailText = 'Thank you for adding a place!\n' +
 			'Please confirm it by passing the link: ' +
@@ -80,7 +94,7 @@ function Email (config, transporter) {
 
 
 		this.send(mailOptions, callback);
-	}
+	};
 }
 
 module.exports = Email;

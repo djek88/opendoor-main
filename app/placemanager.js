@@ -2,7 +2,7 @@
  * Created by Vavooon on 18.12.2015.
  */
 
-module.exports = function(mongoose) {
+module.exports = function(mongoose, email) {
 
 
 	var sanitizeHtml = require('sanitize-html');
@@ -101,6 +101,7 @@ module.exports = function(mongoose) {
 	var Place = mongoose.model('place', placeSchema);
 
 	function preprocessFields(place, callback) {
+		console.log('preprocess');
 
 		var religionGroup = {name: place.groupName, religion: place.religion};
 		religionGroupManager.find(religionGroup, function(err, religionGroups){
@@ -114,7 +115,6 @@ module.exports = function(mongoose) {
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 		place.about = sanitizeHtml(place.about);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
-		console.log(place._id);
 		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
 			console.log(arguments);
 			if (places.length) {
@@ -132,7 +132,7 @@ module.exports = function(mongoose) {
 		this.add = function(data, callback) {
 			var place = new Place(data);
 
-			preprocessFields(place);
+			//preprocessFields(place);
 			preprocessFields(place, function(err){
 				if (!err) {
 					place.save(callback);
@@ -152,6 +152,7 @@ module.exports = function(mongoose) {
 
 			preprocessFields(place, function(err){
 				if (!err) {
+					console.log(place);
 					Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
 				}
 				else {
@@ -206,7 +207,26 @@ module.exports = function(mongoose) {
 		};
 
 		this.markAsConfirmed = function(id, callback) {
-			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, callback);
+			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, function(err, place){
+				if (place) {
+					var data = {
+							coordinates: place.location.coordinates
+						,	religion: place.religion
+						,	id: place.uri
+					};
+					global.placeNotificationManager.findNearby(data, function(err, placeNotifications){
+						var ids = [];
+						for (var i = 0; i < placeNotifications.length; i++) {
+							email.sendNotificationAboutNewPlace(data.id, placeNotifications[i].email);
+							ids.push(mongoose.Types.ObjectId(placeNotifications[i]._id));
+						}
+						global.placeNotificationManager.remove({_id:{'$in': ids}}, function(){});
+					});
+				}
+				if (typeof callback == 'function') {
+					callback(err, place);
+				}
+			});
 		};
 
 		this.addReview = function(id, data, callback) {

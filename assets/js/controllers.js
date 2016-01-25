@@ -261,10 +261,12 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				$newReligionGroupOption.detach();
 			}
 			if (value) {
-				var regExp = new RegExp(".*" + RegExp.escape(value) + ".*");
+				var regExp = new RegExp(".*" + RegExp.escape(value.toLowerCase()) + ".*");
 				var matchesWasFound = false;
+				console.log(regExp);
 				for (var i = 0; i<groups.length; i++) {
-					if (regExp.test(groups[i])) {
+					if (typeof groups[i].name=='string' && regExp.test(groups[i].name.toLowerCase())) {
+						console.log(groups[i].name.toLowerCase());
 						matchesWasFound = true;
 						break;
 					}
@@ -432,11 +434,26 @@ opendoorControllers.controller('FormCtrl', ['$scope',
 	}
 ]);
 
+
+opendoorControllers.controller('SubscribeForNotificationFormCtrl', ['$scope', '$location',
+	function($scope, $location) {
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
+		var query = $location.search();
+		$scope.lat = query.lat;
+		$scope.lng = query.lng
+	}
+]);
+
 opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 		$('.location-picker').locationpicker();
 
-		$scope.$places = [];
+		$scope.$places = null;
 		$scope.$message = 'Press "Search" to find nearest places';
 		var $table = $('#search-table');
 		var map;
@@ -479,7 +496,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				var marker = map.addMarker({
 						position: pos
 					,	map: map
-					,	icon: map.icons.defaultPoi
+					,	icon: map.icons.brightPoi
 					,	title: data[i].name
 				});
 				bounds.extend(pos);
@@ -487,11 +504,11 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 				(function(marker, i) {
 					google.maps.event.addListener(marker, 'mouseover', function () {
-						marker.setIcon(map.icons.brightPoi);
+						marker.setIcon(map.icons.defaultPoi);
 						$('tr:nth-child(' + (i+1) + ')', $table).addClass('hover');
 					});
 					google.maps.event.addListener(marker, 'mouseout', function () {
-						marker.setIcon(map.icons.defaultPoi);
+						marker.setIcon(map.icons.brightPoi);
 						$('tr:nth-child(' + (i+1) + ')', $table).removeClass('hover');
 					});
 				})(marker, i);
@@ -506,10 +523,10 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		$scope.religion = '';
 
 		$scope.$mouseOver = function(i) {
-			map.markers[i+1].setIcon(map.icons.brightPoi);
+			map.markers[i+1].setIcon(map.icons.defaultPoi);
 		};
 		$scope.$mouseOut = function(i) {
-			map.markers[i+1].setIcon(map.icons.defaultPoi);
+			map.markers[i+1].setIcon(map.icons.brightPoi);
 		};
 
 
@@ -538,8 +555,15 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			return (!isNaN(val) && val <= 90 && val >= -90);
 		}
 
+		function onError() {
+			$scope.$message = 'An error happened during request';
+			$scope.$places = null;
+		}
+
 		var requestParams = $location.search();
 		if (validateCoordinate(requestParams.lat) && validateCoordinate(requestParams.lng)) {
+			$scope.lat = requestParams.lat;
+			$scope.lng = requestParams.lng;
 			$scope.location = requestParams.lat + ', ' + requestParams.lng;
 			$scope.address = $rootScope.$lastSearchAddress || $scope.location;
 			$scope.religion = requestParams.religion;
@@ -559,20 +583,16 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						$scope.$message = '';
 					}
 					else {
-						$scope.$message = 'There are no places nearby';
+						$scope.$message = 'There are no places of worship found near this location';
 					}
 					$scope.$places = data;
+					createMap();
 				}
 				else {
-					$scope.$message = 'An error happened during request';
-					$scope.$places = [];
-					console.error(data);
+					onError();
 				}
-				createMap();
 			}).
-			error(function () {
-				$scope.$message = 'Error processing request';
-			});
+			error(onError);
 		}
 
 	}
@@ -681,8 +701,8 @@ opendoorControllers.controller('PlaceClaimsCtrl', ['$scope', '$http', '$rootScop
 ]);
 
 
-opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
-	function($scope, $http, $rootScope, $location, $window) {
+opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window', '$sce',
+	function($scope, $http, $rootScope, $location, $window, $sce) {
 
 		$scope.$message = 'Loading…';
 		$http({
@@ -693,8 +713,19 @@ opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootSco
 			if (Array.isArray(data)) {
 				if (data.length) {
 					for (var i=0; i < data.length; i++) {
-						if (Array.isArray(data[i].value)) {
-							data[i].value = data[i].value.join(', ');
+						var change = data[i];
+						if (Array.isArray(change.value)) {
+							change.value = change.value.join(', ');
+						}
+						else if (change.field == 'address') {
+							change.value = [change.value.line1, change.value.line2, change.value.city, change.value.region, change.value.country, change.value.postalCode].cleanArray().join(', ');
+						}
+						else if (change.field == 'location') {
+							change.value = change.value.coordinates.join(', ');
+						}
+						else if (change.field == 'bannerPhoto' || change.field == 'leaderPhoto') {
+
+							change.htmlValue = $sce.trustAsHtml('<img class="change-preview-photo" src="/photos/' + change.value + '">');
 						}
 					}
 					$scope.$message = '';
@@ -779,7 +810,11 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertTitle = 'Your message has been received';
 				$scope.$alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
 				break;
-
+			case 'notificationsaved':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Your subscription has been saved';
+				$scope.$alertMessage = 'We will notify you when place near you will be added';
+				break;
 			case 'changesadded':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Your changes has been added';

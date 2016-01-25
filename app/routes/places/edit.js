@@ -1,14 +1,19 @@
-module.exports = function(mongoose, userManager, placeChangeManager, email) {
+module.exports = function(mongoose, userManager, placeChangeManager, placeNotificationManager, email) {
 	var fs = require('fs');
 	var extend = require('util')._extend;
 	return function (req, res) {
 		if (!req.session.user) {
 			return res.end();
 		}
-		var id = mongoose.Types.ObjectId();
 		var isAdding = !req.params.id;
+		if (isAdding) {
+			var id = mongoose.Types.ObjectId();
+		}
+		else {
+			var id = mongoose.Types.ObjectId(req.params.id);
+		}
 		var fields = {};
-		var imagesPath = '/photos/';
+
 		var files = {};
 
 		var allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
@@ -17,7 +22,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, email) {
 		function finishRequest(err, place) {
 
 			if (isAdding) {
-				email.sendNotificationAboutNewPlace(id);
+				email.sendNotificationAboutNewPlaceToAdmin(id);
 				email.sendConfirmationLink(id, req.session.user.email);
 				res.redirect('/message?message=placeadded');
 			}
@@ -60,6 +65,13 @@ module.exports = function(mongoose, userManager, placeChangeManager, email) {
 				, country: place.country
 				, postalCode: place.postalCode
 			};
+
+			delete place.addressLine1;
+			delete place.addressLine2;
+			delete place.city;
+			delete place.region;
+			delete place.country;
+			delete place.postalCode;
 
 			if (isAdding) {
 				place._id = id;
@@ -108,8 +120,9 @@ module.exports = function(mongoose, userManager, placeChangeManager, email) {
 				if (filename.length) {
 					var extension = filename.toLowerCase().split('.').pop();
 					if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
-						var imgFileName = files[fieldname] = imagesPath + id + '_' + fieldname + '.' + extension;
-						var fstream = fs.createWriteStream(__dirname + imgFileName);
+						var imgFileName = files[fieldname] = id + '_' + fieldname + '_' + global.getUniqueFilename() + '.' + extension;
+						var fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
+						console.log(appDir + imagesPath + imgFileName);
 						file.pipe(fstream);
 					}
 					else {

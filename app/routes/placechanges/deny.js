@@ -1,6 +1,6 @@
 module.exports = function(placeChangeManager){
 	return function (req, res) {
-		if (req.session.user && req.session.user.isAdmin) {
+		if (req.session.user) {
 			var id = req.params.id;
 			placeChangeManager.removeChange(id, function(err, place){
 				if (!err && place) {

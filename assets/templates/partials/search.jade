@@ -22,19 +22,28 @@
 				#results-map
 		.row
 			.col-lg-12.m-t-40
-				h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
-				.table-wrap.bg-white(ng-show='$places.length')
-					table#search-table.table
-						thead
-							tr
-								th Name
-								th.hidden-sm-down Religion
-								th Distance
-								th
-						tbody
-							tr.place-link(ng-repeat="$place in $places", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
-								td {{$place.name}}
-								td.hidden-sm-down {{$place.religion}}
-								td {{$place.distance}}m
-								td.text-right
-									i.fa.fa-chevron-right
+				h4.text-center(ng-show='$message.length') {{$message}}
+				div(ng-show="$places")
+					h5.text-center(ng-show="!$places.length")
+						| If you know of a place of worship please&nbsp;
+						a(href="/places/add") add it
+						| &nbsp;or we can&nbsp;
+						a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
+					div(ng-show="$places.length")
+						.table-wrap.bg-white
+							table#search-table.table
+								thead
+									tr
+										th Name
+										th.hidden-sm-down Religion
+										th Distance
+										th
+								tbody
+									tr.place-link(ng-repeat="$place in $places", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
+										td {{$place.name}}
+										td.hidden-sm-down {{$place.religion}}
+										td {{$place.distance}}m
+										td.text-right
+											i.fa.fa-chevron-right
+						h4.m-t-40.text-center If the Place of Worship you are looking for isn't listed, please help us by&nbsp;
+							a(href="/places/add") adding it

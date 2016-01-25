@@ -1,4 +1,5 @@
 module.exports = function(mongoose) {
+	var fs = require('fs');
 	var changeSchema = new mongoose.Schema({
 		user: {
 			type: mongoose.Schema.Types.ObjectId
@@ -31,8 +32,13 @@ module.exports = function(mongoose) {
 			PlaceChange.findOne({_id: id}, function(err, change){
 				if (change) {
 					global.placeManager.findOne(change.place, function(err, place){
+						if (change.field == 'bannerPhoto' || change.field == 'leaderPhoto') {
+							fs.unlink(global.appDir + global.imagesPath + place[change.field]);
+						}
 						place[change.field] = change.value;
-						place.save();
+						global.placeManager.update(change.place, place, function(err, place){
+							console.log(arguments);
+						});
 						change.remove({}, callback);
 					});
 				}
@@ -45,7 +51,19 @@ module.exports = function(mongoose) {
 		};
 
 		this.removeChange = function(id, callback) {
-			PlaceChange.findOneAndRemove({_id: id}, callback);
+			PlaceChange.findOne({_id: id}, function(err, change) {
+				if (change) {
+					if (change.field == 'bannerPhoto' || change.field == 'leaderPhoto') {
+						fs.unlink(global.appDir + global.imagesPath + change.value);
+					}
+					change.remove({}, callback);
+				}
+				else {
+					if (typeof callback == 'function') {
+						callback(err, change);
+					}
+				}
+			});
 		}
 	}
 	return PlaceChangeManager;

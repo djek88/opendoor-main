@@ -14,30 +14,16 @@ var jade = require('jade');
 var sha1 = require('sha1');
 require('./assets/js/utils.js');
 
-var UserManager = require('./app/usermanager.js')(mongoose);
-var userManager = new UserManager;
-
-var PlaceManager = require('./app/placemanager.js')(mongoose);
-var placeManager = new PlaceManager;
-
-var ReligionGroupManager = require('./app/religiongroupmanager.js')(mongoose);
-var religionGroupManager = new ReligionGroupManager;
-
-var DenominationManager = require('./app/denominationmanager.js')(mongoose);
-var denominationManager = new DenominationManager;
-
-var ClaimManager = require('./app/claimmanager.js')(mongoose);
-var claimManager = new ClaimManager;
-
-var PlaceChangeManager = require('./app/placechangemanager.js')(mongoose);
-var placeChangeManager = new PlaceChangeManager;
-
-global.userManager = userManager;
-global.placeManager = placeManager;
-global.religionGroupManager = religionGroupManager;
-global.denominationManager = denominationManager;
+var lastFileName = (new Date).getTime();
+function getUniqueFilename() {
+	return lastFileName++;
+}
+global.getUniqueFilename = getUniqueFilename;
 
 
+var path = require('path');
+global.appDir = path.dirname(require.main.filename);
+global.imagesPath = '/photos/';
 
 if (config.mailConfig.transport == 'gmail') {
 	var transporter = nodemailer.createTransport(config.mailConfig);
@@ -54,6 +40,36 @@ else {
 var Email = require('./app/email.js');
 var email = new Email(config, transporter);
 
+var UserManager = require('./app/usermanager.js')(mongoose);
+var userManager = new UserManager;
+
+var PlaceManager = require('./app/placemanager.js')(mongoose, email);
+var placeManager = new PlaceManager;
+
+var ReligionGroupManager = require('./app/religiongroupmanager.js')(mongoose);
+var religionGroupManager = new ReligionGroupManager;
+
+var DenominationManager = require('./app/denominationmanager.js')(mongoose);
+var denominationManager = new DenominationManager;
+
+var ClaimManager = require('./app/claimmanager.js')(mongoose);
+var claimManager = new ClaimManager;
+
+var PlaceChangeManager = require('./app/placechangemanager.js')(mongoose);
+var placeChangeManager = new PlaceChangeManager;
+
+
+var PlaceNotificationManager = require('./app/placenotificationmanager.js')(mongoose);
+var placeNotificationManager = new PlaceNotificationManager;
+
+global.userManager = userManager;
+global.placeManager = placeManager;
+global.religionGroupManager = religionGroupManager;
+global.denominationManager = denominationManager;
+global.placeNotificationManager = placeNotificationManager;
+
+
+
 
 var frontendPages = [
 	'/'
@@ -64,6 +80,7 @@ var frontendPages = [
 	,	'/error'
 	,	'/message'
 	,	'/notfound'
+	,	'/subscribefornotification'
 	,	'/places/add'
 	,	'/places/claims'
 	,	'/places/changes'
@@ -98,7 +115,10 @@ db.once('open', function () {
 		console.log('App listening at http://%s:%s', host, port);
 	});
 });
-
+app.use(function(req, res, next) {
+	res.header('Expires', (new Date(0).toGMTString()));
+	next();
+});
 
 
 app.get('/assets/templates/partials/:filename.html', function (req, res) {
@@ -130,7 +150,7 @@ app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(den
 app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
 
 
-app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, email));
+app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
 app.post('/places/review/:id', require('./app/routes/places/review.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
@@ -140,10 +160,11 @@ app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimMana
 app.get('/claims/:id/deny', require('./app/routes/claims/deny.js')(claimManager));
 
 
-app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(claimManager));
-app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(claimManager));
+app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(placeChangeManager));
+app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(placeChangeManager));
 
 
+app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));
 
 
 
