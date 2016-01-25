@@ -97,8 +97,6 @@ module.exports = function(mongoose, email) {
 	var Place = mongoose.model('place', placeSchema);
 
 	function preprocessFields(place, callback) {
-		console.log('preprocess');
-
 		var religionGroup = {name: place.groupName, religion: place.religion};
 		religionGroupManager.find(religionGroup, function(err, religionGroups){
 			if (!err && !religionGroups.length) {
@@ -112,7 +110,6 @@ module.exports = function(mongoose, email) {
 		place.about = sanitizeHtml(place.about);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
 		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
-			console.log(arguments);
 			if (places.length) {
 				err = new Error('Place with such URI already exists');
 			}
@@ -128,7 +125,6 @@ module.exports = function(mongoose, email) {
 		this.add = function(data, callback) {
 			var place = new Place(data);
 
-			//preprocessFields(place);
 			preprocessFields(place, function(err){
 				if (!err) {
 					place.save(callback);
@@ -148,7 +144,6 @@ module.exports = function(mongoose, email) {
 
 			preprocessFields(place, function(err){
 				if (!err) {
-					console.log(place);
 					Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
 				}
 				else {
@@ -202,9 +197,6 @@ module.exports = function(mongoose, email) {
 			if (data.exclude) {
 				options[0]['$geoNear']['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
 			}
-			console.log('============================================');
-			console.log(options);
-			console.log(options[0]['$geoNear']['query']);
 			Place.aggregate(options, function(err, places){
 				Place.populate(places, {path: "maintainer"}, callback);
 			});
