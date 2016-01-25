@@ -40,6 +40,10 @@ html, body {
 	color: #337ab7;
 }
 
+.inline {
+	display: inline;
+}
+
 .link:hover {
 	color: #23527c;
 	text-decoration: underline;
@@ -226,19 +230,20 @@ select.form-control,
 .rating-group .fa {
 	color: #FFBE00;
 }
-.form-group.rating-group .fa {
+.rating-group .fa {
 	padding-top: 3px;
 }
 
-a.rating-group {
+.rating-group {
 	color: #FFBE00;
 }
 
-a.rating-group:hover {
+.rating-group.link:hover {
 	text-decoration: none;
 }
 
-a.rating-group:hover  {
+.rating-group.link:hover,
+.rating-group.link:hover .fa  {
 	color: #FF9B00!important;
 }
 

@@ -190,6 +190,11 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
 			, controller: 'MaintainedPlacesCtrl'
 		}).
+		when('/places/review/:id', {
+			title: 'Add review'
+			,	templateUrl: 'assets/templates/partials/reviewadd.html'
+			, controller: 'FormCtrl'
+		}).
 		when('/places/:id', {
 				title: 'View place'
 			,	templateUrl: 'assets/templates/partials/placeview.html'
@@ -199,11 +204,6 @@ opendoorApp.config(
 			title: 'Subscribe fo notification'
 			,	templateUrl: 'assets/templates/partials/subscribefornotification.html'
 			, controller: 'SubscribeForNotificationFormCtrl'
-		}).
-		when('/places/review/:id', {
-				title: 'Add review'
-			,	templateUrl: 'assets/templates/partials/reviewadd.html'
-			, controller: 'FormCtrl'
 		}).
 		when('/login', {
 				title: 'Login'

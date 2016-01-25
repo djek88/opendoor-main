@@ -3,12 +3,12 @@
 		div
 			h3.text-center.m-t-30 Add a review
 			form.form-horizontal(method="POST", novalidate, name="form")
-				.form-group.rating-group(ng-class="{'has-error': (form.$submitted || form.rating.$touched) && form.rating.$error.required}")
+				.form-group(ng-class="{'has-error': (form.$submitted || form.rating.$touched) && form.rating.$error.required}")
 					label.col-md-3.control-label Rating
 
 					.col-md-9
 
-						.radio
+						.radio.rating-group
 							label
 								input(type="radio", name="rating", ng-model="rating", value="1", required)
 								.fa.fa-star
@@ -16,7 +16,7 @@
 								.fa.fa-star-o
 								.fa.fa-star-o
 								.fa.fa-star-o
-						.radio
+						.radio.rating-group
 							label
 								input(type="radio", name="rating", ng-model="rating", value="2", required)
 								.fa.fa-star
@@ -24,7 +24,7 @@
 								.fa.fa-star-o
 								.fa.fa-star-o
 								.fa.fa-star-o
-						.radio
+						.radio.rating-group
 							label
 								input(type="radio", name="rating", ng-model="rating", value="3", required)
 								.fa.fa-star
@@ -32,7 +32,7 @@
 								.fa.fa-star
 								.fa.fa-star-o
 								.fa.fa-star-o
-						.radio
+						.radio.rating-group
 							label
 								input(type="radio", name="rating", ng-model="rating", value="4", required)
 								.fa.fa-star
@@ -40,7 +40,7 @@
 								.fa.fa-star
 								.fa.fa-star
 								.fa.fa-star-o
-						.radio
+						.radio.rating-group
 							label
 								input(type="radio", name="rating", ng-model="rating", value="5", required)
 								.fa.fa-star

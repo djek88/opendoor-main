@@ -73,18 +73,26 @@
 						h6(ng-show="$place.updatedAt") Last updated at {{$place.updatedAt}}
 				#reviews.row
 					.col-lg-12.p-l-40.p-r-40.p-b-40
-						a
 						h3 Reviews
 							a.btn.btn-sm.btn-primary.m-l-5(href="/places/review/{{$place._id}}")  Add a review
-						span(ng-hide="$place.reviews.length") There are no reviews
-						div.rating-group.m-b-40(ng-repeat="$review in $place.reviews")
-							h5 {{$review.name}}
-							.fa(ng-class="$review.rating >= 1 ? 'fa-star' : 'fa-star-o'")
-							.fa(ng-class="$review.rating >= 2 ? 'fa-star' : 'fa-star-o'")
-							.fa(ng-class="$review.rating >= 3 ? 'fa-star' : 'fa-star-o'")
-							.fa(ng-class="$review.rating >= 4 ? 'fa-star' : 'fa-star-o'")
-							.fa(ng-class="$review.rating >= 5 ? 'fa-star' : 'fa-star-o'")
-							div {{$review.text}}
+						.rating-group.m-b-40
+							span.fa(ng-class="$place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
+							span.fa(ng-class="$place.averageRating >= 2 ? 'fa-star' : 'fa-star-o'")
+							span.fa(ng-class="$place.averageRating >= 3 ? 'fa-star' : 'fa-star-o'")
+							span.fa(ng-class="$place.averageRating >= 4 ? 'fa-star' : 'fa-star-o'")
+							span.fa(ng-class="$place.averageRating >= 5 ? 'fa-star' : 'fa-star-o'")
+							span  ({{$place.ratingsCount}})
+						div(ng-hide="$place.reviews.length") There are no reviews
+						div.m-b-40(ng-repeat="$review in $place.reviews")
+
+							h5.inline.semi-bold {{$review.name}}&nbsp;
+							span.rating-group
+								.fa(ng-class="$review.rating >= 1 ? 'fa-star' : 'fa-star-o'")
+								.fa(ng-class="$review.rating >= 2 ? 'fa-star' : 'fa-star-o'")
+								.fa(ng-class="$review.rating >= 3 ? 'fa-star' : 'fa-star-o'")
+								.fa(ng-class="$review.rating >= 4 ? 'fa-star' : 'fa-star-o'")
+								.fa(ng-class="$review.rating >= 5 ? 'fa-star' : 'fa-star-o'")
+							div.m-t-5 {{$review.text}}
 			.col-lg-1
 			.col-lg-3.bg-white.place-sidebar.p-b-10
 				h3 Nearby places
