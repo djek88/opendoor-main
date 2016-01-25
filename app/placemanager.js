@@ -74,10 +74,7 @@ module.exports = function(mongoose, email) {
 				type: mongoose.Schema.Types.ObjectId
 				, ref: 'user'
 			}
-			, isConfirmed: {
-				type: Boolean
-				,	default: false
-			}
+			, isConfirmed: Boolean
 			, reviews: {
 				type: [reviewSchema]
 				,	default: []
@@ -94,7 +91,6 @@ module.exports = function(mongoose, email) {
 		, {
 		timestamps: true
 	});
-	//placeSchema.index({location: '2dsphere'});
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
 
@@ -197,6 +193,18 @@ module.exports = function(mongoose, email) {
 			if (data.maxDistance) {
 				options[0]['$geoNear'].maxDistance = parseInt(data.maxDistance);
 			}
+			if (data.limit) {
+				options[0]['$geoNear']['limit'] = parseInt(data.limit);
+				if (data.exclude) {
+					options[0]['$geoNear']['limit']++;
+				}
+			}
+			if (data.exclude) {
+				options[0]['$geoNear']['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
+			}
+			console.log('============================================');
+			console.log(options);
+			console.log(options[0]['$geoNear']['query']);
 			Place.aggregate(options, function(err, places){
 				Place.populate(places, {path: "maintainer"}, callback);
 			});

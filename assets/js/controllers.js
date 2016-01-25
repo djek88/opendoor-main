@@ -82,7 +82,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			var requestParams = {
 				lat: place.location.coordinates[0]
 				, lng: place.location.coordinates[1]
-				, religion: place.religion
+				,	limit: 7
+				, exclude: place._id
+				//, religion: place.religion
 			};
 
 			$http({
@@ -91,32 +93,26 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				, params: requestParams
 			}).
 			success(function (places){
-				var nearbyPlaces = [];
 				if (Array.isArray(places)) {
-					if (places.length > 1) {
-						var placesCount = places.length;
-						if (placesCount>5) {
-							placesCount=5;
-						}
-						for (var i = 0; i < placesCount; i++) {
-							if (places[i]._id != $scope.$place._id){
+					if (places.length) {
+						for (var i = 0; i < places.length; i++) {
 								places[i].distance = Math.round(places[i].distance);
-								nearbyPlaces.push(places[i]);
-							}
 						}
 						$scope.$nearbyPlacesMessage = '';
 					}
 					else {
 						$scope.$nearbyPlacesMessage = 'There are no places nearby';
 					}
-					$scope.$nearbyPlaces = nearbyPlaces;
+					$scope.$nearbyPlaces = places;
 				}
 				else {
 					$scope.$nearbyPlacesMessage = 'An error happened during request';
+					$scope.$nearbyPlaces = null;
 				}
-				$scope.$nearbyPlaces = nearbyPlaces;
 			}).
 			error(function () {
+				$scope.$nearbyPlacesMessage = 'An error happened during request';
+				$scope.$nearbyPlaces = null;
 			});
 		}
 

@@ -35,6 +35,8 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 		}
 
 		function storePlace() {
+			delete fields.isConfirmed;
+			delete fields.maintainer;
 			var place = extend({}, fields);
 			place = extend(place, files);
 			var locationAsString = fields.location.split(',');
@@ -73,6 +75,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			delete place.country;
 			delete place.postalCode;
 
+			console.log(place);
 			if (isAdding) {
 				place._id = id;
 				place.isConfirmed = false;
@@ -81,7 +84,6 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				placeManager.add(place, finishRequest);
 			}
 			else {
-				delete place.isConfirmed;
 				placeManager.getById(req.params.id, function (err, currentPlace) {
 					if (currentPlace) {
 						if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {

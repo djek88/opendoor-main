@@ -7,6 +7,8 @@ module.exports = function(placeManager){
 			]
 			,	religion: req.query.religion
 			,	maxDistance: req.query.maxDistance
+			,	limit: req.query.limit
+			,	exclude: req.query.exclude
 		};
 		placeManager.findNearby(data, function(err, places){
 			if (!err) {
