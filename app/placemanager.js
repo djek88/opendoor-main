@@ -104,10 +104,12 @@ module.exports = function(mongoose, email) {
 			}
 		});
 
+		console.log(place.denominations);
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
 		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 		place.about = sanitizeHtml(place.about);
+		console.log(place.denominations);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
 		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
 			if (places.length) {
@@ -138,8 +140,8 @@ module.exports = function(mongoose, email) {
 
 		};
 
-		this.update = function(id, data, callback) {
-			var place = (new Place(data)).toObject();
+		this.update = function(id, place, callback) {
+			//var place = (new Place(data)).toObject();
 			place._id = id;
 
 			preprocessFields(place, function(err){
@@ -148,7 +150,7 @@ module.exports = function(mongoose, email) {
 				}
 				else {
 					if (typeof callback=='function') {
-						callback(err, place);
+						callback(err);
 					}
 				}
 			});

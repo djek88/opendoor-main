@@ -20,7 +20,6 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 		var allowedFileExtensions = ['jpg', 'png'];
 
 		function finishRequest(err, place) {
-
 			if (isAdding) {
 				email.sendNotificationAboutNewPlaceToAdmin(id);
 				email.sendConfirmationLink(id, req.session.user.email);
@@ -75,7 +74,6 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			delete place.country;
 			delete place.postalCode;
 
-			console.log(place);
 			if (isAdding) {
 				place._id = id;
 				place.isConfirmed = false;
@@ -124,7 +122,6 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 					if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
 						var imgFileName = files[fieldname] = id + '_' + fieldname + '_' + global.getUniqueFilename() + '.' + extension;
 						var fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
-						console.log(appDir + imagesPath + imgFileName);
 						file.pipe(fstream);
 					}
 					else {

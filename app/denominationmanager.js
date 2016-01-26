@@ -34,7 +34,8 @@ module.exports = function(mongoose) {
 			Denomination.find(query, cb);
 		};
 
-		this.addIfNotExists = function(newDenominations, religion, callback) {
+		this.addIfNotExists = function(currDenominations, religion, callback) {
+			var newDenominations = currDenominations.slice(0, currDenominations.length);
 			Denomination.find({
 				name: {
 					$in: newDenominations
