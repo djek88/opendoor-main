@@ -1,7 +1,7 @@
 #content.content
 	.container
 		.row
-			.col-lg-8.bg-white
+			.col-lg-8.bg-white.m-b-10
 				.row.p-l-40.p-r-40.p-b-20
 					.col-sm-12
 						h3
@@ -93,13 +93,16 @@
 								.fa(ng-class="$review.rating >= 4 ? 'fa-star' : 'fa-star-o'")
 								.fa(ng-class="$review.rating >= 5 ? 'fa-star' : 'fa-star-o'")
 							div.m-t-5 {{$review.text}}
-			.col-lg-1
-			.col-lg-3.bg-white.place-sidebar.p-b-10
-				h3 Nearby places
-				div(ng-show='$nearbyPlacesMessage.length') {{$nearbyPlacesMessage}}
-				.bg-white(ng-show='$nearbyPlaces.length')
-					table#search-table.table
-						tbody
-							tr.place-link(ng-repeat="$place in $nearbyPlaces", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
-								td {{$place.name}}
-								td {{$place.distance}}m
+			//.col-lg-1
+			.col-lg-4.row
+				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
+					h3 Edit
+				.col-lg-12.bg-white.place-sidebar.p-10
+					h3 Nearby places
+					div(ng-show='$nearbyPlacesMessage.length') {{$nearbyPlacesMessage}}
+					.bg-white(ng-show='$nearbyPlaces.length')
+						table#search-table.table
+							tbody
+								tr.place-link(ng-repeat="$place in $nearbyPlaces", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
+									td {{$place.name}}
+									td {{$place.distance}}m

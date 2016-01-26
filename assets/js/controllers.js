@@ -448,6 +448,7 @@ opendoorControllers.controller('SubscribeForNotificationFormCtrl', ['$scope', '$
 opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 		$('.location-picker').locationpicker();
+		var $locationInputEl = $('.location-picker-address');
 
 		$scope.$places = null;
 		$scope.$message = 'Press "Search" to find nearest places';
@@ -526,23 +527,32 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		};
 
 
+		function setSearchParams() {
+			var location = document.forms.form.location.value.split(', ');
+			console.log(location);
+			if (location.length==2) {
+
+				var requestParams = {
+					lat: location[0]
+					, lng: location[1]
+					, religion: $scope.religion
+				};
+
+				$location.search('lat', requestParams.lat);
+				$location.search('lng', requestParams.lng);
+				$location.search('religion', requestParams.religion);
+				$rootScope.$lastSearchAddress = $scope.address;
+			}
+			//$scope.$locationIsInvalid = (location.length<2);
+		}
 		$scope.$searchPlaces = function() {
 			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				var location = document.forms.form.location.value.split(', ');
-				if (location.length) {
-
-					var requestParams = {
-						lat: location[0]
-						, lng: location[1]
-						, religion: $scope.religion
-					};
-
-					$location.search('lat', requestParams.lat);
-					$location.search('lng', requestParams.lng);
-					$location.search('religion', requestParams.religion);
-					$rootScope.$lastSearchAddress = $scope.address;
-				}
+			console.log(typeof $locationInputEl.attr('active'));
+			if ($locationInputEl.attr('active')=='1') {
+				$locationInputEl.one('change', setSearchParams);
+			}
+			else {
+				setSearchParams();
 			}
 		};
 

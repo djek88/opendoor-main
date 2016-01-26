@@ -95,12 +95,16 @@ html, body {
 select.form-control,
 .select2-dropdown,
 .select2-container--default .select2-selection--single,
-.tagit.ui-widget,
 .input-group-addon,
 .trumbowyg-box,
 .form-control {
-	border-color: #2A72B5!important;
+	border-color: #2A72B5;
 	border-radius: 3px;
+}
+
+
+ul.tagit.ui-widget {
+	border-color: #2A72B5!important;
 }
 
 .table {

@@ -1,10 +1,7 @@
 /**
  * Created by Vavooon on 22.12.2015.
  */
-$.fn.locationpicker = function(options) {
-	var defaults = {
-	}
-	options = $.extend({}, defaults, options);
+$.fn.locationpicker = function() {
 	var geocoder = new google.maps.Geocoder();
 
 	var $rootEl = this;
@@ -14,8 +11,14 @@ $.fn.locationpicker = function(options) {
 	var $resultsEl = $('<div class="location-picker-results"></div>');
 
 	var location = null;
-
-
+	var typingDelay = 600;
+	var delay = (function(){
+		var timer = 0;
+		return function(callback, ms){
+			clearTimeout (timer);
+			timer = setTimeout(callback, ms);
+		};
+	})();
 
 	function showResults() {
 		$rootEl.addClass('location-picker-active');
@@ -48,38 +51,52 @@ $.fn.locationpicker = function(options) {
 			}
 		}
 		$inputEl.trigger("change");
+		$coordsEl.trigger("change");
 	}
 
-	function clearInput() {
-		setLocation(null);
-	}
 
 	function blur(e) {
 		if (e.target != $inputEl[0]) {
-			removeResults();
 			$(document).off('click', blur);
+			$inputEl.attr('active', 0);
+			if (e.target.className != 'location-picker-result' && $resultsEl.children().length) {
+				$resultsEl.children().first().click();
+			}
+			removeResults();
 		}
 	}
+
+	function loadResults() {
+		$(document).off('click', blur);
+		$inputEl.attr('active', 1);
+		geocoder.geocode({'address': $inputEl.val()}, function (results, status) {
+			if (status === google.maps.GeocoderStatus.OK) {
+				$resultsEl.empty();
+				for (var i = 0; i<results.length; i++) {
+					var $result = $('<div class="location-picker-result">' + results[i].formatted_address + '</div>');
+					$result[0].location = results[i];
+					$result.click(function(){
+						setLocation(this.location);
+					});
+					$resultsEl.append($result);
+				}
+				showResults();
+				$(document).on('click', blur);
+			}
+		});
+	}
+
 	$inputEl.keypress(function(e){
 		if(e.which == 13) {
 			e.stopPropagation();
-			geocoder.geocode({'address': $inputEl.val()}, function (results, status) {
-				if (status === google.maps.GeocoderStatus.OK) {
-					$resultsEl.empty();
-					for (var i = 0; i<results.length; i++) {
-						var $result = $('<div class="location-picker-result">' + results[i].formatted_address + '</div>');
-						$result[0].location = results[i];
-						$result.click(function(){
-							setLocation(this.location);
-						});
-						$resultsEl.append($result);
-					}
-					showResults();
-					$(document).on('click', blur);
-				}
-			});
+			loadResults();
+		}
+		else {
+			delay(loadResults, typingDelay);
 		}
 	});
+
+
 
 
 	function onPositionReceive (location) {
@@ -122,10 +139,7 @@ $.fn.locationpicker = function(options) {
 		}
 		return false;
 	};
-	$inputEl.focus(clearInput);
+	$inputEl.focus(loadResults);
 	$autoDetectEl.click(getLocationFromBrowser);
 
-	if (options.autoDetect) {
-		getLocationFromBrowser({clientX: 1});
-	}
 };
