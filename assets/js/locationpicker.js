@@ -62,6 +62,9 @@ $.fn.locationpicker = function() {
 			if (e.target.className != 'location-picker-result' && $resultsEl.children().length) {
 				$resultsEl.children().first().click();
 			}
+			else if (e.target.className != 'location-picker-result') {
+				setLocation();
+			}
 			removeResults();
 		}
 	}
@@ -69,24 +72,31 @@ $.fn.locationpicker = function() {
 	function loadResults() {
 		$(document).off('click', blur);
 		$inputEl.attr('active', 1);
-		geocoder.geocode({'address': $inputEl.val()}, function (results, status) {
-			if (status === google.maps.GeocoderStatus.OK) {
-				$resultsEl.empty();
-				for (var i = 0; i<results.length; i++) {
-					var $result = $('<div class="location-picker-result">' + results[i].formatted_address + '</div>');
-					$result[0].location = results[i];
-					$result.click(function(){
-						setLocation(this.location);
-					});
-					$resultsEl.append($result);
+		var value = $inputEl.val();
+		if (value) {
+			geocoder.geocode({'address': value}, function (results, status) {
+				if (status === google.maps.GeocoderStatus.OK) {
+					$resultsEl.empty();
+					for (var i = 0; i<results.length; i++) {
+						var $result = $('<div class="location-picker-result">' + results[i].formatted_address + '</div>');
+						$result[0].location = results[i];
+						$result.click(function(){
+							setLocation(this.location);
+						});
+						$resultsEl.append($result);
+					}
+					showResults();
+					$(document).on('click', blur);
 				}
-				showResults();
-				$(document).on('click', blur);
-			}
-		});
+			});
+		}
+		else {
+			setLocation();
+			removeResults();
+		}
 	}
 
-	$inputEl.keypress(function(e){
+	$inputEl.keyup(function(e){
 		if(e.which == 13) {
 			e.stopPropagation();
 			loadResults();

@@ -259,10 +259,8 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			if (value) {
 				var regExp = new RegExp(".*" + RegExp.escape(value.toLowerCase()) + ".*");
 				var matchesWasFound = false;
-				console.log(regExp);
 				for (var i = 0; i<groups.length; i++) {
 					if (typeof groups[i].name=='string' && regExp.test(groups[i].name.toLowerCase())) {
-						console.log(groups[i].name.toLowerCase());
 						matchesWasFound = true;
 						break;
 					}
@@ -374,7 +372,6 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
 			$scope.$place = $place;
-			console.log($scope.$isMaintainer);
 
 			loadOptionsForReligion($place.religion);
 			$groupsEl.selectpicker('val', $place.groupName);
@@ -529,7 +526,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 
 		function setSearchParams() {
 			var location = document.forms.form.location.value.split(', ');
-			console.log(location);
 			if (location.length==2) {
 
 				var requestParams = {
@@ -547,7 +543,6 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		}
 		$scope.$searchPlaces = function() {
 			$scope.form.$submitted = true;
-			console.log(typeof $locationInputEl.attr('active'));
 			if ($locationInputEl.attr('active')=='1') {
 				$locationInputEl.one('change', setSearchParams);
 			}
