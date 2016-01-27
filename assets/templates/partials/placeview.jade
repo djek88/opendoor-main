@@ -24,9 +24,6 @@
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
 						img.place-photo(ng-src="/photos/{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
-					a.btn.place-edit-btn.btn-primary.p-r-10.pull-right(href="/places/edit/{{$place._id}}")
-						span(ng-if="$isMaintainer") Edit place
-						span(ng-if="!$isMaintainer") Suggest changes
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
 						img.leader-photo(ng-src="/photos/{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
 					h3.m-l-40.p-l-10(ng-if="!$place.leaderPhoto && $place.leaderName") Place leader
@@ -68,7 +65,7 @@
 							a(href="{{$place.homepage}}", target="_blank", rel="nofollow")  {{$place.homepage}}
 						h3 Page details
 						h6.m-t-20(ng-show="$place.maintainer") This page is maintained by {{$place.maintainer.name}}
-						h6(ng-show="!$place.maintainer") There is no maintainer for this page
+						h6 There is no maintainer for this page
 						a(ng-if="!$isMaintainer", href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
 						h6(ng-show="$place.updatedAt") Last updated at {{$place.updatedAt}}
 				#reviews.row
@@ -96,7 +93,22 @@
 			//.col-lg-1
 			.col-lg-4.row
 				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
-					h3 Edit
+					h3.m-b-20 Edit
+					div(ng-show="$place.maintainer")
+						h6 This page is maintained by {{$place.maintainer.name}}
+						a(href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
+					div(ng-show="!$place.maintainer")
+						h5 Important!
+						| There is nobody currently managing this page. Please help us keep this profile up to date by either make a&nbsp;
+						a(href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
+						| &nbsp;or&nbsp;
+						a(href="/claims/{{$place._id}}/add", target="_self") notify the person that should be the editor
+
+					br
+					br
+					a.btn.btn-primary(ng-if="$place.maintainer", href="/places/edit/{{$place._id}}")
+						span(ng-if="$isMaintainer") Edit place
+						span(ng-if="!$isMaintainer") Suggest changes
 				.col-lg-12.bg-white.place-sidebar.p-10
 					h3 Nearby places
 					div(ng-show='$nearbyPlacesMessage.length') {{$nearbyPlacesMessage}}
