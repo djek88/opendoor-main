@@ -141,12 +141,8 @@ ul.tagit.ui-widget {
 }
 
 
-.place-photo-wrap + a + .leader-photo-wrap {
+.place-photo-wrap + .leader-photo-wrap {
 	margin-top: -80px;
-}
-
-.place-photo-wrap + a {
-	margin-top: 30px;
 }
 
 @media (max-width: 768px) {

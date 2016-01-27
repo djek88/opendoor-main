@@ -91,16 +91,14 @@
 					div(ng-show="$place.maintainer")
 						h6 This page is maintained by {{$place.maintainer.name}}
 							span(ng-if="$isMaintainer")  (you)
-						a(ng-if="!$isMaintainer", href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
+						div.m-b-10(ng-if="!$isMaintainer")
+							a(href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
 					div(ng-show="!$place.maintainer")
 						h5 Important!
 						| There is nobody currently managing this page. Please help us keep this profile up to date by either make a&nbsp;
 						a(href="/claims/{{$place._id}}/add", target="_self") Claim to be the editor
 						| &nbsp;or&nbsp;
 						a(href="/places/editorproposal/{{$place._id}}", target="_self") notify the person that should be the editor
-
-					br
-					br
 					a.btn.btn-primary(ng-if="$place.maintainer", href="/places/edit/{{$place._id}}")
 						span(ng-if="$isMaintainer") Edit place
 						span(ng-if="!$isMaintainer") Suggest changes
