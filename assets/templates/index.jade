@@ -87,4 +87,6 @@ html(ng-app="opendoorApp")
 			#wrap.ng-view
 			footer#footer.my-footer(ng-controller="FooterCtrl")
 				| © {{$root.$year}} OpenDoor -
-				a.link(ng-click="$leaveFeedback($event)", ng-disabled="$isFeedbackPage")  Please give us feedback no matter how small to help improve this resource
+				a.link(ng-click="$leaveFeedback($event)", ng-disabled="$isFeedbackPage")  Suggest an improvement
+				| &nbsp;-&nbsp;
+				a.link(href="/about") About
