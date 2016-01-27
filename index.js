@@ -88,6 +88,7 @@ var frontendPages = [
 	,	'/places/last'
 	,	'/places/maintained'
 	,	'/places/review/:id'
+	,	'/places/editorproposal/:id'
 	, /\/places\/(.*)/
 ];
 
@@ -151,6 +152,7 @@ app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
 
 
 app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
+app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
 app.post('/places/review/:id', require('./app/routes/places/review.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));

@@ -7,6 +7,7 @@ module.exports = function(mongoose, claimManager){
 				, place: mongoose.Types.ObjectId(placeId)
 			};
 
+			console.log('start');
 			claimManager.add(data, function(err, place){
 				if (!err && place) {
 					console.log('Claim for place ' + placeId + ' was added');
@@ -16,6 +17,9 @@ module.exports = function(mongoose, claimManager){
 					res.redirect('/error');
 				}
 			});
+		}
+		else {
+			res.redirect('/message?message=pleaselogin');
 		}
 	};
 };

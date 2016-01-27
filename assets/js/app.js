@@ -195,6 +195,11 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/reviewadd.html'
 			, controller: 'FormCtrl'
 		}).
+		when('/places/editorproposal/:id', {
+			title: 'Notify the person'
+			,	templateUrl: 'assets/templates/partials/editorproposalform.html'
+			, controller: 'EditorProposalCtrl'
+		}).
 		when('/places/:id', {
 				title: 'View place'
 			,	templateUrl: 'assets/templates/partials/placeview.html'

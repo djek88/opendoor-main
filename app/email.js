@@ -95,6 +95,20 @@ function Email (config, transporter) {
 
 		this.send(mailOptions, callback);
 	};
+
+	this.sendEditorProposal = function(options, callback) {
+		var mailText = 'Someone asked you to be an editor of place: ' + config.url + '/places/' + options.id + '\n' +
+			'You can claim to be editor by passing by the link: ' + config.url + '/claims/' + options.id + '/add' + '\n';
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+
+		this.send(mailOptions, callback);
+	};
 }
 
 module.exports = Email;

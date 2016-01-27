@@ -759,6 +759,19 @@ opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$locati
 	}
 ]);
 
+opendoorControllers.controller('EditorProposalCtrl', ['$scope', '$routeParams', '$sce',
+	function($scope, $routeParams, $sce) {
+		$scope.$action = $sce.trustAsResourceUrl('/places/editorproposal/' + $routeParams.id);
+		$scope.placeId = $routeParams.id;
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
+	}
+]);
+
 
 opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location', '$window',
 	function($scope, $rootScope, $location, $window) {
@@ -800,7 +813,11 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Page not found';
 				break;
-
+			case 'proposalsent':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Your proposal has been sent';
+				break;
 			case 'messagesent':
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Success';
