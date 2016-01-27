@@ -104,6 +104,7 @@
 					a.btn.btn-primary(ng-if="$place.maintainer", href="/places/edit/{{$place._id}}")
 						span(ng-if="$isMaintainer") Edit place
 						span(ng-if="!$isMaintainer") Suggest changes
+					h6(ng-show="$place.updatedAt") Last updated at {{$place.updatedAt}}
 				.col-lg-12.bg-white.place-sidebar.p-10
 					h3 Nearby places
 					div(ng-show='$nearbyPlacesMessage.length') {{$nearbyPlacesMessage}}
