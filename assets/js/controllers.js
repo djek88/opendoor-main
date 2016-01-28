@@ -116,7 +116,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			});
 		}
 
-
 		function setData($place) {
 			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
 			if ($place.updatedAt) {
@@ -127,6 +126,17 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				if ($place.homepage.substr(0, 4) != 'http') {
 					$place.homepage = 'http://' + $place.homepage;
 				}
+			}
+
+			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1) {
+				$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[0] + ',' + $place.location.coordinates[1]);
+			}
+			else if( navigator.userAgent.toLowerCase().indexOf("android") != -1 || navigator.userAgent.toLowerCase().indexOf("windows") != -1) {
+				$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[0] + ',' + $place.location.coordinates[1] + '(' + $place.name + ')');
+			}
+
+			if ($place.phone) {
+				$place.phoneUrl = $sce.trustAsResourceUrl('tel:' + $place.phone);
 			}
 
 			$scope.$mainMeetingText = '';

@@ -124,6 +124,13 @@ opendoorApp.config(['$httpProvider', function($httpProvider) {
 	$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }]);
 
+opendoorApp.config( [
+	'$compileProvider',
+	function( $compileProvider )
+	{
+		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
+	}
+]);
 
 opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
 	$rootScope.$on('$routeChangeSuccess', function() {

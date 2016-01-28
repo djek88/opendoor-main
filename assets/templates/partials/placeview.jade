@@ -41,6 +41,9 @@
 				.row.p-40.p-b-10
 					.col-lg-12
 						h3 Location
+							h4
+								a(ng-if="$place.externalMapsLink", href="{{$place.externalMapsLink}}", target="_system") Open in Maps app&nbsp;
+									.fa.fa-external-link
 				.row
 					.col-lg-12
 					#results-map
@@ -58,8 +61,9 @@
 							.fa.fa-home
 							|  {{$place.concatenatedAddress}}
 						div(ng-show="$place.phone")
-							.fa.fa-phone
-							|  {{$place.phone}}
+							a(href="{{$place.phoneUrl}}")
+								.fa.fa-phone
+								|  {{$place.phone}}
 						div(ng-show="$place.homepage")
 							.fa.fa-link
 							a(href="{{$place.homepage}}", target="_blank", rel="nofollow")  {{$place.homepage}}
