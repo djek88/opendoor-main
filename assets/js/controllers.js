@@ -153,6 +153,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			$place.about = $sce.trustAsHtml($place.about);
 			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
 
+			$(document.head).append('<script type="application/ld+json">' + JSON.stringify($place.jsonLd) + '</script>');
 			$scope.$place = $place;
 
 

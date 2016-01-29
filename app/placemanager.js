@@ -2,7 +2,7 @@
  * Created by Vavooon on 18.12.2015.
  */
 
-module.exports = function(mongoose, email) {
+module.exports = function(mongoose, email, config) {
 
 
 	var sanitizeHtml = require('sanitize-html');
@@ -87,6 +87,7 @@ module.exports = function(mongoose, email) {
 				type: Number
 				,	default: 0
 			}
+			,	jsonLd: mongoose.Schema.Types.Mixed
 		}
 		, {
 		timestamps: true
@@ -121,12 +122,66 @@ module.exports = function(mongoose, email) {
 		});
 	}
 
+	function createJsonLd(place) {
+		var data = {
+				'@type': 'Place'
+			,	name: place.name
+			,	mainentitiyofpage: config.url + place.uri
+			,	geo: {
+				'@type': 'GeoCoordinates'
+				, latitude: place.location.coordinates[0]
+				, longitude: place.location.coordinates[1]
+			}
+			,	address: {
+				'@type': 'PostalAddress'
+				,	addressCountry: place.address.coutry
+				,	addressLocality: place.address.city
+				,	addressRegion: place.address.region
+				,	postalCode: place.address.postalCode
+				,	streetAddress: [place.address.line1, place.address.line2].cleanArray().join(', ')
+			}
+		};
+
+
+		if (place.bannerPhoto) {
+			data.image = config.url + '/photos/' + place.bannerPhoto;
+		}
+
+		if (place.about) {
+			data.description = place.about;
+		}
+
+		if (place.phone) {
+			data.telephone = place.phone;
+		}
+
+		if (place.averageRating) {
+			data.aggregateRating = place.averageRating;
+		}
+
+		if (place.reviews.length) {
+			data.review = [];
+			for (var i=0; i < place.reviews.length; i++) {
+				data.review.push({
+					"@type": 'Review'
+					,	author: place.reviews[i].name
+					,	reviewBody: place.reviews[i].text
+					,	reviewRating: {
+						"@type": 'Rating'
+						,	ratingValue: place.reviews[i].rating
+					}
+				})
+			}
+		}
+		return data;
+	}
+
 	function PlaceManager() {
 		this.model = Place;
 
 		this.add = function(data, callback) {
 			var place = new Place(data);
-
+			place.jsonLd = createJsonLd(place);
 			preprocessFields(place, function(err){
 				if (!err) {
 					place.save(callback);
@@ -140,20 +195,24 @@ module.exports = function(mongoose, email) {
 
 		};
 
-		this.update = function(id, place, callback) {
-			//var place = (new Place(data)).toObject();
-			place._id = id;
-
-			preprocessFields(place, function(err){
-				if (!err) {
-					Place.findOneAndUpdate({_id: id}, {'$set': place}, callback);
+		this.update = function(id, data, callback) {
+			Place.findOne({_id: id}, function(err, place) {
+				for (var i in data) {
+					place[i] = data[i];
 				}
-				else {
-					if (typeof callback=='function') {
-						callback(err);
+				preprocessFields(place, function(err){
+					if (!err) {
+						place.jsonLd = createJsonLd(place);
+						place.save(callback);
 					}
-				}
-			});
+					else {
+						if (typeof callback=='function') {
+							callback(err);
+						}
+					}
+				});
+			})
+
 
 		};
 
@@ -240,6 +299,7 @@ module.exports = function(mongoose, email) {
 				}
 				place.ratingsCount = place.reviews.length;
 				place.averageRating = averageRating / place.reviews.length;
+				place.jsonLd = createJsonLd(place);
 				place.save();
 				if (typeof callback=='function') {
 					callback(err, place);

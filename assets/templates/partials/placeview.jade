@@ -80,7 +80,6 @@
 							span  ({{$place.ratingsCount}})
 						div(ng-hide="$place.reviews.length") There are no reviews
 						div.m-b-40(ng-repeat="$review in $place.reviews")
-
 							h5.inline.semi-bold {{$review.name}}&nbsp;
 							span.rating-group
 								.fa(ng-class="$review.rating >= 1 ? 'fa-star' : 'fa-star-o'")

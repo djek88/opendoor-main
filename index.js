@@ -43,7 +43,7 @@ var email = new Email(config, transporter);
 var UserManager = require('./app/usermanager.js')(mongoose);
 var userManager = new UserManager;
 
-var PlaceManager = require('./app/placemanager.js')(mongoose, email);
+var PlaceManager = require('./app/placemanager.js')(mongoose, email, config);
 var placeManager = new PlaceManager;
 
 var ReligionGroupManager = require('./app/religiongroupmanager.js')(mongoose);
