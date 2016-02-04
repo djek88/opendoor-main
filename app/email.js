@@ -109,6 +109,20 @@ function Email (config, transporter) {
 
 		this.send(mailOptions, callback);
 	};
+
+	this.sendClaimConfirmation = function(options, callback) {
+		var mailText = 'Your claim for editing place: ' + config.url + '/places/' + options.id + ' was accepted.\n' +
+			'Now you will be able to edit the place.';
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+
+		this.send(mailOptions, callback);
+	};
 }
 
 module.exports = Email;

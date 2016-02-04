@@ -1,0 +1,30 @@
+#content.content
+	.container
+		.row
+			h2 User info
+			.col-lg-12.bg-white.p-25.m-b-20
+				dl
+					dt Name
+					dd {{$user.name}}
+					dt Email
+					dd {{$user.email}}
+					dt Admin
+					dd.m-t-5
+						.label.label-danger(ng-if="$user.isAdmin") YES
+						.label.label-primary(ng-if="!$user.isAdmin") NO
+			h2 Maintained places
+			.col-lg-12.bg-white.table-wrap
+				//h4.search-placeholder.text-center(ng-show='$message.length') {{$message}}
+				div(ng-show='$places.length')
+					table#search-table.table
+						thead
+							tr
+								th Name
+								th Religion
+								th
+						tbody
+							tr.place-link(ng-repeat="$place in $places", ng-mousedown="$root.$openPlace($event, $place)")
+								td {{$place.name}}
+								td {{$place.religion}}
+								td.text-right
+									i.fa.fa-chevron-right

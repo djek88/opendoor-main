@@ -1,7 +1,14 @@
 module.exports = function(mongoose, placeManager){
 	return function(req, res){
 		if (req.session.user) {
-			placeManager.find({isConfirmed: true, maintainer: mongoose.Types.ObjectId(req.session.user._id)}).populate('maintainer', 'name').exec(function (err, places) {
+			var maintainerId;
+			if (req.params.id && req.session.user.isAdmin) {
+				maintainerId = req.params.id;
+			}
+			else {
+				maintainerId = req.session.user._id;
+			}
+			placeManager.find({isConfirmed: true, maintainer: mongoose.Types.ObjectId(maintainerId)}).populate('maintainer', 'name').exec(function (err, places) {
 				if (!err) {
 					res.send(JSON.stringify(places));
 				}

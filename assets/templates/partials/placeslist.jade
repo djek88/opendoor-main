@@ -1,0 +1,35 @@
+#content.content
+	.container
+		.row
+			.col-lg-12
+				form.form-inline(name="form", novalidate)
+					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.location.$error.required}")
+						input.form-control(name="name", ng-model="name", placeholder="Name")
+					.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
+						select.form-control(name="religion", ng-model="religion")
+							option(value="", selected) All religions
+							option(value="{{$name}}", ng-repeat="$name in $religionsList") {{$name}}
+					button.btn.btn-md.btn-primary(type='submit', ng-click="$searchPlaces()") Filter
+					.clearfix
+		.row
+		.row
+			.col-lg-12.m-t-40
+				h4.text-center(ng-show='$message.length') {{$message}}
+				div(ng-show="$places")
+					div(ng-show="$places.length")
+						.table-wrap.bg-white
+							table#search-table.table
+								thead
+									tr
+										th Name
+										th Religion
+										th Maintainer
+										th
+								tbody
+									tr.place-link(ng-repeat="$place in $places", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
+										td {{$place.name}}
+										td {{$place.religion}}
+										td
+											span(ng-show="$place.maintainer") {{$place.maintainer.name}}
+										td.text-right
+											i.fa.fa-chevron-right

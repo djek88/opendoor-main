@@ -205,6 +205,73 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 	}
 ]);
 
+
+
+opendoorControllers.controller('UserViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
+	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
+		var userId = $location.url().split('/').pop();
+		$scope.$userId = userId;
+
+
+
+		function setData($user) {
+			$scope.$user = $user;
+
+			$scope.$places = [];
+			$scope.$message = 'Loading…';
+			$http({
+				url: '/ajax/places/maintained/' + $user._id
+				, method: 'GET'
+			}).
+			success(function (data){
+				if (Array.isArray(data)) {
+					if (data.length) {
+						for (var i = 0; i < data.length; i++) {
+							data[i].distance = Math.round(data[i].distance);
+						}
+						$scope.$message = '';
+					}
+					else {
+						$scope.$message = 'There are no maintained places';
+					}
+					$scope.$places = data;
+				}
+				else {
+					$scope.$message = 'An error happened during request';
+					$scope.$places = [];
+				}
+			}).
+			error(function () {
+				$scope.$message = 'Error processing request';
+			});
+		}
+		if ($rootScope.$selectedUser) {
+			setData($rootScope.$selectedUser);
+		}
+		else {
+			$http({
+				url: '/ajax/users/' + userId
+				, method: 'GET'
+			}).
+			success(function (data) {
+				if (typeof data== 'object') {
+					setData(data[0]);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function () {
+				$location.url('/notfound');
+			});
+		}
+
+
+
+
+	}
+]);
+
 opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
 
@@ -545,9 +612,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 					, religion: $scope.religion
 				};
 
-				$location.search('lat', requestParams.lat);
-				$location.search('lng', requestParams.lng);
-				$location.search('religion', requestParams.religion);
+				$location.search('lat', requestParams.lat || null);
+				$location.search('lng', requestParams.lng || null);
+				$location.search('religion', requestParams.religion || null);
 				$rootScope.$lastSearchAddress = $scope.address;
 			}
 			//$scope.$locationIsInvalid = (location.length<2);
@@ -611,6 +678,109 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 ]);
 
 
+opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+
+		$scope.$places = null;
+		var $table = $('#search-table');
+		$scope.$religionsList = $rootScope.$religions;
+		$scope.religion = '';
+
+
+		function setSearchParams() {
+
+			var requestParams = {
+					name: $scope.name
+				, religion: $scope.religion
+			};
+
+			$location.search('name', requestParams.name || null);
+			$location.search('religion', requestParams.religion || null);
+		}
+		$scope.$searchPlaces = function() {
+			$scope.form.$submitted = true;
+			setSearchParams();
+		};
+
+		function onError() {
+			$scope.$message = 'An error happened during request';
+			$scope.$places = null;
+		}
+
+		var requestParams = $location.search();
+		$scope.name = requestParams.name;
+		$scope.religion = requestParams.religion;
+		$scope.$message = 'Searching…';
+		$http({
+			url: '/ajax/places/search'
+			, method: 'GET'
+			, params: requestParams
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no places of worship';
+				}
+				$scope.$places = data;
+			}
+			else {
+				onError();
+			}
+		}).
+		error(onError);
+	}
+
+]);
+
+
+opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+
+		$scope.$users = null;
+
+		$scope.$openUser = function($event, $user) {
+			$rootScope.$selectedUser = $user;
+			if ($event.which == 2) {
+				$window.open('/users/' + $user._id, '_blank');
+			}
+			else {
+				$location.url('/users/' + $user._id);
+			}
+		};
+
+		function onError() {
+			$scope.$message = 'An error happened during request';
+			$scope.$users = null;
+		}
+
+		$scope.$message = 'Searching…';
+		$http({
+			url: '/ajax/users'
+			, method: 'GET'
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					$scope.$message = '';
+				}
+				else {
+					$scope.$message = 'There are no users';
+				}
+				$scope.$users = data;
+			}
+			else {
+				onError();
+			}
+		}).
+		error(onError);
+	}
+
+]);
+
+
 opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 		$scope.$places = [];
@@ -647,10 +817,9 @@ opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope
 ]);
 
 
-opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
-	function($scope, $http, $rootScope, $location, $window) {
+opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http',
+	function($scope, $http) {
 		$scope.$places = [];
-
 		$scope.$message = 'Loading…';
 		$http({
 			url: '/ajax/places/maintained'
@@ -659,9 +828,6 @@ opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http', '$roo
 		success(function (data){
 			if (Array.isArray(data)) {
 				if (data.length) {
-					for (var i = 0; i < data.length; i++) {
-						data[i].distance = Math.round(data[i].distance);
-					}
 					$scope.$message = '';
 				}
 				else {

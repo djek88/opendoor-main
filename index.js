@@ -52,7 +52,7 @@ var religionGroupManager = new ReligionGroupManager;
 var DenominationManager = require('./app/denominationmanager.js')(mongoose);
 var denominationManager = new DenominationManager;
 
-var ClaimManager = require('./app/claimmanager.js')(mongoose);
+var ClaimManager = require('./app/claimmanager.js')(mongoose, email);
 var claimManager = new ClaimManager;
 
 var PlaceChangeManager = require('./app/placechangemanager.js')(mongoose);
@@ -85,7 +85,10 @@ var frontendPages = [
 	,	'/places/claims'
 	,	'/places/changes'
 	,	'/places/edit/:id'
+	,	'/places/list'
 	,	'/places/last'
+	,	'/users/list'
+	,	'/users/:id'
 	,	'/places/maintained'
 	,	'/places/review/:id'
 	,	'/places/editorproposal/:id'
@@ -137,8 +140,11 @@ app.get('/logout', require('./app/routes/logout.js')());
 app.post('/register', require('./app/routes/register.js')(userManager, sha1));
 
 
+app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
+app.get('/ajax/users/:id', require('./app/routes/ajax/users.js')(userManager));
 app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(placeManager));
 app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(mongoose, placeManager));
+app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(mongoose, placeManager));
 app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(placeManager));
 app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/find.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
 

@@ -65,7 +65,11 @@ html(ng-app="opendoorApp")
 									b.caret
 								ul.dropdown-menu
 									li
+										a(href='/places/list') PLACES LIST
+									li
 										a(href='/places/claims') PLACE CLAIMS
+									li
+										a(href='/users/list') USERS LIST
 
 							li(ng-show="$isLoggedIn")
 								a.link(data-toggle='dropdown' ng-disabled)

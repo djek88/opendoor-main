@@ -179,6 +179,24 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/placechanges.html'
 			, controller: 'PlaceChangesCtrl'
 		}).
+		when('/places/list', {
+			title: 'Places list'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/placeslist.html'
+			, controller: 'PlacesListCtrl'
+		}).
+		when('/users/list', {
+			title: 'Users list'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/userslist.html'
+			, controller: 'UsersListCtrl'
+		}).
+		when('/users/:id', {
+			title: 'View user'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/userview.html'
+			, controller: 'UserViewCtrl'
+		}).
 		when('/places/edit/:id', {
 				title: 'Edit place'
 			,	shouldLogin: true

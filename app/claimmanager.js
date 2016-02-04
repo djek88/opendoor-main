@@ -3,7 +3,7 @@
  */
 
 
-module.exports = function(mongoose) {
+module.exports = function(mongoose, email) {
 	var claimSchema = new mongoose.Schema({
 			user: {
 				type: mongoose.Schema.Types.ObjectId
@@ -38,6 +38,9 @@ module.exports = function(mongoose) {
 				if (claim) {
 					global.placeManager.setMaintainer(claim.place, claim.user, function(err, place){
 						if (place) {
+							global.userManager.findOne(claim.user, function(err, user){
+								email.sendClaimConfirmation({id: claim.place, recipientEmail: user.email});
+							});
 							claim.remove({}, callback);
 						}
 					});

@@ -221,43 +221,55 @@ module.exports = function(mongoose, email, config) {
 		};
 
 		this.findNearby = function(data, callback) {
+			var geoNearOption = {
+				"near": {
+					"type": "Point"
+					,	"coordinates": data.coordinates
+				}
+				,	"distanceField": "distance"
+				//,	"maxDistance": 2000
+				,	"spherical": true
+				,	"query": { "location.type": "Point" }
+			};
+			var matchOption = {
+				'isConfirmed': true
+			};
+
 			var options = [
 				{
-					"$geoNear": {
-						"near": {
-							"type": "Point"
-							,	"coordinates": data.coordinates
-						}
-						,	"distanceField": "distance"
-						//,	"maxDistance": 2000
-						,	"spherical": true
-						,	"query": { "location.type": "Point" }
-					}
-				},
-				{
-					"$sort": {"distance": 1} // Sort the nearest first
-				},
-				{
-					"$match": {
-						'isConfirmed': true
-					}
+					"$match": matchOption
 				}
 			];
+			if (data.coordinates) {
+				options.unshift({"$geoNear": geoNearOption}, {
+					"$sort": {"distance": 1} // Sort the nearest first
+				});
+			}
+
 			if (data.religion) {
-				options[2]['$match']['religion'] = data.religion;
+				matchOption['religion'] = data.religion;
+			}
+
+			if (data.name) {
+				matchOption['name'] = new RegExp(data.name, 'i');
 			}
 			if (data.maxDistance) {
-				options[0]['$geoNear'].maxDistance = parseInt(data.maxDistance);
+				geoNearOption.maxDistance = parseInt(data.maxDistance);
 			}
 			if (data.limit) {
-				options[0]['$geoNear']['limit'] = parseInt(data.limit);
+				var limit = parseInt(data.limit);
+				//geoNearOption['limit'] = parseInt(data.limit);
 				if (data.exclude) {
-					options[0]['$geoNear']['limit']++;
+					limit++;
+					//geoNearOption['limit']++;
 				}
+				options.push({"$limit": limit});
 			}
 			if (data.exclude) {
-				options[0]['$geoNear']['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
+				geoNearOption['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
 			}
+
+			console.log("Find place", options);
 			Place.aggregate(options, function(err, places){
 				Place.populate(places, {path: "maintainer"}, callback);
 			});
