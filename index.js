@@ -135,6 +135,9 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 
 });
 
+
+app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(config));
+
 app.post('/login', require('./app/routes/login.js')(userManager, sha1));
 app.get('/logout', require('./app/routes/logout.js')());
 app.post('/register', require('./app/routes/register.js')(userManager, sha1));

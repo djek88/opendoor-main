@@ -75,6 +75,8 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 
 	$rootScope.$year = (new Date).getFullYear();
 
+	$rootScope.siteconfig = siteconfig;
+
 	$rootScope.$openPlace = function($event, $place) {
 		$rootScope.$selectedPlace = $place;
 		if ($event.which == 2) {

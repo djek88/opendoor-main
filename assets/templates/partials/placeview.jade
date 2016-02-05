@@ -23,9 +23,9 @@
 
 				.row
 					.place-photo-wrap(ng-if="$place.bannerPhoto")
-						img.place-photo(ng-src="/photos/{{$place.bannerPhoto}}", ng-show="$place.bannerPhoto")
+						img.place-photo(ng-src="{{siteconfig.imagesPath + $place.bannerPhoto}}", ng-show="$place.bannerPhoto")
 					.leader-photo-wrap(ng-if="$place.leaderPhoto")
-						img.leader-photo(ng-src="/photos/{{$place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
+						img.leader-photo(ng-src="{{siteconfig.imagesPath + $place.leaderPhoto}}", ng-image-load="$onLeaderPhotoLoad()")
 					h3.m-l-40.p-l-10(ng-if="!$place.leaderPhoto && $place.leaderName") Place leader
 					h4.leader-title(ng-class="$place.leaderPhoto ? 'photo-title' : 'alone-title'") {{$place.leaderRole}} {{$place.leaderName}}
 
@@ -112,6 +112,6 @@
 					.bg-white(ng-show='$nearbyPlaces.length')
 						table#search-table.table
 							tbody
-								tr.place-link(ng-repeat="$place in $nearbyPlaces", ng-mousedown="$root.$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
+								tr.place-link(ng-repeat="$place in $nearbyPlaces", ng-mousedown="$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
 									td {{$place.name}}
 									td {{$place.distance}}m
