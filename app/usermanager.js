@@ -11,7 +11,11 @@ module.exports = function(mongoose) {
 		name: String,
 		email: String,
 		password: String,
-		isAdmin: Boolean
+		isAdmin: Boolean,
+		maintainedPlaces: {
+			type: [mongoose.Schema.Types.ObjectId]
+		, ref: 'place'
+		}
 	});
 	var User = mongoose.model('user', userSchema);
 

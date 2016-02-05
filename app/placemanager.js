@@ -217,7 +217,30 @@ module.exports = function(mongoose, email, config) {
 		};
 
 		this.setMaintainer = function(id, maintainerId, callback) {
-			Place.findOneAndUpdate({_id: id}, {'$set': {maintainer: mongoose.Types.ObjectId(maintainerId)}}, callback);
+			Place.findOne({_id: id}, function(err, place) {
+				if (place.maintainer) {
+					global.userManager.findOne({_id: place.maintainer}, function(err, user){
+						if (user) {
+							var index = user.maintainedPlaces.indexOf(place._id);
+							if (index != -1) {
+								user.maintainedPlaces.splice(index, 1);
+								user.save();
+							}
+						}
+					})
+				}
+				place.maintainer = maintainerId;
+				global.userManager.findOne({_id: maintainerId}, function(err, user){
+					if (user) {
+						user.maintainedPlaces.push(place._id);
+						user.save();
+					}
+				});
+				place.maintainer = maintainerId;
+				place.save(callback);
+			});
+				//{'$set': {maintainer: mongoose.Types.ObjectId(maintainerId)}}
+			//}, callback);
 		};
 
 		this.findNearby = function(data, callback) {
@@ -267,6 +290,10 @@ module.exports = function(mongoose, email, config) {
 			}
 			if (data.exclude) {
 				geoNearOption['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
+			}
+
+			if (data.maintained) {
+				matchOption['maintainer'] = {$ne: null};
 			}
 
 			console.log("Find place", options);

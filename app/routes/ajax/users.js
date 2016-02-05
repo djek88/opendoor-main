@@ -6,6 +6,10 @@ module.exports = function(userManager){
 				query['_id'] = req.params.id;
 			}
 
+			if (req.query.maintainers == 'true') {
+				query['maintainedPlaces'] =  {$ne: []};
+			}
+
 			userManager.find(query, function(err, users){
 				if (!err) {
 					res.send(JSON.stringify(users));

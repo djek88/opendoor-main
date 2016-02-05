@@ -6,6 +6,7 @@ module.exports = function(placeManager){
 			,	limit: req.query.limit
 			,	exclude: req.query.exclude
 			, name: req.query.name
+			, maintained: req.query.maintained
 		};
 		if (req.query.lat) {
 			data.coordinates = [

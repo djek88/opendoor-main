@@ -692,10 +692,12 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 			var requestParams = {
 					name: $scope.name
 				, religion: $scope.religion
+				, maintained: $scope.maintained
 			};
 
 			$location.search('name', requestParams.name || null);
 			$location.search('religion', requestParams.religion || null);
+			$location.search('maintained', requestParams.maintained || null);
 		}
 		$scope.$searchPlaces = function() {
 			$scope.form.$submitted = true;
@@ -710,6 +712,7 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 		var requestParams = $location.search();
 		$scope.name = requestParams.name;
 		$scope.religion = requestParams.religion;
+		$scope.maintained = requestParams.maintained;
 		$scope.$message = 'Searching…';
 		$http({
 			url: '/ajax/places/search'
@@ -719,6 +722,11 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 		success(function (data){
 			if (Array.isArray(data)) {
 				if (data.length) {
+					for (var i=0; i< data.length; i++) {
+						if (data[i].updatedAt) {
+							data[i].updatedAt = (new Date(data[i].updatedAt)).toString('MM/dd/yyyy');
+						}
+					}
 					$scope.$message = '';
 				}
 				else {
@@ -751,15 +759,31 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 			}
 		};
 
+		function setSearchParams() {
+
+			var requestParams = {
+				maintainers: $scope.maintainers
+			};
+
+			$location.search('maintainers', requestParams.maintainers || null);
+		}
+		$scope.$searchUsers = function() {
+			$scope.form.$submitted = true;
+			setSearchParams();
+		};
+
 		function onError() {
 			$scope.$message = 'An error happened during request';
 			$scope.$users = null;
 		}
 
+		var requestParams = $location.search();
+		$scope.maintainers = requestParams.maintainers;
 		$scope.$message = 'Searching…';
 		$http({
 			url: '/ajax/users'
 			, method: 'GET'
+			, params: requestParams
 		}).
 		success(function (data){
 			if (Array.isArray(data)) {
