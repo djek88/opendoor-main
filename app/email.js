@@ -123,6 +123,21 @@ function Email (config, transporter) {
 
 		this.send(mailOptions, callback);
 	};
+
+	this.sendPlaceReminder = function(options, callback) {
+		var mailText = 'Place ' + config.url + '/places/' + options.id + ' was updated 3 months ago.\n' +
+			'Please update information about it or press "Everything is up to date".';
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+		console.log(mailOptions);
+
+		this.send(mailOptions, callback);
+	};
 }
 
 module.exports = Email;

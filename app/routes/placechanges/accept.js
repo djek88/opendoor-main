@@ -1,15 +1,31 @@
 module.exports = function(placeChangeManager){
 	return function (req, res) {
-		if (req.session.user && req.session.user.isAdmin) {
+		if (req.session.user) {
 			var id = req.params.id;
-			placeChangeManager.acceptChange(id, function(err, place){
-				if (!err && place) {
-					res.redirect('/message?message=changeaccepted');
+
+
+			placeChangeManager.findOne({_id: id}, function(err, placeChange){
+				if (err) {
+					res.end();
 				}
-				else {
-					res.redirect('/error');
-				}
-			});
+				placeManager.findOne({_id: placeChange.place}, function(err, place){
+					if (place.maintainer == req.session.user._id) {
+						placeChangeManager.acceptChange(id, function (err, place) {
+							if (!err && place) {
+								res.redirect('/message?message=changeaccepted');
+							}
+							else {
+								res.redirect('/error');
+							}
+						});
+					}
+					else {
+						res.end();
+					}
+				});
+
+			})
+
 		}
 	};
 };

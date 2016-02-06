@@ -12,7 +12,10 @@ var session = require('cookie-session');
 var busboy = require('connect-busboy');
 var jade = require('jade');
 var sha1 = require('sha1');
+var schedule = require('node-schedule');
+var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
 require('./assets/js/utils.js');
+require('./app/date.min.js');
 
 var lastFileName = (new Date).getTime();
 function getUniqueFilename() {
@@ -163,6 +166,7 @@ app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
 app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
 app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
 app.post('/places/review/:id', require('./app/routes/places/review.js')(placeManager));
+app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
 
@@ -189,3 +193,7 @@ app.get(frontendPages, function(req, res) {
 		}
 	});
 });
+
+
+schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
+

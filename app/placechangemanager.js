@@ -23,6 +23,7 @@ module.exports = function(mongoose) {
 		};
 
 		this.find = PlaceChange.find.bind(PlaceChange);
+		this.findOne = PlaceChange.findOne.bind(PlaceChange);
 
 		this.findAll = function(cb) {
 			PlaceChange.find({}).populate('user', 'name').populate('place').exec(cb);
