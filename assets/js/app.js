@@ -113,6 +113,22 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 				map.markers.push(marker);
 				return marker;
 			}
+
+			map.setMarker = function(location, bounds) {
+				if (bounds) {
+					map.fitBounds(bounds);
+				}
+				else {
+					map.setZoom(16);
+				}
+				var pos = new google.maps.LatLng(location[0], location[1]);
+				map.addMarker({
+					position: pos
+					,	map: map
+					,	icon: map.icons.defaultPoi
+				});
+				map.setCenter(pos);
+			}
 		}
 		else {
 			$(targetEl).append($rootScope.$map.getDiv());
@@ -221,6 +237,11 @@ opendoorApp.config(
 			title: 'Add review'
 			,	templateUrl: 'assets/templates/partials/reviewadd.html'
 			, controller: 'FormCtrl'
+		}).
+		when('/places/event/:id/add', {
+			title: 'Add an event'
+			,	templateUrl: 'assets/templates/partials/eventadd.html'
+			, controller: 'EventAddCtrl'
 		}).
 		when('/places/editorproposal/:id', {
 			title: 'Notify the person'

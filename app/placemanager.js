@@ -15,6 +15,20 @@ module.exports = function(mongoose, email, config) {
 		,	text: String
 	});
 
+	var eventSchema = new mongoose.Schema({
+		name: String
+		,	date: Date
+		,	description: String
+		,	address: String
+		, location : {
+				type: {
+					type: String
+					,	default: 'Point'
+				}
+				,	coordinates: [Number]
+			}
+	});
+
 	var placeSchema = new mongoose.Schema({
 			name: {
 				type: String
@@ -79,6 +93,10 @@ module.exports = function(mongoose, email, config) {
 				type: [reviewSchema]
 				,	default: []
 			}
+			, events: {
+				type: [eventSchema]
+				, default: []
+			}
 			,	averageRating: {
 				type: Number
 				,	default: 0
@@ -105,12 +123,10 @@ module.exports = function(mongoose, email, config) {
 			}
 		});
 
-		console.log(place.denominations);
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
 		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 		place.about = sanitizeHtml(place.about);
-		console.log(place.denominations);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
 		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
 			if (places.length) {
@@ -265,7 +281,7 @@ module.exports = function(mongoose, email, config) {
 			];
 			if (data.coordinates) {
 				options.unshift({"$geoNear": geoNearOption}, {
-					"$sort": {"distance": 1} // Sort the nearest first
+					"$sort": {"distance": 1} // Show the nearest first
 				});
 			}
 
@@ -281,10 +297,8 @@ module.exports = function(mongoose, email, config) {
 			}
 			if (data.limit) {
 				var limit = parseInt(data.limit);
-				//geoNearOption['limit'] = parseInt(data.limit);
 				if (data.exclude) {
 					limit++;
-					//geoNearOption['limit']++;
 				}
 				options.push({"$limit": limit});
 			}
@@ -296,7 +310,6 @@ module.exports = function(mongoose, email, config) {
 				matchOption['maintainer'] = {$ne: null};
 			}
 
-			console.log("Find place", options);
 			Place.aggregate(options, function(err, places){
 				Place.populate(places, {path: "maintainer"}, callback);
 			});
@@ -346,6 +359,16 @@ module.exports = function(mongoose, email, config) {
 			});
 		};
 
+
+		this.addEvent = function(id, data, callback) {
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
+				place.events.push(data);
+				place.events.sort(function(a,b){
+					return a.date > b.date ? 1 : -1;
+				});
+				place.save(callback);
+			});
+		};
 
 
 		this.find = function(options, callback) {

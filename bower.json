@@ -31,6 +31,7 @@
     "Datejs": "datejs/Datejs",
     "bootstrap-select": "~1.9.4",
     "trumbowyg": "~1.1.7",
-    "trumbowyg-ng": "~0.0.3"
+    "trumbowyg-ng": "~0.0.3",
+    "eonasdan-bootstrap-datetimepicker": "~4.17.37"
   }
 }

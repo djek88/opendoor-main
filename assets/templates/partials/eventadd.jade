@@ -1,0 +1,41 @@
+#content.content
+	.container.bg-white.p-t-10
+		div
+			h3.text-center.m-t-30 Add a event
+			form.form-horizontal(method="POST", novalidate, name="form")
+				.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
+					label.col-md-3.control-label Name
+					.col-md-9
+						input.form-control(name="name", ng-model="name", required)
+				.form-group(ng-class="{'has-error': (form.$submitted || form.date.$touched) && form.date.$error.required}")
+					label.col-md-3.control-label Date
+					.col-md-9
+						//input.form-control(name="date", ng-model="date", required)
+						#datetimepicker.input-group.date
+							input.form-control(name="date", ng-model="date", required)
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
+
+				.form-group(ng-class="{'has-error': (form.$submitted || form.description.$touched) && form.description.$error.required}")
+					label.col-md-3.control-label Description
+					.col-md-9
+						textarea.form-control(rows="5", name="description", ng-model="description", required)
+				.form-group
+					.col-md-3
+					.col-md-9
+						h5 Add address and location in case event will be not in place location
+				.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.required}")
+					label.col-md-3.control-label Address
+					.col-md-9
+						input.form-control(name="address", ng-model="address")
+				.form-group(ng-class="{'has-error': (form.$submitted || form.location.$touched) && form.location.$error.required}")
+					label.col-md-3.control-label Location
+					.col-md-9
+						//h5.m-r-10 Type place address to find it on map
+						.btn.btn-sm.btn-primary.m-b-10(ng-click="$searchByAddress()") Find address on map
+						input.hidden(name="location", ng-model="location")
+						#results-map
+				.form-group
+					label.col-md-3.control-label
+					.col-md-9
+						input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Add review")

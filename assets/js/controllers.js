@@ -181,6 +181,26 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				}
 			}
 
+			$place.pastEvents = [];
+			if ($place.events) {
+				var currentDate = new Date();
+				for (var i=0; i<$place.events.length; i++) {
+					$place.events[i].dateObject = new Date($place.events[i].date);
+					$place.events[i].date = (new Date($place.events[i].date)).toString('dd/MM/yyyy HH:mm');
+					if ($place.events[i].dateObject<currentDate) {
+						$place.pastEvents.push($place.events[i]);
+						$place.events.splice(i, 1);
+						i--;
+						continue;
+					}
+					if ($place.events[i].dateObject>currentDate && (!$place.nextEvent || $place.events[i].dateObject<$place.nextEvent.dateObject)) {
+						$place.nextEvent = $place.events[i];
+					}
+				}
+				console.log($place.events);
+				console.log($place.nextEvent);
+ 			}
+
 			$place.about = $sce.trustAsHtml($place.about);
 			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
 
@@ -385,21 +405,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			$groupsEl.selectpicker('refresh');
 		});
 
-		function setMarker(location, bounds) {
-			if (bounds) {
-				map.fitBounds(bounds);
-			}
-			else {
-				map.setZoom(16);
-			}
-			var pos = new google.maps.LatLng(location[0], location[1]);
-			map.addMarker({
-				position: pos
-				,	map: map
-				,	icon: map.icons.defaultPoi
-			});
-			map.setCenter(pos);
-		}
+
 
 		$scope.$searchByAddress = function() {
 			var concatenatedAddress = [
@@ -418,7 +424,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 						var $locationEl = $('[name="location"]');
 						$locationEl.val([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()].join(', '));
 						$locationEl.trigger('change');
-						setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
+						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
 					}
 				}
 			});
@@ -487,7 +493,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 			loadOptionsForReligion($place.religion);
 			$groupsEl.selectpicker('val', $place.groupName);
-			setMarker($place.location.coordinates);
+			map.setMarker($place.location.coordinates);
 		}
 
 
@@ -524,6 +530,51 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				,	location: {}
 			};
 		}
+	}
+]);
+
+opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
+	function($scope, $rootScope) {
+		var geocoder = new google.maps.Geocoder();
+		var map = $rootScope.$getMapInstance($('#results-map'));
+		var $datetimepicker = $('#datetimepicker');
+		$datetimepicker.datetimepicker();
+		$datetimepicker.on('dp.change', function(){
+			$scope.date = $('input', $datetimepicker).val();
+		});
+		google.maps.event.addListenerOnce(map, 'idle', function(){
+			google.maps.event.trigger(map, 'resize');
+		});
+
+		a=$scope;
+
+		var pos = new google.maps.LatLng(0,0);
+		map.setCenter(pos);
+		map.setZoom(2);
+
+
+		$scope.$searchByAddress = function() {
+			console.log($scope.address);
+			geocoder.geocode({'address': $scope.address}, function (results, status) {
+				if (status === google.maps.GeocoderStatus.OK) {
+					map.removeMarkers();
+					if (results.length) {
+						var firstResult = results[0];
+						var $locationEl = $('[name="location"]');
+						$locationEl.val([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()].join(', '));
+						$locationEl.trigger('change');
+						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
+					}
+				}
+			});
+		};
+
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
 	}
 ]);
 
@@ -1103,6 +1154,12 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertType = 'info';
 				$scope.$alertTitle = 'Your review has been saved';
 				$scope.$alertMessage = 'Thank you for taking the time to place a review.';
+				break;
+
+			case 'eventadded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Your event has been added';
 				break;
 			case 'placeadded':
 				$scope.$alertType = 'info';
