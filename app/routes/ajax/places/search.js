@@ -8,7 +8,7 @@ module.exports = function(placeManager){
 			, name: req.query.name
 			, maintained: req.query.maintained
 		};
-		if (req.query.lat) {
+		if (req.query.lat && req.query.lng) {
 			data.coordinates = [
 				parseFloat(req.query.lat)
 				, parseFloat(req.query.lng)

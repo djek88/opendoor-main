@@ -6,6 +6,13 @@ module.exports = function(mongoose, email, config) {
 
 
 	var sanitizeHtml = require('sanitize-html');
+
+	var promotionSchema = new mongoose.Schema({
+			name: String
+		,	expireDate: Date
+		, url: String
+	});
+
 	var reviewSchema = new mongoose.Schema({
 			name: String
 		,	rating: {
@@ -95,6 +102,10 @@ module.exports = function(mongoose, email, config) {
 			}
 			, events: {
 				type: [eventSchema]
+				, default: []
+			}
+			, promotions: {
+				type: [promotionSchema]
 				, default: []
 			}
 			,	averageRating: {
@@ -365,6 +376,16 @@ module.exports = function(mongoose, email, config) {
 				place.events.push(data);
 				place.events.sort(function(a,b){
 					return a.date > b.date ? 1 : -1;
+				});
+				place.save(callback);
+			});
+		};
+
+		this.addPromotion = function(id, data, callback) {
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
+				place.promotions.push(data);
+				place.promotions.sort(function(a,b){
+					return a.expireDate > b.expireDate ? 1 : -1;
 				});
 				place.save(callback);
 			});

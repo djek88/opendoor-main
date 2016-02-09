@@ -215,6 +215,12 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/userview.html'
 			, controller: 'UserViewCtrl'
 		}).
+		when('/promotion/:id', {
+			title: 'View promotion'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/promotion.html'
+			//, controller: 'PromotionCtrl'
+		}).
 		when('/places/edit/:id', {
 				title: 'Edit place'
 			,	shouldLogin: true
@@ -232,6 +238,11 @@ opendoorApp.config(
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
 			, controller: 'MaintainedPlacesCtrl'
+		}).
+		when('/places/donate/:id', {
+			title: 'Donate'
+			,	templateUrl: 'assets/templates/partials/donate.html'
+			, controller: 'DonateCtrl'
 		}).
 		when('/places/review/:id', {
 			title: 'Add review'

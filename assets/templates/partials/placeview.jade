@@ -123,6 +123,12 @@
 									a(href="http://maps.google.com/?q={{$event.location.coordinates.join(',')}}", target="_blank") Show on map
 								div.m-t-5(ng-show="$event.description") {{$event.description}}
 			.col-lg-4.row
+				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10(ng-show="$place.activePromotions.length")
+					h3 Place sponsors
+					.bg-white
+						.m-t-15(ng-repeat="$promotion in $place.activePromotions")
+							h4.m-b-5 {{$promotion.name}}
+							a(href="{{$promotion.url}}") {{$promotion.url || '&nbsp;'}}
 				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
 					h3.m-b-20 Edit
 					div(ng-show="$place.maintainer")
@@ -153,3 +159,8 @@
 									td {{$place.distance}}m
 				.col-lg-12.bg-white.place-sidebar.p-10
 					h3 Support us
+					ul
+						li Share this profile socially
+						li Do you run a Blog? then please link to this page
+						li Awareness campaign&nbsp;
+							a(href="/places/donate/{{$place._id}}") [Donate]

@@ -181,9 +181,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				}
 			}
 
+			var currentDate = new Date();
 			$place.pastEvents = [];
 			if ($place.events) {
-				var currentDate = new Date();
 				for (var i=0; i<$place.events.length; i++) {
 					$place.events[i].dateObject = new Date($place.events[i].date);
 					$place.events[i].date = (new Date($place.events[i].date)).toString('dd/MM/yyyy HH:mm');
@@ -197,9 +197,22 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 						$place.nextEvent = $place.events[i];
 					}
 				}
-				console.log($place.events);
-				console.log($place.nextEvent);
  			}
+
+
+			$place.activePromotions = [];
+			if ($place.promotions) {
+				for (var i=0; i<$place.promotions.length; i++) {
+					var promotion = $place.promotions[i];
+					promotion.dateObject = new Date(promotion.expireDate);
+					if (promotion.dateObject>currentDate) {
+						if (promotion.url && promotion.url.substr(0, 4) != 'http') {
+							promotion.url = 'http://' + promotion.url;
+						}
+						$place.activePromotions.push(promotion);
+					}
+				}
+			}
 
 			$place.about = $sce.trustAsHtml($place.about);
 			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
@@ -587,6 +600,45 @@ opendoorControllers.controller('FormCtrl', ['$scope',
 				document.forms.form.submit();
 			}
 		};
+	}
+]);
+
+
+opendoorControllers.controller('DonateCtrl', ['$scope',
+	function($scope) {
+		$scope.sum = 120;
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				//document.forms.form.submit();
+				handler.open({
+					name: siteconfig.sitename
+					, description: 'Donate'
+					, amount: $scope.sum * 100
+				});
+			}
+		};
+
+
+		var handler = StripeCheckout.configure({
+				key: 'pk_test_Tscr1WLEPD6tUzdqk0ssijPl'
+			//image: '/img/documentation/checkout/marketplace.png',
+			, locale: 'auto'
+			//, token: document.forms.form.submit
+			, token: function(token) {
+				document.forms.form.elements.token.value = token.id;
+				document.forms.form.submit();
+
+				console.log(token);
+				// Use the token to create the charge with a server-side script.
+				// You can access the token ID with `token.id`
+				}
+		});
+
+		$scope.$on("$destroy", function() {
+			console.log('close handler');
+			handler.close();
+		});
 	}
 ]);
 
