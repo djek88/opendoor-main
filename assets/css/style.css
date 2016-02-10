@@ -260,3 +260,11 @@ ul.tagit.ui-widget {
 .change-preview-photo {
 	max-width: 200px;
 }
+
+.job-link {
+	font-size: 130%;
+}
+
+.job-info {
+	font-size: 130%;
+}

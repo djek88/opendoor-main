@@ -36,6 +36,14 @@ module.exports = function(mongoose, email, config) {
 			}
 	});
 
+	var jobSchema = new mongoose.Schema({
+		title: String,
+		type: String,
+		description: String,
+		email: String,
+		expireDate: Date
+	});
+
 	var placeSchema = new mongoose.Schema({
 			name: {
 				type: String
@@ -106,6 +114,10 @@ module.exports = function(mongoose, email, config) {
 			}
 			, promotions: {
 				type: [promotionSchema]
+				, default: []
+			}
+			, jobs: {
+				type: [jobSchema]
 				, default: []
 			}
 			,	averageRating: {
@@ -355,17 +367,21 @@ module.exports = function(mongoose, email, config) {
 
 		this.addReview = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
-				place.reviews.push(data);
-				var averageRating = 0;
-				for (var i=0; i < place.reviews.length; i++) {
-					averageRating += place.reviews[i].rating;
+				if (!err && place) {
+					place.reviews.push(data);
+					var averageRating = 0;
+					for (var i=0; i < place.reviews.length; i++) {
+						averageRating += place.reviews[i].rating;
+					}
+					place.ratingsCount = place.reviews.length;
+					place.averageRating = averageRating / place.reviews.length;
+					place.jsonLd = createJsonLd(place);
+					place.save(callback);
 				}
-				place.ratingsCount = place.reviews.length;
-				place.averageRating = averageRating / place.reviews.length;
-				place.jsonLd = createJsonLd(place);
-				place.save();
-				if (typeof callback=='function') {
-					callback(err, place);
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
 				}
 			});
 		};
@@ -373,32 +389,60 @@ module.exports = function(mongoose, email, config) {
 
 		this.addEvent = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
-				place.events.push(data);
-				place.events.sort(function(a,b){
-					return a.date > b.date ? 1 : -1;
-				});
-				place.save(callback);
+				if (!err && place) {
+					place.events.push(data);
+					place.events.sort(function(a,b){
+						return a.date > b.date ? 1 : -1;
+					});
+					place.save(callback);
+				}
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
+				}
 			});
 		};
 
 		this.addPromotion = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
-				place.promotions.push(data);
-				place.promotions.sort(function(a,b){
-					return a.expireDate > b.expireDate ? 1 : -1;
-				});
-				place.save(callback);
+				if (!err && place) {
+					place.promotions.push(data);
+					place.promotions.sort(function(a,b){
+						return a.expireDate > b.expireDate ? 1 : -1;
+					});
+					place.save(callback);
+				}
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
+				}
+			});
+		};
+
+		this.addJob = function(id, data, callback) {
+			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
+				if (!err && place) {
+					place.jobs.push(data);
+					place.jobs.sort(function(a,b){
+						return a.expireDate > b.expireDate ? 1 : -1;
+					});
+					place.save(callback);
+				}
+				else {
+					if (typeof callback=='function') {
+						callback(err, place);
+					}
+				}
 			});
 		};
 
 
-		this.find = function(options, callback) {
-			Place.find(options, callback);
-		};
-
 		this.find = Place.find.bind(Place);
-
 		this.findOne = Place.findOne.bind(Place);
+		this.findOneAndUpdate = Place.findOneAndUpdate.bind(Place);
+		this.aggregate = Place.aggregate.bind(Place);
 
 
 	}

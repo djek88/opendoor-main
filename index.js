@@ -65,6 +65,9 @@ var placeChangeManager = new PlaceChangeManager;
 var PlaceNotificationManager = require('./app/placenotificationmanager.js')(mongoose);
 var placeNotificationManager = new PlaceNotificationManager;
 
+var SubscriptionManager = require('./app/subscriptionmanager.js')(mongoose);
+var subscriptionManager = new SubscriptionManager;
+
 global.userManager = userManager;
 global.placeManager = placeManager;
 global.religionGroupManager = religionGroupManager;
@@ -99,6 +102,11 @@ var frontendPages = [
 	,	'/places/event/:id/add'
 	,	'/places/editorproposal/:id'
 	, /\/places\/(.*)/
+	,	'/jobs/search'
+	, '/jobs/add'
+	,	'/jobs/:id'
+	, '/jobs/edit/:id'
+	, '/jobs/fund/:id'
 ];
 
 app.use(cookieParser(config.cookieKeys));
@@ -156,16 +164,21 @@ app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.
 app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(mongoose, placeManager));
 app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(placeManager));
 app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/find.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
+app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
 
 app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));
 
 app.get('/places/confirm/:id', require('./app/routes/places/confirm.js')(placeManager));
+app.get('/subscriptions/confirm/:id', require('./app/routes/subscriptions/confirm.js')(subscriptionManager));
 
 app.get('/ajax/religionGroups', require('./app/routes/ajax/religionGroups.js')(religionGroupManager));
 app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(denominationManager));
 app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
 
 
+app.post(['/jobs/add', '/jobs/edit/:id'], require('./app/routes/jobs/edit.js')(mongoose, placeManager, placeManager));
+app.post('/jobs/fund/:id', require('./app/routes/jobs/fund.js')(placeManager, stripe));
+app.post('/jobs/:id', require('./app/routes/jobs/contact.js')(placeManager, email));
 app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
 app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
 app.post('/places/review/:id', require('./app/routes/places/addreview.js')(placeManager));
@@ -173,6 +186,7 @@ app.post('/places/donate/:id', require('./app/routes/promotion.js')(placeManager
 app.post('/places/event/:id/add', require('./app/routes/places/addevent.js')(placeManager));
 app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
+app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
 
 app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager));

@@ -1,0 +1,13 @@
+#content.content
+	.container
+		.row
+			.col-12
+				.panel(ng-class="'panel-' + $alertType")
+					.panel-heading
+						h4.panel-title {{$alertTitle}}
+					.panel-body
+						p {{ $alertMessage }}
+							form(method="POST", novalidate, name="form")
+								input.hidden(name="token")
+								input.hidden(name="sum", value="1")
+								.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()") Publish

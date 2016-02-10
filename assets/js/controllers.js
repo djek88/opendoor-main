@@ -21,12 +21,6 @@ opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
 				$scope.$alertMessage = 'You have entered an invalid username or password';
 			break;
 		}
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
@@ -38,12 +32,6 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 				$scope.$alertMessage = 'Your email already exists in our database. Please try to restore your password';
 				break;
 		}
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
@@ -146,6 +134,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			});
 		}
 
+
 		function setData($place) {
 			addMeta($place);
 			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
@@ -210,6 +199,18 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 							promotion.url = 'http://' + promotion.url;
 						}
 						$place.activePromotions.push(promotion);
+					}
+				}
+			}
+
+
+			$place.activeJobs = [];
+			if ($place.jobs.length) {
+				for (var i = 0; i < $place.jobs.length; i++) {
+					$place.jobs[i].expireDate = new Date($place.jobs[i].expireDate);
+					$place.jobs[i].action = $sce.trustAsResourceUrl('/jobs/fund/' + $place.jobs[i]._id);
+					if ($place.jobs[i].expireDate>$rootScope.currentDate) {
+						$place.activeJobs.push($place.jobs[i]);
 					}
 				}
 			}
@@ -339,6 +340,44 @@ opendoorControllers.controller('UserViewCtrl', ['$scope', '$rootScope', '$locati
 	}
 ]);
 
+
+
+opendoorControllers.controller('JobViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
+	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
+		var jobId = $location.url().split('/').pop();
+		$scope.$jobId = jobId;
+
+
+
+		function setData($job) {
+			$scope.$job = $job;
+		}
+		$http({
+			url: '/ajax/jobs/' + jobId
+			, method: 'GET'
+		}).
+		success(function (data) {
+			console.log(data);
+			if (typeof data== 'object') {
+				setData(data);
+			}
+			else {
+				$location.url('/notfound');
+			}
+		}).
+		error(function () {
+			$location.url('/notfound');
+		});
+
+
+
+
+
+	}
+]);
+
+
+
 opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
 
@@ -384,12 +423,6 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		});
 
 		$scope.$religions = $rootScope.$religions;
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 
 		$groupsEl.selectpicker({
 			style: 'form-control btn-white',
@@ -546,6 +579,156 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 	}
 ]);
 
+
+
+opendoorControllers.controller('JobFundCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+		$scope.$alertType = 'info';
+		$scope.$alertTitle = 'Success';
+		$scope.$alertMessage = 'Your job was added successfully. Please pay $1 in order to publish it.';
+
+		$scope.submitForm = function() {
+			$scope.form.$submitted = true;
+			if ($scope.form.$valid) {
+				handler.open({
+					name: siteconfig.sitename
+					, description: 'Payment for job posting'
+					, amount: 100
+				});
+			}
+		};
+
+
+		var handler = StripeCheckout.configure({
+			key: siteconfig.apiKeys.stripePublic
+			, locale: 'auto'
+			, token: function(token) {
+				document.forms.form.elements.token.value = token.id;
+				document.forms.form.submit();
+			}
+		});
+
+		$scope.$on("$destroy", function() {
+			handler.close();
+		});
+
+
+	}
+]);
+
+
+opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+	function($scope, $http, $rootScope, $location, $window) {
+
+		$scope.$jobs = null;
+		$scope.$message = '';
+
+		$scope.$religionsList = $rootScope.$religions;
+		$scope.religion = '';
+
+
+		$scope.$openJob = function($event, $job) {
+			if ($event.which == 2) {
+				$window.open('/jobs/' + $job._id, '_blank');
+			}
+			else {
+				$location.url('/jobs/' + $job._id);
+			}
+		};
+
+
+		function setSearchParams() {
+
+			var requestParams = {
+				religion: $scope.religion
+			};
+			$location.search('religion', requestParams.religion || null);
+		}
+		$scope.$searchJobs = function() {
+			setSearchParams();
+		};
+
+		function onError() {
+			$scope.$message = 'An error happened during request';
+			$scope.$jobs = null;
+		}
+
+		var requestParams = $location.search();
+			$scope.religion = requestParams.religion;
+			$scope.$message = 'Searching…';
+			$http({
+				url: '/ajax/jobs/search'
+				, method: 'GET'
+				, params: requestParams
+			}).
+			success(function (data){
+				if (Array.isArray(data)) {
+					if (data.length) {
+						$scope.$message = '';
+					}
+					else {
+						$scope.$message = 'There are no places of worship found near this location';
+					}
+					$scope.$jobs = data;
+				}
+				else {
+					onError();
+				}
+			}).
+			error(onError);
+
+	}
+]);
+
+opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
+
+
+		var query = $location.search();
+
+		var jobId = $location.path().split('/').pop();
+
+		if (jobId == 'add') {
+			jobId = 0;
+		}
+
+
+		function setData($job) {
+			$scope.$job = $job;
+			//$('input[name="place"]').val($job.place);
+		}
+
+
+		if (jobId) {
+			$scope.$edit = true;
+			$scope.$mode = 'edit';
+
+			$http({
+				url: '/ajax/jobs/' + jobId
+				, method: 'GET'
+			}).
+			success(function (data) {
+				if (typeof data== 'object') {
+					setData(data[0]);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function () {
+				$location.url('/notfound');
+			});
+
+		}
+		else {
+			$scope.$edit = false;
+			$scope.$mode = 'add';
+
+			setData({place: query.place});
+		}
+	}
+]);
+
 opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 	function($scope, $rootScope) {
 		var geocoder = new google.maps.Geocoder();
@@ -582,24 +765,12 @@ opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 			});
 		};
 
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
 
 opendoorControllers.controller('FormCtrl', ['$scope',
 	function($scope) {
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
@@ -610,7 +781,6 @@ opendoorControllers.controller('DonateCtrl', ['$scope',
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
-				//document.forms.form.submit();
 				handler.open({
 					name: siteconfig.sitename
 					, description: 'Donate'
@@ -621,7 +791,7 @@ opendoorControllers.controller('DonateCtrl', ['$scope',
 
 
 		var handler = StripeCheckout.configure({
-				key: 'pk_test_Tscr1WLEPD6tUzdqk0ssijPl'
+				key: siteconfig.apiKeys.stripePublic
 			//image: '/img/documentation/checkout/marketplace.png',
 			, locale: 'auto'
 			//, token: document.forms.form.submit
@@ -645,12 +815,6 @@ opendoorControllers.controller('DonateCtrl', ['$scope',
 
 opendoorControllers.controller('SubscribeForNotificationFormCtrl', ['$scope', '$location',
 	function($scope, $location) {
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 		var query = $location.search();
 		$scope.lat = query.lat;
 		$scope.lng = query.lng
@@ -1088,12 +1252,6 @@ opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootSco
 opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location',
 	function($scope, $rootScope, $location) {
 		$scope.$targetPage = $location.hash();
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
@@ -1101,12 +1259,6 @@ opendoorControllers.controller('EditorProposalCtrl', ['$scope', '$routeParams', 
 	function($scope, $routeParams, $sce) {
 		$scope.$action = $sce.trustAsResourceUrl('/places/editorproposal/' + $routeParams.id);
 		$scope.placeId = $routeParams.id;
-		$scope.submitForm = function() {
-			$scope.form.$submitted = true;
-			if ($scope.form.$valid) {
-				document.forms.form.submit();
-			}
-		};
 	}
 ]);
 
@@ -1232,6 +1384,36 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.$alertType = 'danger';
 				$scope.$alertTitle = 'Error';
 				$scope.$alertMessage = 'Error during place confirmation';
+				break;
+			case 'subscriptionadded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Subscription was added successfully';
+				break;
+			case 'verifysubscription':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'We\'ve sent confirmation details on your email';
+				break;
+			case 'subscriptionexists':
+				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
+				$scope.$alertMessage = 'You are already subscribed on this place';
+				break;
+			case 'subscriptionconfirmed':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Subscription was confirmed successfully';
+				break;
+			case 'subscriptionconfirmationerror':
+				$scope.$alertType = 'danger';
+				$scope.$alertTitle = 'Error';
+				$scope.$alertMessage = 'Error during subscription confirmation';
+				break;
+			case 'jobfunded':
+				$scope.$alertType = 'info';
+				$scope.$alertTitle = 'Success';
+				$scope.$alertMessage = 'Job was funded successfully';
 				break;
 			default:
 				$scope.$alertType = 'danger';

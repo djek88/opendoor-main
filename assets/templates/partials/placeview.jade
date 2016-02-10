@@ -129,6 +129,22 @@
 						.m-t-15(ng-repeat="$promotion in $place.activePromotions")
 							h4.m-b-5 {{$promotion.name}}
 							a(href="{{$promotion.url}}") {{$promotion.url || '&nbsp;'}}
+				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10(ng-show="$jobs.length || $isMaintainer")
+					h3 Jobs
+					.bg-white(ng-show='$place.jobs.length')
+						div.m-t-5(ng-repeat="$job in ($isMaintainer ? $place.jobs : $place.activeJobs)")
+
+							a.job-link.valign-middle(href="/jobs/{{$job._id}}", ng-class="{'text-muted': $job.expireDate<=$root.currentDate}") {{$job.title}}
+							span.job-fund-btdn.pull-right(ng-if="$job.expireDate<=$root.currentDate")
+								form.inline(method="POST", novalidate, name="form", action="{{$job.action}}", ng-controller="JobFundCtrl")
+									input.hidden(name="token")
+									input.hidden(name="sum", value="1")
+									span.btn.btn-xs.btn-primary(ng-click="submitForm()") Publish
+
+					a.btn.btn-sm.btn-primary.m-t-10(ng-if="$isMaintainer", href="/jobs/add?place={{$place._id}}")  Add job
+					//.bg-white
+					//	.m-t-15(ng-repeat="$job in $jobs")
+					//		h4.m-b-5 {{$job.name}}
 				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
 					h3.m-b-20 Edit
 					div(ng-show="$place.maintainer")
@@ -157,10 +173,26 @@
 								tr.place-link(ng-repeat="$place in $nearbyPlaces", ng-mousedown="$openPlace($event, $place)", ng-mouseover="$mouseOver($index)", ng-mouseout="$mouseOut($index)")
 									td {{$place.name}}
 									td {{$place.distance}}m
-				.col-lg-12.bg-white.place-sidebar.p-10
+				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
 					h3 Support us
 					ul
 						li Share this profile socially
 						li Do you run a Blog? then please link to this page
 						li Awareness campaign&nbsp;
 							a(href="/places/donate/{{$place._id}}") [Donate]
+				.col-lg-12.bg-white.place-sidebar.p-10
+					h3 Join our mailing list
+					h5 Receive information and updates about {{$place.name}}
+					form(method="POST", action="/places/subscribe", novalidate name="form", ng-controller="FormCtrl")
+						.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.$isLoggedIn")
+							label.control-label Name
+							input.form-control(type="text", name="name", ng-model="name", ng-required="!$root.$isLoggedIn")
+						.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.$error.email)}", ng-show="!$root.$isLoggedIn")
+							label.control-label Email
+							div(ng-show="form.$submitted || form.email.$touched")
+								label.control-label(ng-show="form.email.$error.email") This is not a valid email.
+							input.form-control(type="email", name="email", ng-model="email", ng-required="!$root.$isLoggedIn")
+							input(name="place", type="hidden", value="{{$place._id}}")
+						.form-group
+							label.control-label
+							input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Sign up now")

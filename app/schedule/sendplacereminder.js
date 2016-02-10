@@ -1,8 +1,5 @@
 module.exports = function(placeManager, email) {
-console.log('get fn');
-
 	return function() {
-		//console.log((new Date).toString());
 		console.log('schedule started');
 
 		var date = Date.today().add(-3).months();

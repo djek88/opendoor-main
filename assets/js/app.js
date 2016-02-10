@@ -73,6 +73,8 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 	,	'Tenriism'
 	];
 
+	$rootScope.currentDate = new Date;
+
 	$rootScope.$year = (new Date).getFullYear();
 
 	$rootScope.siteconfig = siteconfig;
@@ -84,6 +86,14 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		}
 		else {
 			$location.url('/places/' + $place.uri);
+		}
+	};
+
+
+	$rootScope.submitForm = function() {
+		this.form.$submitted = true;
+		if (this.form.$valid) {
+			document.forms.form.submit();
 		}
 	};
 
@@ -179,8 +189,42 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/search.html'
 			, controller: 'SearchCtrl'
 		}).
+		when('/jobs/search', {
+			title: 'Find a job'
+			,	templateUrl: 'assets/templates/partials/jobsearch.html'
+			, controller: 'JobSearchCtrl'
+		}).
+		when('/jobs/add', {
+			title: 'Add job'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/jobform.html'
+			, controller: 'JobFormCtrl'
+		}).
+		when('/jobs/edit/:id', {
+			title: 'Edit job'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/jobform.html'
+			, controller: 'JobFormCtrl'
+		}).
+		when('/jobs/fund/:id', {
+			title: 'Fund job'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/jobfund.html'
+			, controller: 'JobFundCtrl'
+		}).
+		when('/jobs/:id', {
+			title: 'View job'
+			,	templateUrl: 'assets/templates/partials/jobview.html'
+			, controller: 'JobViewCtrl'
+		}).
 		when('/places/add', {
 				title: 'Add place'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/placeform.html'
+			, controller: 'PlaceFormCtrl'
+		}).
+		when('/places/edit/:id', {
+			title: 'Edit place'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
@@ -220,12 +264,6 @@ opendoorApp.config(
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/promotion.html'
 			//, controller: 'PromotionCtrl'
-		}).
-		when('/places/edit/:id', {
-				title: 'Edit place'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placeform.html'
-			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/last', {
 			title: 'Last places'

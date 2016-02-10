@@ -96,6 +96,22 @@ function Email (config, transporter) {
 		this.send(mailOptions, callback);
 	};
 
+	this.sendJobMessage = function(options, callback) {
+		var mailText = 'You got a message about job: ' + config.url + '/jobs/' + options.id + '\n' +
+			'Sender: ' + options.senderEmail + '\n' +
+			'Name: ' + options.name + '\n' +
+			'Message: ' + options.text;
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+
+		this.send(mailOptions, callback);
+	};
+
 	this.sendEditorProposal = function(options, callback) {
 		var mailText = 'Someone asked you to be an editor of place: ' + config.url + '/places/' + options.id + '\n' +
 			'You can claim to be editor by passing by the link: ' + config.url + '/claims/' + options.id + '/add' + '\n';
@@ -135,6 +151,19 @@ function Email (config, transporter) {
 		};
 
 		console.log(mailOptions);
+
+		this.send(mailOptions, callback);
+	};
+
+	this.sendSubscriptionConfirmation = function(options, callback) {
+		var mailText = 'Please confirm your subscription passing by link ' + config.url + '/subscriptions/confirm/' + options.id ;
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
 
 		this.send(mailOptions, callback);
 	};

@@ -62,7 +62,8 @@ html(ng-app="opendoorApp")
 									| HOME
 							li(ng-show="$root.$isLoggedIn")
 								a(href='/places/add') ADD A PLACE
-
+							li
+								a(href='/jobs/search') OPPORTUNITIES
 							li(ng-show="$root.$isAdmin")
 								a.link(data-toggle='dropdown' ng-disabled)
 									| ADMIN
