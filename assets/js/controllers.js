@@ -457,7 +457,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			var concatenatedAddress = [
 				$scope.$place.address.line1
 				, $scope.$place.address.line2
-				, $scope.$place.address.city
+				, $scope.$place.address.locality
 				, $scope.$place.address.region
 				, $scope.$place.address.country
 				, $scope.$place.address.postalCode
@@ -1221,7 +1221,7 @@ opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootSco
 							change.value = change.value.join(', ');
 						}
 						else if (change.field == 'address') {
-							change.value = [change.value.line1, change.value.line2, change.value.city, change.value.region, change.value.country, change.value.postalCode].cleanArray().join(', ');
+							change.value = [change.value.line1, change.value.line2, change.value.locality, change.value.region, change.value.country, change.value.postalCode].cleanArray().join(', ');
 						}
 						else if (change.field == 'location') {
 							change.value = change.value.coordinates.join(', ');

@@ -67,7 +67,7 @@ module.exports = function(mongoose, email, config) {
 						,	required: true
 					}
 				,	line2: String
-				, city: {
+				, locality: {
 					type: String
 					,	required: true
 				}
@@ -147,8 +147,8 @@ module.exports = function(mongoose, email, config) {
 		});
 
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
-		place.uri = [place.address.country, place.address.region, place.address.city, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
-		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.city, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+		place.uri = [place.address.country, place.address.region, place.address.locality, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 		place.about = sanitizeHtml(place.about);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
 		Place.find({'$and':[{uri: place.uri}, {_id: {'$ne': mongoose.Types.ObjectId(place._id)}}]}, function(err, places){
@@ -173,8 +173,8 @@ module.exports = function(mongoose, email, config) {
 			}
 			,	address: {
 				'@type': 'PostalAddress'
-				,	addressCountry: place.address.coutry
-				,	addressLocality: place.address.city
+				,	addressCountry: place.address.country
+				,	addressLocality: place.address.locality
 				,	addressRegion: place.address.region
 				,	postalCode: place.address.postalCode
 				,	streetAddress: [place.address.line1, place.address.line2].cleanArray().join(', ')

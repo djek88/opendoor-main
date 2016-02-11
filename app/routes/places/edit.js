@@ -61,7 +61,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			place.address = {
 				line1: place.addressLine1
 				, line2: place.addressLine2
-				, city: place.city
+				, locality: place.locality
 				, region: place.region
 				, country: place.country
 				, postalCode: place.postalCode
@@ -69,7 +69,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 
 			delete place.addressLine1;
 			delete place.addressLine2;
-			delete place.city;
+			delete place.locality;
 			delete place.region;
 			delete place.country;
 			delete place.postalCode;

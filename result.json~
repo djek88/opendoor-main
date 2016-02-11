@@ -1,0 +1,242 @@
+[
+	{
+		"name": "Abundance Of Life Romford",
+		"address": {
+			"line1": "Carries Hall, Maybank Avenue, Elmpark",
+			"line2": "",
+			"locality": "Romford",
+			"region": "Essex",
+			"country": "England",
+			"postalCode": "RM12 5SB"
+		},
+		"religion": "Christianity",
+		"groupName": "RCCG",
+		"isConfirmed": true,
+		"denominations": [],
+		"reviews": [],
+		"events": [],
+		"promotions": [],
+		"ratingsCount": 0,
+		"averageRating": 0,
+		"uri": "England/Essex/Romford/Christianity/RCCG/Abundance-Of-Life-Romford",
+		"concatenatedAddress": "Carries Hall, Maybank Avenue, Elmpark, Romford, Essex, England, RM12 5SB",
+		"location": {
+			"type": "Point",
+			"coordinates": [
+				51.5449802,
+				0.2048702
+			]
+		},
+		"jsonLd": {
+			"@type": "Place",
+			"name": "Abundance Of Life Romford",
+			"mainentitiyofpage": "http://192.168.100.2:8000England/Essex/Romford/Christianity/RCCG/Abundance-Of-Life-Romford",
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 51.5449802,
+				"longitude": 0.2048702
+			},
+			"address": {
+				"@type": "PostalAddress",
+				"addressCountry": "England",
+				"addressLocality": "Romford",
+				"addressRegion": "Essex",
+				"postalCode": "RM12 5SB",
+				"streetAddress": "Carries Hall, Maybank Avenue, Elmpark"
+			}
+		},
+		"hash": "f61b47544ab2895383b1903802be0649283067d5"
+	},
+	{
+		"name": "Abundant Faith Connections Dagenham",
+		"address": {
+			"line1": "62B Wood Lane, Dagenham, Dagenham",
+			"line2": "",
+			"locality": "Dagenham",
+			"region": "Essex",
+			"country": "England",
+			"postalCode": "RM8 2NT"
+		},
+		"religion": "Christianity",
+		"groupName": "RCCG",
+		"isConfirmed": true,
+		"denominations": [],
+		"reviews": [],
+		"events": [],
+		"promotions": [],
+		"ratingsCount": 0,
+		"averageRating": 0,
+		"uri": "England/Essex/Dagenham/Christianity/RCCG/Abundant-Faith-Connections-Dagenham",
+		"concatenatedAddress": "62B Wood Lane, Dagenham, Dagenham, Dagenham, Essex, England, RM8 2NT",
+		"location": {
+			"type": "Point",
+			"coordinates": [
+				51.5515362,
+				0.1290722
+			]
+		},
+		"jsonLd": {
+			"@type": "Place",
+			"name": "Abundant Faith Connections Dagenham",
+			"mainentitiyofpage": "http://192.168.100.2:8000England/Essex/Dagenham/Christianity/RCCG/Abundant-Faith-Connections-Dagenham",
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 51.5515362,
+				"longitude": 0.1290722
+			},
+			"address": {
+				"@type": "PostalAddress",
+				"addressCountry": "England",
+				"addressLocality": "Dagenham",
+				"addressRegion": "Essex",
+				"postalCode": "RM8 2NT",
+				"streetAddress": "62B Wood Lane, Dagenham, Dagenham"
+			}
+		},
+		"hash": "060b84fb4e64fb8bb0d260b6d8c3438fa1cbf7cd"
+	},
+	{
+		"name": "Abundant Grace Tabernacle Barnsley",
+		"address": {
+			"line1": "Greenacre School, Keresforth Hill Road, Barnsley",
+			"line2": "",
+			"locality": "Barnsley",
+			"region": "South Yorkshire",
+			"country": "England",
+			"postalCode": "S70 6RG"
+		},
+		"religion": "Christianity",
+		"groupName": "RCCG",
+		"isConfirmed": true,
+		"denominations": [],
+		"reviews": [],
+		"events": [],
+		"promotions": [],
+		"ratingsCount": 0,
+		"averageRating": 0,
+		"uri": "England/South-Yorkshire/Barnsley/Christianity/RCCG/Abundant-Grace-Tabernacle-Barnsley",
+		"concatenatedAddress": "Greenacre School, Keresforth Hill Road, Barnsley, Barnsley, South Yorkshire, England, S70 6RG",
+		"location": {
+			"type": "Point",
+			"coordinates": [
+				53.5432557,
+				-1.4989407
+			]
+		},
+		"jsonLd": {
+			"@type": "Place",
+			"name": "Abundant Grace Tabernacle Barnsley",
+			"mainentitiyofpage": "http://192.168.100.2:8000England/South-Yorkshire/Barnsley/Christianity/RCCG/Abundant-Grace-Tabernacle-Barnsley",
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 53.5432557,
+				"longitude": -1.4989407
+			},
+			"address": {
+				"@type": "PostalAddress",
+				"addressCountry": "England",
+				"addressLocality": "Barnsley",
+				"addressRegion": "South Yorkshire",
+				"postalCode": "S70 6RG",
+				"streetAddress": "Greenacre School, Keresforth Hill Road, Barnsley"
+			}
+		},
+		"hash": "8a5001abd011cf4f07f12869aca9542528aade64"
+	},
+	{
+		"name": "Abundant Life Church Billericay",
+		"address": {
+			"line1": "Billericay Reading Rooms, 73 High Street",
+			"line2": "",
+			"locality": "Billericay",
+			"region": "Essex",
+			"country": "England",
+			"postalCode": "CM12 9AS"
+		},
+		"religion": "Christianity",
+		"groupName": "RCCG",
+		"isConfirmed": true,
+		"denominations": [],
+		"reviews": [],
+		"events": [],
+		"promotions": [],
+		"ratingsCount": 0,
+		"averageRating": 0,
+		"uri": "England/Essex/Billericay/Christianity/RCCG/Abundant-Life-Church-Billericay",
+		"concatenatedAddress": "Billericay Reading Rooms, 73 High Street, Billericay, Essex, England, CM12 9AS",
+		"location": {
+			"type": "Point",
+			"coordinates": [
+				51.62571819999999,
+				0.4177065
+			]
+		},
+		"jsonLd": {
+			"@type": "Place",
+			"name": "Abundant Life Church Billericay",
+			"mainentitiyofpage": "http://192.168.100.2:8000England/Essex/Billericay/Christianity/RCCG/Abundant-Life-Church-Billericay",
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 51.62571819999999,
+				"longitude": 0.4177065
+			},
+			"address": {
+				"@type": "PostalAddress",
+				"addressCountry": "England",
+				"addressLocality": "Billericay",
+				"addressRegion": "Essex",
+				"postalCode": "CM12 9AS",
+				"streetAddress": "Billericay Reading Rooms, 73 High Street"
+			}
+		},
+		"hash": "eaa01a3ee9dbc53620d17a7b636291affbfdb62f"
+	},
+	{
+		"name": "Abundant Life Church Cheltenham",
+		"address": {
+			"line1": "Salvation Army Community Hall, 39 Bath Road, Cheltenham",
+			"line2": "",
+			"locality": "Cheltenham",
+			"region": "Gloucestershire",
+			"country": "England",
+			"postalCode": "GL53 7HG"
+		},
+		"religion": "Christianity",
+		"groupName": "RCCG",
+		"isConfirmed": true,
+		"denominations": [],
+		"reviews": [],
+		"events": [],
+		"promotions": [],
+		"ratingsCount": 0,
+		"averageRating": 0,
+		"uri": "England/Gloucestershire/Cheltenham/Christianity/RCCG/Abundant-Life-Church-Cheltenham",
+		"concatenatedAddress": "Salvation Army Community Hall, 39 Bath Road, Cheltenham, Cheltenham, Gloucestershire, England, GL53 7HG",
+		"location": {
+			"type": "Point",
+			"coordinates": [
+				51.8970981,
+				-2.07338
+			]
+		},
+		"jsonLd": {
+			"@type": "Place",
+			"name": "Abundant Life Church Cheltenham",
+			"mainentitiyofpage": "http://192.168.100.2:8000England/Gloucestershire/Cheltenham/Christianity/RCCG/Abundant-Life-Church-Cheltenham",
+			"geo": {
+				"@type": "GeoCoordinates",
+				"latitude": 51.8970981,
+				"longitude": -2.07338
+			},
+			"address": {
+				"@type": "PostalAddress",
+				"addressCountry": "England",
+				"addressLocality": "Cheltenham",
+				"addressRegion": "Gloucestershire",
+				"postalCode": "GL53 7HG",
+				"streetAddress": "Salvation Army Community Hall, 39 Bath Road, Cheltenham"
+			}
+		},
+		"hash": "2af519bd51f4360c084db580c812e45649452403"
+	}
+]

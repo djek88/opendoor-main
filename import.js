@@ -8,6 +8,7 @@ var csv = require('csv');
 var geocoder = require('geocoder');
 var config = require('./config.js');
 var sha1 = require('sha1');
+require('./assets/js/utils.js');
 var placeQueue = [];
 
 var codesStats = {};
@@ -24,6 +25,62 @@ var startTime = Date.now();
 
 var finishedRequests = 0;
 var allRequests;
+
+
+function createJsonLd(place) {
+	var data = {
+		'@type': 'Place'
+		,	name: place.name
+		,	mainentitiyofpage: config.url + place.uri
+		,	geo: {
+			'@type': 'GeoCoordinates'
+			, latitude: place.location.coordinates[0]
+			, longitude: place.location.coordinates[1]
+		}
+		,	address: {
+			'@type': 'PostalAddress'
+			,	addressCountry: place.address.country
+			,	addressLocality: place.address.locality
+			,	addressRegion: place.address.region
+			,	postalCode: place.address.postalCode
+			,	streetAddress: [place.address.line1, place.address.line2].cleanArray().join(', ')
+		}
+	};
+
+
+	if (place.bannerPhoto) {
+		data.image = config.url + '/photos/' + place.bannerPhoto;
+	}
+
+	if (place.about) {
+		data.description = place.about;
+	}
+
+	if (place.phone) {
+		data.telephone = place.phone;
+	}
+
+	if (place.averageRating) {
+		data.aggregateRating = place.averageRating;
+	}
+
+	if (place.reviews.length) {
+		data.review = [];
+		for (var i=0; i < place.reviews.length; i++) {
+			data.review.push({
+				"@type": 'Review'
+				,	author: place.reviews[i].name
+				,	reviewBody: place.reviews[i].text
+				,	reviewRating: {
+					"@type": 'Rating'
+					,	ratingValue: place.reviews[i].rating
+				}
+			})
+		}
+	}
+	return data;
+}
+
 
 
 function sendGeocodeRequest(address, cb, delay) {
@@ -61,9 +118,10 @@ function sendNewRequestFromQueue() {
 	if (place) {
 		var hash =sha1(JSON.stringify(place));
 		if (existingPlaceHashes.indexOf(hash) == -1) {
-			sendGeocodeRequest(place.address, function (err, res) {
+			sendGeocodeRequest(place.concatenatedAddress, function (err, res) {
 				if (res.results.length) {
 					place.location = {type: 'Point', coordinates: [res.results[0].geometry.location.lat, res.results[0].geometry.location.lng]};
+					place.jsonLd = createJsonLd(place);
 					place.hash = hash;
 					console.log("Location was found: ", place.name);
 					outContent.push(place);
@@ -121,28 +179,36 @@ fs.readFile(outFileName, 'utf8', function (err, data) {
 			else {
 				csv.parse(content, function(err, data) {
 					for (var i=1; i<data.length; i++) {
-						var place = data[i];
-						for (var j=0; j<place.length; j++) {
-							place[j] = place[j].trim();
+						var placeAsArray = data[i];
+						for (var j=0; j < placeAsArray.length; j++) {
+							placeAsArray[j] = placeAsArray[j].trim();
 						}
-						var placeObject = {
-								name: place[0]
-							, postalCode: place[7]
-							,	religion: place[9]
-							, denomination: place[10]
+						var place = {
+								name: placeAsArray[0]
+							, address: {
+									line1: [placeAsArray[1], placeAsArray[2], placeAsArray[3], placeAsArray[4]].cleanArray().join(', ')
+								, line2: ''
+								, locality: placeAsArray[5]
+								, region: placeAsArray[6]
+								, country: placeAsArray[8]
+								, postalCode: placeAsArray[7]
+							}
+							,	religion: 'Christianity'
+							, groupName: 'RCCG'
 							,	isConfirmed: true
+							, denominations: []
+							, reviews: []
+							, events: []
+							, promotions: []
+							, jobs: []
+							, ratingsCount: 0
+							, averageRating: 0
 						};
 
-						var address = place.splice(2, 7);
-						for (var j=0; j<address.length; j++) {
-							if (!address[j].length) {
-								address.splice(j, 1);
-							}
-						}
-						placeObject.address = address.join(', ');
-
-						placeQueue.push(placeObject);
-						//if (i>9) {
+						place.uri = [place.address.country, place.address.region, place.address.locality, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+						place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+						placeQueue.push(place);
+						//if (i>4) {
 						//	break;
 						//}
 					}
@@ -161,3 +227,6 @@ process.on('exit', function() {
 		fs.writeFileSync(outFileName, JSON.stringify(outContent, null, '\t'), 'utf8');
 	}
 });
+
+
+// Do import with mongoimport --db opendoor --collection places --type json --file "path-to\result_proper_addrs.json" --jsonArray

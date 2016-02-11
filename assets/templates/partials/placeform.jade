@@ -34,10 +34,10 @@
 				label.col-md-3.control-label Address line 2
 				.col-md-9
 					input.form-control(type="text", name="addressLine2", ng-model="$place.address.line2")
-			.form-group(ng-class="{'has-error': (form.$submitted || form.city.$touched) && form.city.$error.required}")
-				label.col-md-3.control-label City
+			.form-group(ng-class="{'has-error': (form.$submitted || form.locality.$touched) && form.locality.$error.required}")
+				label.col-md-3.control-label Locality
 				.col-md-9
-					input.form-control(type="text", name="city", ng-model="$place.address.city", required)
+					input.form-control(type="text", name="locality", ng-model="$place.address.locality", required)
 			.form-group(ng-class="{'has-error': (form.$submitted || form.region.$touched) && form.region.$error.required}")
 				label.col-md-3.control-label Region
 				.col-md-9
