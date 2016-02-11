@@ -159,11 +159,12 @@ app.post('/register', require('./app/routes/register.js')(userManager, sha1));
 
 app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
 app.get('/ajax/users/:id', require('./app/routes/ajax/users.js')(userManager));
-app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(placeManager));
-app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(mongoose, placeManager));
-app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(mongoose, placeManager));
-app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(placeManager));
-app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/find.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
+app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
+app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
+app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
+app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
 app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
 
 app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));

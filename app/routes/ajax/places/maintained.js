@@ -1,4 +1,4 @@
-module.exports = function(mongoose, placeManager){
+module.exports = function(config, mongoose, placeManager){
 	return function(req, res){
 		if (req.session.user) {
 			var maintainerId;

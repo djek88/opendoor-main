@@ -98,9 +98,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 		function showNearbyPlaces(place){
 			var requestParams = {
-				lat: place.location.coordinates[0]
+					lat: place.location.coordinates[0]
 				, lng: place.location.coordinates[1]
-				,	limit: 7
+				,	limit: 4
 				, exclude: place._id
 				//, religion: place.religion
 			};
@@ -110,8 +110,10 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				, method: 'GET'
 				, params: requestParams
 			}).
-			success(function (places){
-				if (Array.isArray(places)) {
+			success(function (response){
+
+				if (typeof response == 'object' && Array.isArray(response.results)) {
+					var places = response.results;
 					if (places.length) {
 						for (var i = 0; i < places.length; i++) {
 								places[i].distance = Math.round(places[i].distance);
@@ -954,18 +956,19 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				, method: 'GET'
 				, params: requestParams
 			}).
-			success(function (data){
-				if (Array.isArray(data)) {
-					if (data.length) {
-						for (var i = 0; i < data.length; i++) {
-							data[i].distance = Math.round(data[i].distance);
+			success(function (response){
+				if (typeof response == 'object' && Array.isArray(response.results)) {
+					var places = response.results;
+					if (places.length) {
+						for (var i = 0; i < places.length; i++) {
+							places[i].distance = Math.round(places[i].distance);
 						}
 						$scope.$message = '';
 					}
 					else {
 						$scope.$message = 'There are no places of worship found near this location';
 					}
-					$scope.$places = data;
+					$scope.$places = places;
 					createMap();
 				}
 				else {
@@ -1020,12 +1023,13 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 			, method: 'GET'
 			, params: requestParams
 		}).
-		success(function (data){
-			if (Array.isArray(data)) {
-				if (data.length) {
-					for (var i=0; i< data.length; i++) {
-						if (data[i].updatedAt) {
-							data[i].updatedAt = (new Date(data[i].updatedAt)).toString('MM/dd/yyyy');
+		success(function (response){
+			if (typeof response == 'object' && Array.isArray(response.results)) {
+				var places = response.results;
+				if (places.length) {
+					for (var i=0; i< places.length; i++) {
+						if (places[i].updatedAt) {
+							places[i].updatedAt = (new Date(places[i].updatedAt)).toString('MM/dd/yyyy');
 						}
 					}
 					$scope.$message = '';
@@ -1033,7 +1037,7 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 				else {
 					$scope.$message = 'There are no places of worship';
 				}
-				$scope.$places = data;
+				$scope.$places = places;
 			}
 			else {
 				onError();

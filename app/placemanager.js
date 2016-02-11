@@ -283,6 +283,8 @@ module.exports = function(mongoose, email, config) {
 		};
 
 		this.findNearby = function(data, callback) {
+			var skipPosition;
+			var limitPosition;
 			var geoNearOption = {
 				"near": {
 					"type": "Point"
@@ -318,12 +320,11 @@ module.exports = function(mongoose, email, config) {
 			if (data.maxDistance) {
 				geoNearOption.maxDistance = parseInt(data.maxDistance);
 			}
+			if (data.skip) {
+				skipPosition = options.push({"$skip": parseInt(data.skip)});
+			}
 			if (data.limit) {
-				var limit = parseInt(data.limit);
-				if (data.exclude) {
-					limit++;
-				}
-				options.push({"$limit": limit});
+				limitPosition = options.push({"$limit": parseInt(data.limit)});
 			}
 			if (data.exclude) {
 				geoNearOption['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
@@ -333,8 +334,30 @@ module.exports = function(mongoose, email, config) {
 				matchOption['maintainer'] = {$ne: null};
 			}
 
+			console.log(options);
+
 			Place.aggregate(options, function(err, places){
-				Place.populate(places, {path: "maintainer"}, callback);
+				options.push({ $group: { _id: null, count: { $sum: 1 } } });
+
+
+				if (limitPosition) {
+					options.splice(limitPosition - 1, 1);
+				}
+				if (skipPosition) {
+					options.splice(skipPosition - 1, 1);
+				}
+				Place.aggregate(options, function(err, stats){
+					console.log(stats);
+					Place.populate(places, {path: "maintainer"}, function(err, places){
+						var response = {
+							results: places
+							, count: stats[0] ? stats[0].count : 0
+						}
+						if (typeof callback == 'function') {
+							callback(err, response);
+						}
+					});
+				});
 			});
 		};
 
