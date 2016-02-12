@@ -6,9 +6,9 @@ var args = process.argv.slice(2);
 var fs = require('fs');
 var csv = require('csv');
 var geocoder = require('geocoder');
-var config = require('./config.js');
+var config = require('../config.js');
 var sha1 = require('sha1');
-require('./assets/js/utils.js');
+require('../assets/js/utils.js');
 var placeQueue = [];
 
 var codesStats = {};
@@ -112,6 +112,15 @@ function sendGeocodeRequest(address, cb, delay) {
 
 }
 
+function showResusts() {
+
+	console.log(codesStats);
+	var executionTime = (Date.now() - startTime)/1000;
+	var timePerRequest = Math.round((executionTime / allRequests) * 1000) / 1000;
+	console.log('Execution time: ' + executionTime + 's, time per request: ' + timePerRequest + 's');
+}
+
+
 function sendNewRequestFromQueue() {
 	var place = placeQueue.shift();
 
@@ -142,11 +151,7 @@ function sendNewRequestFromQueue() {
 	}
 	else if (finishedRequests == allRequests) {
 		console.log('All elements have been processed');
-		console.log(codesStats);
-		var executionTime = (Date.now() - startTime)/1000;
-		var timePerRequest = Math.round((executionTime / allRequests) * 1000) / 1000;
-		console.log('Execution time: ' + executionTime + 's, time per request: ' + timePerRequest + 's');
-
+		showResusts();
 	}
 
 }
@@ -224,6 +229,7 @@ process.on('SIGINT', process.exit);
 
 process.on('exit', function() {
 	if (finishedRequests && finishedRequests > skippedPlaces) {
+		showResusts();
 		fs.writeFileSync(outFileName, JSON.stringify(outContent, null, '\t'), 'utf8');
 	}
 });

@@ -7,13 +7,13 @@
 						label(for="maintainers") Only maintainers
 						input.form-control(type="checkbox", id="maintainers", name="maintainers", ng-model="maintainers")
 						| &nbsp;
-					button.btn.btn-md.btn-primary(type='submit', ng-click="$searchUsers()") Filter
+					button.btn.btn-md.btn-primary(type='submit', ng-click="searchUsers()") Filter
 					.clearfix
 		.row
 			.col-lg-12.m-t-40
-				h4.text-center(ng-show='$message.length') {{$message}}
-				div(ng-show="$users")
-					div(ng-show="$users.length")
+				h4.text-center(ng-show='message.length') {{message}}
+				div(ng-show="users")
+					div(ng-show="users.length")
 						.table-wrap.bg-white
 							table#search-table.table
 								thead
@@ -22,8 +22,8 @@
 										th Email
 										th
 								tbody
-									tr.place-link(ng-repeat="$user in $users", ng-mousedown="$openUser($event, $user)")
-										td {{$user.name}}
-										td {{$user.email}}
+									tr.place-link(ng-repeat="user in users", ng-mousedown="openUser(event, user)")
+										td {{user.name}}
+										td {{user.email}}
 										td.text-right
 											i.fa.fa-chevron-right

@@ -7,7 +7,7 @@
 				label.col-md-3.control-label Your Name
 				.col-md-9
 					input.form-control(type="text", name="name", ng-model="name", required)
-			.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.$error.email)}")
+			.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.error.email)}")
 				label.col-md-3.control-label Your Email address
 				.col-md-9
 					input.form-control(type="email", name="email", ng-model="email", required)
@@ -15,7 +15,7 @@
 				label.col-md-3.control-label Your Message
 				.col-md-9
 					textarea.form-control(placeholder='Write your feedback, question, suggestion, message here', rows='5', name="note", ng-model="note", required)
-			input.hidden(name="target" ng-value="$targetPage")
+			input.hidden(name="target" ng-value="targetPage")
 			.form-group
 				label.col-md-3.control-label
 				.col-md-9

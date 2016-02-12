@@ -54,7 +54,7 @@ opendoorApp.directive('ngLocation', function() {
 
 
 opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $location, $window) {
-	$rootScope.$religions = [
+	$rootScope.religions = [
 		'Christianity'
 	,	'Islam'
 	,	'Hinduism'
@@ -75,17 +75,17 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 
 	$rootScope.currentDate = new Date;
 
-	$rootScope.$year = (new Date).getFullYear();
+	$rootScope.year = (new Date).getFullYear();
 
 	$rootScope.siteconfig = siteconfig;
 
-	$rootScope.$openPlace = function($event, $place) {
-		$rootScope.$selectedPlace = $place;
+	$rootScope.openPlace = function($event, place) {
+		$rootScope.selectedPlace = place;
 		if ($event.which == 2) {
-			$window.open('/places/' + $place.uri, '_blank');
+			$window.open('/places/' + place.uri, '_blank');
 		}
 		else {
-			$location.url('/places/' + $place.uri);
+			$location.url('/places/' + place.uri);
 		}
 	};
 
@@ -97,11 +97,11 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		}
 	};
 
-	$rootScope.$getMapInstance = function(targetEl) {
-		if (!$rootScope.$map) {
-			$div = $('<div id="map"></div>');
-			$(targetEl).append($div);
-			var map = $rootScope.$map = new google.maps.Map($div[0], {scrollwheel: false});
+	$rootScope.getMapInstance = function(targetEl) {
+		if (!$rootScope.map) {
+			var div = $('<div id="map"></div>');
+			$(targetEl).append(div);
+			var map = $rootScope.map = new google.maps.Map(div[0], {scrollwheel: false});
 			map.markers=[];
 
 			map.icons = {
@@ -141,10 +141,10 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 			}
 		}
 		else {
-			$(targetEl).append($rootScope.$map.getDiv());
-			$rootScope.$map.removeMarkers();
+			$(targetEl).append($rootScope.map.getDiv());
+			$rootScope.map.removeMarkers();
 		}
-		return $rootScope.$map;
+		return $rootScope.map;
 	}
 }]);
 
@@ -165,18 +165,18 @@ opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($root
 		document.title = $route.current.title + titlePostfix;
 	});
 	$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
-		if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope.$_id) {
+		if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope._id) {
 			$location.url('/message?message=pleaselogin');
 		}
 	});
 
 	var id = $cookies.get('_id');
 	if (typeof id == 'string'){
-		$rootScope.$_id = id.substring(3,id.length-1);
+		$rootScope._id = id.substring(3,id.length-1);
 	}
-	$rootScope.$email = $cookies.get('email');
-	$rootScope.$isAdmin = $cookies.get('isAdmin') == 'true';
-	$rootScope.$isLoggedIn = !!$rootScope.$email;
+	$rootScope.email = $cookies.get('email');
+	$rootScope.isAdmin = $cookies.get('isAdmin') == 'true';
+	$rootScope.isLoggedIn = !!$rootScope.email;
 }]);
 
 opendoorApp.config(

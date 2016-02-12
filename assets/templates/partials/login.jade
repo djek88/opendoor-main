@@ -9,15 +9,15 @@
 							|  The Open Door Project
 							small A place of worship near you
 					.login-content
-						.alert.fade.in(ng-show="$alertMessage", ng-class="'alert-' + $alertType")
+						.alert.fade.in(ng-show="alertMessage", ng-class="'alert-' + alertType")
 							span.close(data-dismiss='alert') ×
 							i.fa.fa-check.fa-2x.pull-left
-							p {{ $alertMessage }}
+							p {{ alertMessage }}
 						form.margin-bottom-0(method="POST", action="/login", novalidate, name="form")
-							.form-group.m-b-20(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.$error.email)}")
+							.form-group.m-b-20(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.error.email)}")
 								div(ng-show="form.$submitted || form.email.$touched")
 									label.control-label(ng-show="form.email.$error.required") Email is required.
-									label.control-label(ng-show="form.email.$error.email") This is not a valid email.
+									label.control-label(ng-show="form.email.error.email") This is not a valid email.
 								input.form-control.input-lg(placeholder="Email Address", type="email", name="email", ng-model="email", required)
 							.form-group.m-b-20(ng-class="{'has-error': (form.$submitted || form.password.$touched) && form.password.$error.required}")
 								div(ng-show="form.$submitted || form.password.$touched")

@@ -179,7 +179,7 @@ app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
 
 app.post(['/jobs/add', '/jobs/edit/:id'], require('./app/routes/jobs/edit.js')(mongoose, placeManager, placeManager));
 app.post('/jobs/fund/:id', require('./app/routes/jobs/fund.js')(placeManager, stripe));
-app.post('/jobs/:id', require('./app/routes/jobs/contact.js')(placeManager, email));
+app.post('/jobs/:id', require('./app/routes/jobs/contact.js')(mongoose, placeManager, email));
 app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
 app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
 app.post('/places/review/:id', require('./app/routes/places/addreview.js')(placeManager));

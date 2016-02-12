@@ -8,13 +8,12 @@ module.exports = function(mongoose, placeManager){
 		else {
 			var query = req.query;
 		}
-		console.log(query);
 
 
 		placeManager.aggregate([
 			{$match: query}
 			, {$unwind: '$jobs'}
-			, {$project: {_id: '$jobs._id', title: '$jobs.title', type: '$jobs.type', place: '$name', country: '$address.country'}}
+			, {$project: {_id: '$jobs._id', title: '$jobs.title', type: '$jobs.type', place: '$name', description: '$jobs.description', placeuri: '$uri', country: '$address.country'}}
 		], function(err, jobs){
 			res.send(JSON.stringify(getById ? jobs[0] : jobs));
 		});

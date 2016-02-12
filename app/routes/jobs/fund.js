@@ -11,12 +11,12 @@ module.exports = function(placeManager, stripe){
 		}, function(err, charge) {
 			if (!err && charge && charge.status == 'succeeded') {
 				var expireDate = (new Date).add(sum).months();
-
+				console.log(id);
 				placeManager.findOneAndUpdate({'jobs._id': id}, {
 					"$set": {
 						"jobs.$.expireDate": expireDate
 					}
-				}, function(){
+				}, function(err, place){
 					res.redirect('/message?message=jobfunded');
 				});
 			}

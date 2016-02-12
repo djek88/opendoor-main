@@ -18,8 +18,8 @@ module.exports = function(mongoose, placeManager) {
 
 				if (isAdding) {
 					data.expireDate = new Date;
-					placeManager.addJob(data.place, data, function(err, place){
-						res.redirect('/jobs/fund/' + place.jobs.pop()._id);
+					placeManager.addJob(data.place, data, function(err, job){
+						res.redirect('/jobs/fund/' + job._id);
 					});
 				}
 				else {

@@ -8,6 +8,7 @@ module.exports = function(config){
 			, apiKeys: {
 				stripePublic: config.apiKeys.stripePublic
 			}
+			, frontend: config.frontend
 		};
 
 		res.send('window.siteconfig = ' + JSON.stringify(data));

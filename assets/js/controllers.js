@@ -13,12 +13,12 @@ opendoorControllers.controller('LoginCtrl', ['$scope', '$location',
 	function($scope, $location) {
 		switch ($location.search()['message']) {
 			case 'regsuccess':
-				$scope.$alertType = 'success';
-				$scope.$alertMessage = 'Registration was successful. Please log in using your login and password';
+				$scope.alertType = 'success';
+				$scope.alertMessage = 'Registration was successful. Please log in using your login and password';
 			break;
 			case 'wrongloginorpassword':
-				$scope.$alertType = 'danger';
-				$scope.$alertMessage = 'You have entered an invalid username or password';
+				$scope.alertType = 'danger';
+				$scope.alertMessage = 'You have entered an invalid username or password';
 			break;
 		}
 	}
@@ -28,8 +28,8 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 	function($scope, $location) {
 		switch ($location.search()['message']) {
 			case 'alreadyregistered':
-				$scope.$alertType = 'danger';
-				$scope.$alertMessage = 'Your email already exists in our database. Please try to restore your password';
+				$scope.alertType = 'danger';
+				$scope.alertMessage = 'Your email already exists in our database. Please try to restore your password';
 				break;
 		}
 	}
@@ -69,7 +69,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			$('title').html($place.name);
 		}
 		var placeId = $location.url().substr(8);
-		$scope.$placeId = placeId;
+		$scope.placeId = placeId;
 		var userPosition = 0;
 		var map;
 
@@ -86,7 +86,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			});
 		}
 
-		$scope.$onLeaderPhotoLoad = function() {
+		$scope.onLeaderPhotoLoad = function() {
 			$el = $('.leader-photo');
 			if ($el.width() > $el.height()) {
 				$el.removeClass('portrait');
@@ -118,28 +118,28 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 						for (var i = 0; i < places.length; i++) {
 								places[i].distance = Math.round(places[i].distance);
 						}
-						$scope.$nearbyPlacesMessage = '';
+						$scope.nearbyPlacesMessage = '';
 					}
 					else {
-						$scope.$nearbyPlacesMessage = 'There are no places nearby';
+						$scope.nearbyPlacesMessage = 'There are no places nearby';
 					}
-					$scope.$nearbyPlaces = places;
+					$scope.nearbyPlaces = places;
 				}
 				else {
-					$scope.$nearbyPlacesMessage = 'An error happened during request';
-					$scope.$nearbyPlaces = null;
+					$scope.nearbyPlacesMessage = 'An error happened during request';
+					$scope.nearbyPlaces = null;
 				}
 			}).
 			error(function () {
-				$scope.$nearbyPlacesMessage = 'An error happened during request';
-				$scope.$nearbyPlaces = null;
+				$scope.nearbyPlacesMessage = 'An error happened during request';
+				$scope.nearbyPlaces = null;
 			});
 		}
 
 
 		function setData($place) {
 			addMeta($place);
-			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
+			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
 			if ($place.updatedAt) {
 				$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
 			}
@@ -161,14 +161,14 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				$place.phoneUrl = $sce.trustAsResourceUrl('tel:' + $place.phone);
 			}
 
-			$scope.$mainMeetingText = '';
+			$scope.mainMeetingText = '';
 			if ($place.mainMeetingTime || $place.mainMeetingDay) {
-				$scope.$mainMeetingText += 'Main service ';
+				$scope.mainMeetingText += 'Main service ';
 				if ($place.mainMeetingTime) {
-					$scope.$mainMeetingText += (new Date($place.mainMeetingTime)).toString('HH:mm') + ' ';
+					$scope.mainMeetingText += (new Date($place.mainMeetingTime)).toString('HH:mm') + ' ';
 				}
 				if ($place.mainMeetingDay) {
-					$scope.$mainMeetingText += 'every ' + $place.mainMeetingDay;
+					$scope.mainMeetingText += 'every ' + $place.mainMeetingDay;
 				}
 			}
 
@@ -221,10 +221,10 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
 
 			$(document.head).append('<script type="application/ld+json">' + JSON.stringify($place.jsonLd) + '</script>');
-			$scope.$place = $place;
+			$scope.place = $place;
 
 
-			map = $rootScope.$getMapInstance($('#results-map'));
+			map = $rootScope.getMapInstance($('#results-map'));
 			google.maps.event.trigger(map, 'resize');
 			var pos = new google.maps.LatLng($place.location.coordinates[0], $place.location.coordinates[1]);
 			map.setCenter(pos);
@@ -243,9 +243,9 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				});
 			}
 		}
-		if ($rootScope.$selectedPlace) {
-			setData($rootScope.$selectedPlace);
-			showNearbyPlaces($rootScope.$selectedPlace);
+		if ($rootScope.selectedPlace) {
+			setData($rootScope.selectedPlace);
+			showNearbyPlaces($rootScope.selectedPlace);
 		}
 		else {
 			$http({
@@ -280,15 +280,15 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 opendoorControllers.controller('UserViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
 		var userId = $location.url().split('/').pop();
-		$scope.$userId = userId;
+		$scope.userId = userId;
 
 
 
 		function setData($user) {
-			$scope.$user = $user;
+			$scope.user = $user;
 
-			$scope.$places = [];
-			$scope.$message = 'Loading…';
+			$scope.places = [];
+			$scope.message = 'Loading…';
 			$http({
 				url: '/ajax/places/maintained/' + $user._id
 				, method: 'GET'
@@ -299,24 +299,24 @@ opendoorControllers.controller('UserViewCtrl', ['$scope', '$rootScope', '$locati
 						for (var i = 0; i < data.length; i++) {
 							data[i].distance = Math.round(data[i].distance);
 						}
-						$scope.$message = '';
+						$scope.message = '';
 					}
 					else {
-						$scope.$message = 'There are no maintained places';
+						$scope.message = 'There are no maintained places';
 					}
-					$scope.$places = data;
+					$scope.places = data;
 				}
 				else {
-					$scope.$message = 'An error happened during request';
-					$scope.$places = [];
+					$scope.message = 'An error happened during request';
+					$scope.places = [];
 				}
 			}).
 			error(function () {
-				$scope.$message = 'Error processing request';
+				$scope.message = 'Error processing request';
 			});
 		}
-		if ($rootScope.$selectedUser) {
-			setData($rootScope.$selectedUser);
+		if ($rootScope.selectedUser) {
+			setData($rootScope.selectedUser);
 		}
 		else {
 			$http({
@@ -347,12 +347,12 @@ opendoorControllers.controller('UserViewCtrl', ['$scope', '$rootScope', '$locati
 opendoorControllers.controller('JobViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
 		var jobId = $location.url().split('/').pop();
-		$scope.$jobId = jobId;
+		$scope.jobId = jobId;
 
 
 
 		function setData($job) {
-			$scope.$job = $job;
+			$scope.job = $job;
 		}
 		$http({
 			url: '/ajax/jobs/' + jobId
@@ -398,10 +398,10 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			placeId = 0;
 		}
 		else {
-			$scope.$submitPath = '/places/edit/' + placeId;
-			$scope.$additionalFieldsAreVisible = true;
+			$scope.submitPath = '/places/edit/' + placeId;
+			$scope.additionalFieldsAreVisible = true;
 		}
-		var map = $rootScope.$getMapInstance($('#results-map'));
+		var map = $rootScope.getMapInstance($('#results-map'));
 
 		google.maps.event.addListenerOnce(map, 'idle', function(){
 			google.maps.event.trigger(map, 'resize');
@@ -424,7 +424,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				}
 		});
 
-		$scope.$religions = $rootScope.$religions;
+		$scope.religions = $rootScope.religions;
 
 		$groupsEl.selectpicker({
 			style: 'form-control btn-white',
@@ -455,14 +455,14 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 
 
-		$scope.$searchByAddress = function() {
+		$scope.searchByAddress = function() {
 			var concatenatedAddress = [
-				$scope.$place.address.line1
-				, $scope.$place.address.line2
-				, $scope.$place.address.locality
-				, $scope.$place.address.region
-				, $scope.$place.address.country
-				, $scope.$place.address.postalCode
+				$scope.place.address.line1
+				, $scope.place.address.line2
+				, $scope.place.address.locality
+				, $scope.place.address.region
+				, $scope.place.address.country
+				, $scope.place.address.postalCode
 			].cleanArray().join(', ');
 			geocoder.geocode({'address': concatenatedAddress}, function (results, status) {
 				if (status === google.maps.GeocoderStatus.OK) {
@@ -494,7 +494,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 					$groupsEl.append('<option value="' + data[i].name + '">' + data[i].name + '</option>');
 				}
 				$groupsEl.selectpicker('refresh');
-				$groupsEl.selectpicker('val', $scope.$place.groupName);
+				$groupsEl.selectpicker('val', $scope.place.groupName);
 			});
 
 
@@ -512,7 +512,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				for (var i=0; i<data.length; i++) {
 					var denomination = data[i].name;
 					denominations.push(denomination);
-					if ($scope.$place.denominations && $scope.$place.denominations.indexOf(denomination) != -1) {
+					if ($scope.place.denominations && $scope.place.denominations.indexOf(denomination) != -1) {
 						$denominationsEl.tagit('createTag', denomination);
 					}
 				}
@@ -525,7 +525,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		});
 
 		$groupsEl.on('change', function(){
-			$scope.$place.groupName = $groupsEl.val();
+			$scope.place.groupName = $groupsEl.val();
 		});
 
 
@@ -536,8 +536,8 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 
 
-			$scope.$isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope.$_id;
-			$scope.$place = $place;
+			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
+			$scope.place = $place;
 
 			loadOptionsForReligion($place.religion);
 			$groupsEl.selectpicker('val', $place.groupName);
@@ -546,11 +546,11 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 
 		if (placeId) {
-			$scope.$edit = true;
-			$scope.$mode = 'edit';
+			$scope.edit = true;
+			$scope.mode = 'edit';
 
-			if ($rootScope.$selectedPlace) {
-				setData($rootScope.$selectedPlace);
+			if ($rootScope.selectedPlace) {
+				setData($rootScope.selectedPlace);
 			}
 			else {
 				$http({
@@ -571,9 +571,9 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			}
 		}
 		else {
-			$scope.$edit = false;
-			$scope.$mode = 'add';
-			$scope.$place = {
+			$scope.edit = false;
+			$scope.mode = 'add';
+			$scope.place = {
 				address: {}
 				,	location: {}
 			};
@@ -585,9 +585,9 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 opendoorControllers.controller('JobFundCtrl', ['$scope', '$rootScope', '$location', '$http',
 	function($scope, $rootScope, $location, $http) {
-		$scope.$alertType = 'info';
-		$scope.$alertTitle = 'Success';
-		$scope.$alertMessage = 'Your job was added successfully. Please pay $1 in order to publish it.';
+		$scope.alertType = 'info';
+		$scope.alertTitle = 'Success';
+		$scope.alertMessage = 'Your job was added successfully. Please pay $1 in order to publish it.';
 
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
@@ -622,14 +622,14 @@ opendoorControllers.controller('JobFundCtrl', ['$scope', '$rootScope', '$locatio
 opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 
-		$scope.$jobs = null;
-		$scope.$message = '';
+		$scope.jobs = null;
+		$scope.message = '';
 
-		$scope.$religionsList = $rootScope.$religions;
+		$scope.religionsList = $rootScope.religions;
 		$scope.religion = '';
 
 
-		$scope.$openJob = function($event, $job) {
+		$scope.openJob = function($event, $job) {
 			if ($event.which == 2) {
 				$window.open('/jobs/' + $job._id, '_blank');
 			}
@@ -646,18 +646,18 @@ opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope'
 			};
 			$location.search('religion', requestParams.religion || null);
 		}
-		$scope.$searchJobs = function() {
+		$scope.searchJobs = function() {
 			setSearchParams();
 		};
 
 		function onError() {
-			$scope.$message = 'An error happened during request';
-			$scope.$jobs = null;
+			$scope.message = 'An error happened during request';
+			$scope.jobs = null;
 		}
 
 		var requestParams = $location.search();
 			$scope.religion = requestParams.religion;
-			$scope.$message = 'Searching…';
+			$scope.message = 'Searching…';
 			$http({
 				url: '/ajax/jobs/search'
 				, method: 'GET'
@@ -666,12 +666,12 @@ opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope'
 			success(function (data){
 				if (Array.isArray(data)) {
 					if (data.length) {
-						$scope.$message = '';
+						$scope.message = '';
 					}
 					else {
-						$scope.$message = 'There are no places of worship found near this location';
+						$scope.message = 'There are no places of worship found near this location';
 					}
-					$scope.$jobs = data;
+					$scope.jobs = data;
 				}
 				else {
 					onError();
@@ -696,14 +696,14 @@ opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$locatio
 
 
 		function setData($job) {
-			$scope.$job = $job;
+			$scope.job = $job;
 			//$('input[name="place"]').val($job.place);
 		}
 
 
 		if (jobId) {
-			$scope.$edit = true;
-			$scope.$mode = 'edit';
+			$scope.edit = true;
+			$scope.mode = 'edit';
 
 			$http({
 				url: '/ajax/jobs/' + jobId
@@ -723,8 +723,8 @@ opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$locatio
 
 		}
 		else {
-			$scope.$edit = false;
-			$scope.$mode = 'add';
+			$scope.edit = false;
+			$scope.mode = 'add';
 
 			setData({place: query.place});
 		}
@@ -734,7 +734,7 @@ opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$locatio
 opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 	function($scope, $rootScope) {
 		var geocoder = new google.maps.Geocoder();
-		var map = $rootScope.$getMapInstance($('#results-map'));
+		var map = $rootScope.getMapInstance($('#results-map'));
 		var $datetimepicker = $('#datetimepicker');
 		$datetimepicker.datetimepicker();
 		$datetimepicker.on('dp.change', function(){
@@ -751,7 +751,7 @@ opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 		map.setZoom(2);
 
 
-		$scope.$searchByAddress = function() {
+		$scope.searchByAddress = function() {
 			console.log($scope.address);
 			geocoder.geocode({'address': $scope.address}, function (results, status) {
 				if (status === google.maps.GeocoderStatus.OK) {
@@ -828,18 +828,18 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		$('.location-picker').locationpicker();
 		var $locationInputEl = $('.location-picker-address');
 
-		$scope.$places = null;
-		$scope.$message = 'Press "Search" to find nearest places';
+		$scope.places = null;
+		$scope.message = 'Press "Search" to find nearest places';
 		var $table = $('#search-table');
 		var map;
 
 		function createMap() {
-			if (!$scope.$message.length) {
-				map = $rootScope.$getMapInstance($('#results-map'));
+			if (!$scope.message.length) {
+				map = $rootScope.getMapInstance($('#results-map'));
 				google.maps.event.addListenerOnce(map, 'idle', function(){
-					addMarkers($scope.$places);
+					addMarkers($scope.places);
 				});
-				addMarkers($scope.$places);
+				addMarkers($scope.places);
 			}
 		}
 
@@ -894,13 +894,13 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			map.fitBounds(bounds);
 		};
 
-		$scope.$religionsList = $rootScope.$religions;
+		$scope.religionsList = $rootScope.religions;
 		$scope.religion = '';
 
-		$scope.$mouseOver = function(i) {
+		$scope.mouseOver = function(i) {
 			map.markers[i+1].setIcon(map.icons.defaultPoi);
 		};
-		$scope.$mouseOut = function(i) {
+		$scope.mouseOut = function(i) {
 			map.markers[i+1].setIcon(map.icons.brightPoi);
 		};
 
@@ -918,11 +918,11 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 				$location.search('lat', requestParams.lat || null);
 				$location.search('lng', requestParams.lng || null);
 				$location.search('religion', requestParams.religion || null);
-				$rootScope.$lastSearchAddress = $scope.address;
+				$rootScope.lastSearchAddress = $scope.address;
 			}
-			//$scope.$locationIsInvalid = (location.length<2);
+			//$scope.locationIsInvalid = (location.length<2);
 		}
-		$scope.$searchPlaces = function() {
+		$scope.searchPlaces = function() {
 			$scope.form.$submitted = true;
 			if ($locationInputEl.attr('active')=='1') {
 				$locationInputEl.one('change', setSearchParams);
@@ -938,8 +938,8 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		}
 
 		function onError() {
-			$scope.$message = 'An error happened during request';
-			$scope.$places = null;
+			$scope.message = 'An error happened during request';
+			$scope.places = null;
 		}
 
 		var requestParams = $location.search();
@@ -947,9 +947,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			$scope.lat = requestParams.lat;
 			$scope.lng = requestParams.lng;
 			$scope.location = requestParams.lat + ', ' + requestParams.lng;
-			$scope.address = $rootScope.$lastSearchAddress || $scope.location;
+			$scope.address = $rootScope.lastSearchAddress || $scope.location;
 			$scope.religion = requestParams.religion;
-			$scope.$message = 'Searching…';
+			$scope.message = 'Searching…';
 			requestParams.maxDistance = 5000;
 			$http({
 				url: '/ajax/places/search'
@@ -963,12 +963,12 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 						for (var i = 0; i < places.length; i++) {
 							places[i].distance = Math.round(places[i].distance);
 						}
-						$scope.$message = '';
+						$scope.message = '';
 					}
 					else {
-						$scope.$message = 'There are no places of worship found near this location';
+						$scope.message = 'There are no places of worship found near this location';
 					}
-					$scope.$places = places;
+					$scope.places = places;
 					createMap();
 				}
 				else {
@@ -985,9 +985,9 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 
-		$scope.$places = null;
+		$scope.places = null;
 		var $table = $('#search-table');
-		$scope.$religionsList = $rootScope.$religions;
+		$scope.religionsList = $rootScope.religions;
 		$scope.religion = '';
 
 
@@ -995,29 +995,56 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 
 			var requestParams = {
 					name: $scope.name
+				, skip: $scope.skip
+				, limit: $scope.limit
 				, religion: $scope.religion
 				, maintained: $scope.maintained
 			};
 
 			$location.search('name', requestParams.name || null);
+			$location.search('skip', requestParams.skip || null);
+			$location.search('limit', requestParams.limit || null);
 			$location.search('religion', requestParams.religion || null);
 			$location.search('maintained', requestParams.maintained || null);
 		}
-		$scope.$searchPlaces = function() {
+		$scope.searchPlaces = function() {
+			console.log($scope.skip);
 			$scope.form.$submitted = true;
 			setSearchParams();
 		};
 
-		function onError() {
-			$scope.$message = 'An error happened during request';
-			$scope.$places = null;
+		$scope.setPage = function(n) {
+			$scope.skip = (n-1) * $scope.itemsPerPage;
+			$scope.form.$submitted = true;
+			setSearchParams();
+		};
+
+
+		function getPages() {
+			$scope.itemsPerPage = $scope.limit || siteconfig.frontend.itemsPerPage;
+			$scope.pages = Math.ceil($scope.count / $scope.itemsPerPage);
+			var pagesList = [];
+			for (var i = 1; i <= $scope.pages; i++) {
+				pagesList.push(i);
+			}
+			$scope.pagesAsArray = pagesList;
+			$scope.page = $scope.skip ?  $scope.skip / $scope.itemsPerPage : 0;
+			$scope.page++;
 		}
+
+		function onError() {
+			$scope.message = 'An error happened during request';
+			$scope.places = null;
+		}
+
 
 		var requestParams = $location.search();
 		$scope.name = requestParams.name;
+		$scope.skip = requestParams.skip;
+		$scope.limit = requestParams.limit;
 		$scope.religion = requestParams.religion;
 		$scope.maintained = requestParams.maintained;
-		$scope.$message = 'Searching…';
+		$scope.message = 'Searching…';
 		$http({
 			url: '/ajax/places/search'
 			, method: 'GET'
@@ -1032,12 +1059,14 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 							places[i].updatedAt = (new Date(places[i].updatedAt)).toString('MM/dd/yyyy');
 						}
 					}
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no places of worship';
+					$scope.message = 'There are no places of worship';
 				}
-				$scope.$places = places;
+				$scope.places = places;
+				$scope.count = response.count;
+				getPages();
 			}
 			else {
 				onError();
@@ -1052,10 +1081,10 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 
-		$scope.$users = null;
+		$scope.users = null;
 
-		$scope.$openUser = function($event, $user) {
-			$rootScope.$selectedUser = $user;
+		$scope.openUser = function($event, $user) {
+			$rootScope.selectedUser = $user;
 			if ($event.which == 2) {
 				$window.open('/users/' + $user._id, '_blank');
 			}
@@ -1072,19 +1101,19 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 
 			$location.search('maintainers', requestParams.maintainers || null);
 		}
-		$scope.$searchUsers = function() {
+		$scope.searchUsers = function() {
 			$scope.form.$submitted = true;
 			setSearchParams();
 		};
 
 		function onError() {
-			$scope.$message = 'An error happened during request';
-			$scope.$users = null;
+			$scope.message = 'An error happened during request';
+			$scope.users = null;
 		}
 
 		var requestParams = $location.search();
 		$scope.maintainers = requestParams.maintainers;
-		$scope.$message = 'Searching…';
+		$scope.message = 'Searching…';
 		$http({
 			url: '/ajax/users'
 			, method: 'GET'
@@ -1093,12 +1122,12 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 		success(function (data){
 			if (Array.isArray(data)) {
 				if (data.length) {
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no users';
+					$scope.message = 'There are no users';
 				}
-				$scope.$users = data;
+				$scope.users = data;
 			}
 			else {
 				onError();
@@ -1112,9 +1141,9 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 
 opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
-		$scope.$places = [];
+		$scope.places = [];
 
-		$scope.$message = 'Loading…';
+		$scope.message = 'Loading…';
 		$http({
 			url: '/ajax/places/last'
 			, method: 'GET'
@@ -1125,20 +1154,20 @@ opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope
 					for (var i = 0; i < data.length; i++) {
 						data[i].distance = Math.round(data[i].distance);
 					}
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no places';
+					$scope.message = 'There are no places';
 				}
-				$scope.$places = data;
+				$scope.places = data;
 			}
 			else {
-				$scope.$message = 'An error happened during request';
-				$scope.$places = [];
+				$scope.message = 'An error happened during request';
+				$scope.places = [];
 			}
 		}).
 		error(function () {
-			$scope.$message = 'Error processing request';
+			$scope.message = 'Error processing request';
 		});
 	}
 
@@ -1148,8 +1177,8 @@ opendoorControllers.controller('LastPlacesCtrl', ['$scope', '$http', '$rootScope
 
 opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http',
 	function($scope, $http) {
-		$scope.$places = [];
-		$scope.$message = 'Loading…';
+		$scope.places = [];
+		$scope.message = 'Loading…';
 		$http({
 			url: '/ajax/places/maintained'
 			, method: 'GET'
@@ -1157,20 +1186,20 @@ opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http',
 		success(function (data){
 			if (Array.isArray(data)) {
 				if (data.length) {
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no maintained places';
+					$scope.message = 'There are no maintained places';
 				}
-				$scope.$places = data;
+				$scope.places = data;
 			}
 			else {
-				$scope.$message = 'An error happened during request';
-				$scope.$places = [];
+				$scope.message = 'An error happened during request';
+				$scope.places = [];
 			}
 		}).
 		error(function () {
-			$scope.$message = 'Error processing request';
+			$scope.message = 'Error processing request';
 		});
 	}
 
@@ -1181,7 +1210,7 @@ opendoorControllers.controller('MaintainedPlacesCtrl', ['$scope', '$http',
 opendoorControllers.controller('PlaceClaimsCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 
-		$scope.$message = 'Loading…';
+		$scope.message = 'Loading…';
 		$http({
 				url: '/ajax/claims'
 			, method: 'GET'
@@ -1189,19 +1218,19 @@ opendoorControllers.controller('PlaceClaimsCtrl', ['$scope', '$http', '$rootScop
 		success(function (data){
 			if (Array.isArray(data)) {
 				if (data.length) {
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no claims';
+					$scope.message = 'There are no claims';
 				}
-				$scope.$claims = data;
+				$scope.claims = data;
 			}
 			else {
-				$scope.$message = 'An error happened during request';
+				$scope.message = 'An error happened during request';
 			}
 		}).
 		error(function () {
-			$scope.$message = 'Error processing request';
+			$scope.message = 'Error processing request';
 		});
 	}
 
@@ -1211,7 +1240,7 @@ opendoorControllers.controller('PlaceClaimsCtrl', ['$scope', '$http', '$rootScop
 opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootScope', '$location', '$window', '$sce',
 	function($scope, $http, $rootScope, $location, $window, $sce) {
 
-		$scope.$message = 'Loading…';
+		$scope.message = 'Loading…';
 		$http({
 			url: '/ajax/placechanges'
 			, method: 'GET'
@@ -1235,19 +1264,19 @@ opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootSco
 							change.htmlValue = $sce.trustAsHtml('<img class="change-preview-photo" src="/photos/' + change.value + '">');
 						}
 					}
-					$scope.$message = '';
+					$scope.message = '';
 				}
 				else {
-					$scope.$message = 'There are no suggested changes';
+					$scope.message = 'There are no suggested changes';
 				}
-				$scope.$changes = data;
+				$scope.changes = data;
 			}
 			else {
-				$scope.$message = 'An error happened during request';
+				$scope.message = 'An error happened during request';
 			}
 		}).
 		error(function () {
-			$scope.$message = 'Error processing request';
+			$scope.message = 'Error processing request';
 		});
 	}
 
@@ -1255,13 +1284,13 @@ opendoorControllers.controller('PlaceChangesCtrl', ['$scope', '$http', '$rootSco
 
 opendoorControllers.controller('FeedbackCtrl', ['$scope', '$rootScope', '$location',
 	function($scope, $rootScope, $location) {
-		$scope.$targetPage = $location.hash();
+		$scope.targetPage = $location.hash();
 	}
 ]);
 
 opendoorControllers.controller('EditorProposalCtrl', ['$scope', '$routeParams', '$sce',
 	function($scope, $routeParams, $sce) {
-		$scope.$action = $sce.trustAsResourceUrl('/places/editorproposal/' + $routeParams.id);
+		$scope.action = $sce.trustAsResourceUrl('/places/editorproposal/' + $routeParams.id);
 		$scope.placeId = $routeParams.id;
 	}
 ]);
@@ -1270,7 +1299,7 @@ opendoorControllers.controller('EditorProposalCtrl', ['$scope', '$routeParams', 
 opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location', '$window',
 	function($scope, $rootScope, $location, $window) {
 		var feedbackPage = '/feedback';
-		$scope.$leaveFeedback = function($event) {
+		$scope.leaveFeedback = function($event) {
 			var targetPage = feedbackPage + '#' + $location.path();
 			if ($event.which == 2) {
 				$window.open(targetPage, '_blank');
@@ -1294,135 +1323,135 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 		switch (message) {
 
 			case 'pleaselogin':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'Please login first';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'Please login first';
 				break;
 			case 'alreadyregistered':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'Your email already exists in our database. Please try to restore your password';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'Your email already exists in our database. Please try to restore your password';
 			break;
 			case 'notfound':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'Page not found';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'Page not found';
 				break;
 			case 'proposalsent':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Your proposal has been sent';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Your proposal has been sent';
 				break;
 			case 'messagesent':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Your message has been sent';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Your message has been sent';
 				break;
 			case 'feedbacksaved':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Your message has been received';
-				$scope.$alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Your message has been received';
+				$scope.alertMessage = 'Thank you for taking the time to send us feedback. We will reply to you as soon as we can and normally within 24 hours.';
 				break;
 			case 'notificationsaved':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Your subscription has been saved';
-				$scope.$alertMessage = 'We will notify you when place near you will be added';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Your subscription has been saved';
+				$scope.alertMessage = 'We will notify you when place near you will be added';
 				break;
 			case 'changesadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Your changes has been added';
-				$scope.$alertMessage = 'Please wait until place maintainer accept your changes.';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Your changes has been added';
+				$scope.alertMessage = 'Please wait until place maintainer accept your changes.';
 				break;
 			case 'claimadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Your claim has been added';
-				$scope.$alertMessage = 'Please wait until administrator accept your claim.';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Your claim has been added';
+				$scope.alertMessage = 'Please wait until administrator accept your claim.';
 				break;
 			case 'changeaccepted':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Change has been accepted';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Change has been accepted';
 				break;
 			case 'changedenied':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Change has been denied';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Change has been denied';
 				break;
 			case 'claimaccepted':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Claim has been accepted';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Claim has been accepted';
 				break;
 			case 'claimdenied':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Claim has been denied';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Claim has been denied';
 				break;
 			case 'reviewsaved':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Your review has been saved';
-				$scope.$alertMessage = 'Thank you for taking the time to place a review.';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Your review has been saved';
+				$scope.alertMessage = 'Thank you for taking the time to place a review.';
 				break;
 
 			case 'eventadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Your event has been added';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Your event has been added';
 				break;
 			case 'placeadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Place was added successfully. Confirmation link was sent to your mail';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Place was added successfully. Confirmation link was sent to your mail';
 				break;
 			case 'placesaved':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Place was saved successfully.';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Place was saved successfully.';
 				break;
 			case 'placeconfirmed':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Place was confirmed successfully';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Place was confirmed successfully';
 				break;
 			case 'placeconfirmationerror':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'Error during place confirmation';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'Error during place confirmation';
 				break;
 			case 'subscriptionadded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Subscription was added successfully';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Subscription was added successfully';
 				break;
 			case 'verifysubscription':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'We\'ve sent confirmation details on your email';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'We\'ve sent confirmation details on your email';
 				break;
 			case 'subscriptionexists':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'You are already subscribed on this place';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'You are already subscribed on this place';
 				break;
 			case 'subscriptionconfirmed':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Subscription was confirmed successfully';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Subscription was confirmed successfully';
 				break;
 			case 'subscriptionconfirmationerror':
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'Error during subscription confirmation';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'Error during subscription confirmation';
 				break;
 			case 'jobfunded':
-				$scope.$alertType = 'info';
-				$scope.$alertTitle = 'Success';
-				$scope.$alertMessage = 'Job was funded successfully';
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Job was funded successfully';
 				break;
 			default:
-				$scope.$alertType = 'danger';
-				$scope.$alertTitle = 'Error';
-				$scope.$alertMessage = 'An unexpected error happened';
+				$scope.alertType = 'danger';
+				$scope.alertTitle = 'Error';
+				$scope.alertMessage = 'An unexpected error happened';
 			break;
 		}
 	}

@@ -324,7 +324,12 @@ module.exports = function(mongoose, email, config) {
 				skipPosition = options.push({"$skip": parseInt(data.skip)});
 			}
 			if (data.limit) {
-				limitPosition = options.push({"$limit": parseInt(data.limit)});
+				var limit = parseInt(data.limit);
+				limit = limit > config.frontend.maxItemsPerPage ? config.frontend.maxItemsPerPage : limit;
+				limitPosition = options.push({"$limit": limit});
+			}
+			else {
+				limitPosition = options.push({"$limit": config.frontend.itemsPerPage});
 			}
 			if (data.exclude) {
 				geoNearOption['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
@@ -347,12 +352,11 @@ module.exports = function(mongoose, email, config) {
 					options.splice(skipPosition - 1, 1);
 				}
 				Place.aggregate(options, function(err, stats){
-					console.log(stats);
 					Place.populate(places, {path: "maintainer"}, function(err, places){
 						var response = {
 							results: places
 							, count: stats[0] ? stats[0].count : 0
-						}
+						};
 						if (typeof callback == 'function') {
 							callback(err, response);
 						}
@@ -447,11 +451,17 @@ module.exports = function(mongoose, email, config) {
 		this.addJob = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
 				if (!err && place) {
-					place.jobs.push(data);
+					var job = place.jobs.create(data);
+					place.jobs.push(job);
 					place.jobs.sort(function(a,b){
 						return a.expireDate > b.expireDate ? 1 : -1;
 					});
-					place.save(callback);
+					place.save(function(err, place){
+
+						if (typeof callback=='function') {
+							callback(err, job);
+						}
+					});
 				}
 				else {
 					if (typeof callback=='function') {

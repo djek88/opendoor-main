@@ -1,4 +1,4 @@
-module.exports = function(jobManager, email){
+module.exports = function(mongoose, placeManager, email){
 	return function (req, res) {
 		var id = req.params.id;
 		var data = {
@@ -15,17 +15,27 @@ module.exports = function(jobManager, email){
 			data.name = req.body.name;
 		}
 
-		console.log(data);
-		jobManager.findOne({_id: id}, function(err, job) {
-			if (job && job.email) {
-				data.recipientEmail = job.email;
-				email.sendJobMessage(data, function(){
-					res.redirect('/message?message=messagesent')
-				});
+
+		placeManager.aggregate([
+			{$match: {'jobs._id': mongoose.Types.ObjectId(id)}}
+			, {$unwind: '$jobs'}
+			, {$project: {_id: '$jobs._id', email: '$jobs.email', type: '$jobs.type'}}
+		], function(err, jobs){
+			if (jobs.length) {
+				var job = jobs[0];
+				if (job && job.email) {
+					data.recipientEmail = job.email;
+					console.log(data);
+					email.sendJobMessage(data, function(){
+						res.redirect('/message?message=messagesent')
+					});
+				}
+				else {
+					console.log(arguments);
+					res.end();
+				}
 			}
-			else {
-				console.log(arguments);
-			}
+			else res.end();
 		});
 	};
 };
