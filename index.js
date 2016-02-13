@@ -187,7 +187,7 @@ app.post('/places/donate/:id', require('./app/routes/promotion.js')(placeManager
 app.post('/places/event/:id/add', require('./app/routes/places/addevent.js')(placeManager));
 app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
-app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, email));
+app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
 
 app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager));

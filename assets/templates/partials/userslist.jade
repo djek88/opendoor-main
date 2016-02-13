@@ -22,7 +22,7 @@
 										th Email
 										th
 								tbody
-									tr.place-link(ng-repeat="user in users", ng-mousedown="openUser(event, user)")
+									tr.place-link(ng-repeat="user in users", ng-mousedown="openUser($event, user)")
 										td {{user.name}}
 										td {{user.email}}
 										td.text-right

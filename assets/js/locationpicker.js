@@ -38,7 +38,7 @@ $.fn.locationpicker = function() {
 		if (newLocation && newLocation.geometry) {
 			location = newLocation;
 			$inputEl.val(location.formatted_address);
-			var locationArray = [location.geometry.location.lat(), location.geometry.location.lng()];
+			var locationArray = [location.geometry.location.lng(), location.geometry.location.lat()];
 			if ($coordsEl) {
 				$coordsEl.val(locationArray.join(', '));
 			}

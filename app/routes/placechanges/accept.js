@@ -12,10 +12,10 @@ module.exports = function(placeChangeManager){
 					if (place.maintainer == req.session.user._id) {
 						placeChangeManager.acceptChange(id, function (err, place) {
 							if (!err && place) {
-								res.redirect('/message?message=changeaccepted');
+								res.redirect('/message?message=changeaccepted&back=' + encodeURIComponent('/places/changes'));
 							}
 							else {
-								res.redirect('/error');
+								res.redirect('/error&back=' + encodeURIComponent('/places/changes'));
 							}
 						});
 					}

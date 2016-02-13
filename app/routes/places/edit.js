@@ -26,10 +26,10 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				res.redirect('/message?message=placeadded');
 			}
 			else if (place.maintainer == req.session.user._id) {
-				res.redirect('/message?message=placesaved');
+				res.redirect('/message?message=placesaved&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 			else {
-				res.redirect('/message?message=changesadded');
+				res.redirect('/message?message=changesadded&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 		}
 

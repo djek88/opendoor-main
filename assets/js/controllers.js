@@ -98,8 +98,8 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 		function showNearbyPlaces(place){
 			var requestParams = {
-					lat: place.location.coordinates[0]
-				, lng: place.location.coordinates[1]
+					lat: place.location.coordinates[1]
+				, lng: place.location.coordinates[0]
 				,	limit: 4
 				, exclude: place._id
 				//, religion: place.religion
@@ -151,10 +151,10 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			}
 
 			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1) {
-				$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[0] + ',' + $place.location.coordinates[1]);
+				$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0]);
 			}
 			else if( navigator.userAgent.toLowerCase().indexOf("android") != -1 || navigator.userAgent.toLowerCase().indexOf("windows") != -1) {
-				$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[0] + ',' + $place.location.coordinates[1] + '(' + $place.name + ')');
+				$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '(' + $place.name + ')');
 			}
 
 			if ($place.phone) {
@@ -226,7 +226,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 			map = $rootScope.getMapInstance($('#results-map'));
 			google.maps.event.trigger(map, 'resize');
-			var pos = new google.maps.LatLng($place.location.coordinates[0], $place.location.coordinates[1]);
+			var pos = new google.maps.LatLng($place.location.coordinates[1], $place.location.coordinates[0]);
 			map.setCenter(pos);
 			map.setZoom(16);
 			map.addMarker({
@@ -470,9 +470,9 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 					if (results.length) {
 						var firstResult = results[0];
 						var $locationEl = $('[name="location"]');
-						$locationEl.val([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()].join(', '));
+						$locationEl.val([firstResult.geometry.location.lng(), firstResult.geometry.location.lat()].join(', '));
 						$locationEl.trigger('change');
-						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
+						map.setMarker([firstResult.geometry.location.lng(), firstResult.geometry.location.lat()], firstResult.geometry.bounds);
 					}
 				}
 			});
@@ -759,9 +759,9 @@ opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 					if (results.length) {
 						var firstResult = results[0];
 						var $locationEl = $('[name="location"]');
-						$locationEl.val([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()].join(', '));
+						$locationEl.val([firstResult.geometry.location.lng(), firstResult.geometry.location.lat()].join(', '));
 						$locationEl.trigger('change');
-						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lng()], firstResult.geometry.bounds);
+						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lat()], firstResult.geometry.bounds);
 					}
 				}
 			});
@@ -856,18 +856,18 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			var location = $scope.location.split(', ');
 
 			map.markers.push(new google.maps.Marker({
-				position: {lat: parseFloat(location[0]), lng: parseFloat(location[1])}
+				position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])}
 				,	map: map
 				,	icon: map.icons.location
 				,	title: 'My location'
 			}));
 
 			for (var i=0; i<data.length; i++) {
-				var pos = new google.maps.LatLng(data[i].location.coordinates[0], data[i].location.coordinates[1]);
+				var pos = new google.maps.LatLng(data[i].location.coordinates[1], data[i].location.coordinates[0]);
 
 				// I mirror all markers against search position in order to keep it in center of map
 				var mirroredPoint = mirrorPoint(data[i].location.coordinates, location);
-				var mirroredPos = new google.maps.LatLng(mirroredPoint[0], mirroredPoint[1]);
+				var mirroredPos = new google.maps.LatLng(mirroredPoint[1], mirroredPoint[0]);
 				var marker = map.addMarker({
 						position: pos
 					,	map: map
@@ -910,8 +910,8 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 			if (location.length==2) {
 
 				var requestParams = {
-					lat: location[0]
-					, lng: location[1]
+					lat: location[1]
+					, lng: location[0]
 					, religion: $scope.religion
 				};
 
@@ -946,7 +946,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		if (validateCoordinate(requestParams.lat) && validateCoordinate(requestParams.lng)) {
 			$scope.lat = requestParams.lat;
 			$scope.lng = requestParams.lng;
-			$scope.location = requestParams.lat + ', ' + requestParams.lng;
+			$scope.location = requestParams.lng + ', ' + requestParams.lat;
 			$scope.address = $rootScope.lastSearchAddress || $scope.location;
 			$scope.religion = requestParams.religion;
 			$scope.message = 'Searching…';
@@ -1083,13 +1083,13 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 
 		$scope.users = null;
 
-		$scope.openUser = function($event, $user) {
-			$rootScope.selectedUser = $user;
+		$scope.openUser = function($event, user) {
+			$rootScope.selectedUser = user;
 			if ($event.which == 2) {
-				$window.open('/users/' + $user._id, '_blank');
+				$window.open('/users/' + user._id, '_blank');
 			}
 			else {
-				$location.url('/users/' + $user._id);
+				$location.url('/users/' + user._id);
 			}
 		};
 
@@ -1314,11 +1314,12 @@ opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location
 
 opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 	function($scope, $location) {
+		var search = $location.search();
 		if ($location.path() == '/notfound') {
 			var message = 'notfound';
 		}
 		else {
-			var message = $location.search()['message'];
+			var message = search.message;
 		}
 		switch (message) {
 
@@ -1454,5 +1455,8 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.alertMessage = 'An unexpected error happened';
 			break;
 		}
+		console.log(search);
+		console.log(search);
+		$scope.back = search.back;
 	}
 ]);

@@ -122,7 +122,7 @@ module.exports = function(mongoose, email, config) {
 			}
 			,	averageRating: {
 				type: Number
-				,	default: 0
+				,	default: 1
 			}
 			,	ratingsCount: {
 				type: Number
@@ -168,8 +168,8 @@ module.exports = function(mongoose, email, config) {
 			,	mainentitiyofpage: config.url + place.uri
 			,	geo: {
 				'@type': 'GeoCoordinates'
-				, latitude: place.location.coordinates[0]
-				, longitude: place.location.coordinates[1]
+				, latitude: place.location.coordinates[1]
+				, longitude: place.location.coordinates[0]
 			}
 			,	address: {
 				'@type': 'PostalAddress'

@@ -11,7 +11,7 @@ module.exports = function(mongoose, claimManager){
 			claimManager.add(data, function(err, place){
 				if (!err && place) {
 					console.log('Claim for place ' + placeId + ' was added');
-					res.redirect('/message?message=claimadded');
+					res.redirect('/message?message=claimadded&back=' + encodeURIComponent('/places/' + place.uri));
 				}
 				else {
 					res.redirect('/error');

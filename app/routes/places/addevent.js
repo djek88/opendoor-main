@@ -22,7 +22,7 @@ module.exports = function(placeManager){
 					placeManager.addEvent(id, data, function(err, place){
 						if (!err && place) {
 							console.log('Event for place ' + id + ' was added');
-							res.redirect('/message?message=eventadded');
+							res.redirect('/message?message=eventadded&back=' + encodeURIComponent('/places/' + place.uri));
 						}
 						else {
 							console.log(err);

@@ -11,8 +11,8 @@ module.exports = function(config, placeManager){
 		};
 		if (req.query.lat && req.query.lng) {
 			data.coordinates = [
-				parseFloat(req.query.lat)
-				, parseFloat(req.query.lng)
+				parseFloat(req.query.lng)
+				, parseFloat(req.query.lat)
 			]
 		}
 		placeManager.findNearby(data, function(err, results){

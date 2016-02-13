@@ -22,6 +22,6 @@
 								td(ng-if="change.htmlValue", ng-bind-html="change.htmlValue")
 								td(ng-if="!change.htmlValue", ng-bind="change.value")
 								td
-									a.btn.btn-sm.btn-primary(href="/placechanges/{{change._id}}/accept", target="self") Accept
+									a.btn.btn-sm.btn-primary(href="/placechanges/{{change._id}}/accept", target="_self") Accept
 									span &nbsp;
-									a.btn.btn-sm.btn-danger(href="/placechanges/{{change._id}}/deny", target="self") Deny
+									a.btn.btn-sm.btn-danger(href="/placechanges/{{change._id}}/deny", target="_self") Deny

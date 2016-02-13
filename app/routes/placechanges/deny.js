@@ -4,10 +4,10 @@ module.exports = function(placeChangeManager){
 			var id = req.params.id;
 			placeChangeManager.removeChange(id, function(err, place){
 				if (!err && place) {
-					res.redirect('/message?message=changedenied');
+					res.redirect('/message?message=changedenied&back=' + encodeURIComponent('/places/changes'));
 				}
 				else {
-					res.redirect('/error');
+					res.redirect('/error&back=' + encodeURIComponent('/places/changes'));
 				}
 			});
 		}

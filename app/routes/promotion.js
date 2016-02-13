@@ -17,13 +17,13 @@ module.exports = function(placeManager, stripe){
 					}
 					else {
 						console.log(err);
-						res.redirect('/message?message=promotionerror');
+						res.redirect('/message?message=promotionerror&back=' + encodeURIComponent('/places/' + place.uri));
 					}
 				});
 			}
 			else {
 				console.log(err);
-				res.redirect('/message?message=promotionerror');
+				res.redirect('/message?message=promotionerror&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 
 		});

@@ -19,7 +19,7 @@ module.exports = function(mongoose, placeManager, email){
 		placeManager.aggregate([
 			{$match: {'jobs._id': mongoose.Types.ObjectId(id)}}
 			, {$unwind: '$jobs'}
-			, {$project: {_id: '$jobs._id', email: '$jobs.email', type: '$jobs.type'}}
+			, {$project: {_id: '$jobs._id', email: '$jobs.email', type: '$jobs.type', uri: 'uri'}}
 		], function(err, jobs){
 			if (jobs.length) {
 				var job = jobs[0];
@@ -27,7 +27,7 @@ module.exports = function(mongoose, placeManager, email){
 					data.recipientEmail = job.email;
 					console.log(data);
 					email.sendJobMessage(data, function(){
-						res.redirect('/message?message=messagesent')
+						res.redirect('/message?message=messagesent&back=' + encodeURIComponent('/places/' + job.uri))
 					});
 				}
 				else {

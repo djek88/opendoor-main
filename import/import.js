@@ -34,8 +34,8 @@ function createJsonLd(place) {
 		,	mainentitiyofpage: config.url + place.uri
 		,	geo: {
 			'@type': 'GeoCoordinates'
-			, latitude: place.location.coordinates[0]
-			, longitude: place.location.coordinates[1]
+			, latitude: place.location.coordinates[1]
+			, longitude: place.location.coordinates[0]
 		}
 		,	address: {
 			'@type': 'PostalAddress'
@@ -129,7 +129,7 @@ function sendNewRequestFromQueue() {
 		if (existingPlaceHashes.indexOf(hash) == -1) {
 			sendGeocodeRequest(place.concatenatedAddress, function (err, res) {
 				if (res.results.length) {
-					place.location = {type: 'Point', coordinates: [res.results[0].geometry.location.lat, res.results[0].geometry.location.lng]};
+					place.location = {type: 'Point', coordinates: [res.results[0].geometry.location.lng, res.results[0].geometry.location.lat]};
 					place.jsonLd = createJsonLd(place);
 					place.hash = hash;
 					console.log("Location was found: ", place.name);

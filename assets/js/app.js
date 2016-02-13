@@ -131,7 +131,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 				else {
 					map.setZoom(16);
 				}
-				var pos = new google.maps.LatLng(location[0], location[1]);
+				var pos = new google.maps.LatLng(location[1], location[0]);
 				map.addMarker({
 					position: pos
 					,	map: map

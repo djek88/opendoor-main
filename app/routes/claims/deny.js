@@ -4,10 +4,10 @@ module.exports = function(claimManager){
 			var id = req.params.id;
 			claimManager.removeClaim(id, function(err, place){
 				if (!err && place) {
-					res.redirect('/message?message=claimdenied');
+					res.redirect('/message?message=claimdenied&back=' + encodeURIComponent('/places/' + place.uri));
 				}
 				else {
-					res.redirect('/error');
+					res.redirect('/error&back=' + encodeURIComponent('/places/' + place.uri));
 				}
 			});
 		}

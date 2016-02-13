@@ -17,7 +17,7 @@ module.exports = function(placeManager, email){
 			if (place && place.email) {
 				data.recipientEmail = place.email;
 				email.sendMessage(data, function(){
-					res.redirect('/message?message=messagesent')
+					res.redirect('/message?message=messagesent&back=' + encodeURIComponent('/places/' + place.uri))
 				});
 			}
 		});

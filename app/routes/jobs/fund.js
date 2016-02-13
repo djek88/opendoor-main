@@ -17,7 +17,7 @@ module.exports = function(placeManager, stripe){
 						"jobs.$.expireDate": expireDate
 					}
 				}, function(err, place){
-					res.redirect('/message?message=jobfunded');
+					res.redirect('/message?message=jobfunded&back=' + encodeURIComponent('/places/' + place.uri));
 				});
 			}
 			else {

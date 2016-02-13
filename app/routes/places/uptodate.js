@@ -5,11 +5,10 @@ module.exports = function(placeManager){
 				if (err) {
 					res.end();
 				}
-				console.log(place);
 				if (place.maintainer == req.session.user._id) {
 					place.updatedAt = new Date;
 					place.save(function(){
-						res.redirect('/message?message=placesaved');
+						res.redirect('/message?message=placesaved&back=' + encodeURIComponent('/places/' + place.uri));
 					});
 				}
 				else {

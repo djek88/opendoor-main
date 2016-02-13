@@ -8,7 +8,7 @@ module.exports = function(email){
 			};
 
 			email.sendEditorProposal(options, function(){
-				res.redirect('/message?message=proposalsent');
+				res.redirect('/message?message=proposalsent&back=' + encodeURIComponent('/places/' + place.uri));
 			})
 		}
 	};

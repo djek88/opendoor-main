@@ -4,7 +4,7 @@ module.exports = function(placeManager){
 		placeManager.markAsConfirmed(id, function(err, place){
 			if (!err && place) {
 				console.log('Place with ' + id + ' was confirmed');
-				res.redirect('/message?message=placeconfirmed');
+				res.redirect('/message?message=placeconfirmed&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 			else {
 				res.redirect('/error?message=placeconfirmationerror');
