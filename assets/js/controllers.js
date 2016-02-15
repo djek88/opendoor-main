@@ -36,6 +36,8 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 ]);
 
 
+
+
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
 		function addMeta($place) {
@@ -622,29 +624,75 @@ opendoorControllers.controller('JobFundCtrl', ['$scope', '$rootScope', '$locatio
 opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 	function($scope, $http, $rootScope, $location, $window) {
 
+		var $religionEl = $('select[name="religion"]');
 		$scope.jobs = null;
 		$scope.message = '';
-
 		$scope.religionsList = $rootScope.religions;
-		$scope.religion = '';
+		var hiddenGroupName;
 
-
-		$scope.openJob = function($event, $job) {
+		$scope.openJob = function($event, job) {
 			if ($event.which == 2) {
-				$window.open('/jobs/' + $job._id, '_blank');
+				$window.open('/jobs/' + job._id, '_blank');
 			}
 			else {
-				$location.url('/jobs/' + $job._id);
+				$location.url('/jobs/' + job._id);
 			}
 		};
 
+		function loadOptionsForReligion(religion) {
+			console.log(religion);
+			if (!religion || religion == 'All religions') {
+				$scope.groupsList = ['Select religion'];
+				$scope.groupName = $scope.groupsList[0];
+			}
+			else {
+				$http({
+					url: '/ajax/religionGroups'
+					, method: 'GET'
+					, params: {
+						religion: religion
+					}
+				}).
+				success(function (data){
+					$scope.groupsList = ['All groups'];
+
+					for (var i=0; i<data.length; i++) {
+						$scope.groupsList.push(data[i].name);
+					}
+
+					$scope.groupName = $scope.groupsList.indexOf(hiddenGroupName) != -1 ? hiddenGroupName : $scope.groupsList[0];
+				});
+			}
+		}
+
+		$http({
+			url: '/ajax/countries'
+			, method: 'GET'
+		}).
+		success(function (data){
+			$scope.countriesList = ['All countries'];
+
+			$scope.countriesList = $scope.countriesList.concat(data);
+			$scope.country = $scope.country || $scope.countriesList[0];
+		});
+
+
+		$religionEl.on('change', function(){
+			loadOptionsForReligion($religionEl.val());
+		});
 
 		function setSearchParams() {
 
 			var requestParams = {
-				religion: $scope.religion
+				country: $scope.country == 'All countries' ? null : $scope.country
+				, locality: $scope.locality == 'Select country' || $scope.locality == 'All cities' ? null : $scope.locality
+				, religion: $scope.religion == 'All religions' ? null : $scope.religion
+				, groupName: $scope.groupName == 'Select religion' || $scope.groupName == 'All groups' ? null : $scope.groupName
 			};
+			$location.search('country', requestParams.country || null);
+			$location.search('locality', requestParams.locality || null);
 			$location.search('religion', requestParams.religion || null);
+			$location.search('groupName', requestParams.groupName || null);
 		}
 		$scope.searchJobs = function() {
 			setSearchParams();
@@ -656,28 +704,34 @@ opendoorControllers.controller('JobSearchCtrl', ['$scope', '$http', '$rootScope'
 		}
 
 		var requestParams = $location.search();
-			$scope.religion = requestParams.religion;
-			$scope.message = 'Searching…';
-			$http({
-				url: '/ajax/jobs/search'
-				, method: 'GET'
-				, params: requestParams
-			}).
-			success(function (data){
-				if (Array.isArray(data)) {
-					if (data.length) {
-						$scope.message = '';
-					}
-					else {
-						$scope.message = 'There are no places of worship found near this location';
-					}
-					$scope.jobs = data;
+		$scope.country = requestParams.country;
+		$scope.locality = requestParams.locality;
+		$scope.religion = requestParams.religion;
+		$scope.groupName = requestParams.groupName;
+		console.log(requestParams);
+		hiddenGroupName = $scope.groupName;
+		loadOptionsForReligion($scope.religion);
+		$scope.message = 'Searching…';
+		$http({
+			url: '/ajax/jobs/search'
+			, method: 'GET'
+			, params: requestParams
+		}).
+		success(function (data){
+			if (Array.isArray(data)) {
+				if (data.length) {
+					$scope.message = '';
 				}
 				else {
-					onError();
+					$scope.message = 'There are no jobs found';
 				}
-			}).
-			error(onError);
+				$scope.jobs = data;
+			}
+			else {
+				onError();
+			}
+		}).
+		error(onError);
 
 	}
 ]);
@@ -697,7 +751,6 @@ opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$locatio
 
 		function setData($job) {
 			$scope.job = $job;
-			//$('input[name="place"]').val($job.place);
 		}
 
 
@@ -777,16 +830,16 @@ opendoorControllers.controller('FormCtrl', ['$scope',
 ]);
 
 
-opendoorControllers.controller('DonateCtrl', ['$scope',
-	function($scope) {
-		$scope.sum = 120;
+opendoorControllers.controller('DonateCtrl', ['$scope', '$location', '$rootScope', '$http',
+	function($scope, $location, $rootScope, $http) {
+		$scope.months = 12;
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
 			if ($scope.form.$valid) {
 				handler.open({
 					name: siteconfig.sitename
 					, description: 'Donate'
-					, amount: $scope.sum * 100
+					, amount: $scope.months * 1000
 				});
 			}
 		};
@@ -811,6 +864,38 @@ opendoorControllers.controller('DonateCtrl', ['$scope',
 			console.log('close handler');
 			handler.close();
 		});
+
+
+		var placeId = $location.url().split('/').pop();
+		$scope.placeId = placeId;
+
+
+		function setData($place) {
+
+			$scope.place = $place;
+		}
+
+		if ($rootScope.selectedPlace) {
+			setData($rootScope.selectedPlace);
+		}
+		else {
+			$http({
+				url: '/ajax/places/' + placeId
+				, method: 'GET'
+			}).
+			success(function (data) {
+				if (typeof data== 'object') {
+					setData(data);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function () {
+				$location.url('/notfound');
+			});
+		}
+
 	}
 ]);
 

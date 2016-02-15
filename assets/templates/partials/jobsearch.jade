@@ -4,11 +4,20 @@
 			.col-lg-12
 				form.form-inline(name="form", novalidate)
 					//span.inline-spacer
+					.form-group(ng-class="{'has-error': (form.$submitted || form.country.$touched) && form.country.$error.required}")
+						select.form-control(name="country", ng-model="country", ng-default-option="All countries")
+							//option(value="", selected) All groups
+							option(value="{{name}}", ng-repeat="name in countriesList") {{name}}
+					.form-group(ng-class="{'has-error': (form.$submitted || form.locality.$touched) && form.locality.$error.required}")
+						input.form-control(name="locality", ng-model="locality", placeholder="All cities")
 					.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
 						select.form-control(name="religion", ng-model="religion")
 							option(value="", selected) All religions
 							option(value="{{name}}", ng-repeat="name in religionsList") {{name}}
-					input.hidden(name="maxDistance", ng-model="maxDistance", value="5000")
+					.form-group(ng-class="{'has-error': (form.$submitted || form.groupName.$touched) && form.groupName.$error.required}")
+						select.form-control(name="groupName", ng-model="groupName")
+							//option(value="", selected) All groups
+							option(value="{{name}}", ng-repeat="name in groupsList") {{name}}
 					button.btn.btn-md.btn-primary(type='submit', ng-click="searchJobs()") Search
 					.clearfix
 		.row
@@ -25,7 +34,7 @@
 										th Country
 										th
 								tbody
-									tr.place-link(ng-repeat="job in jobs", ng-mousedown="openJob(event, job)")
+									tr.place-link(ng-repeat="job in jobs", ng-mousedown="openJob($event, job)")
 										td {{job.title}}
 										td {{job.type}}
 										td {{job.country}}

@@ -15,6 +15,7 @@ var sha1 = require('sha1');
 var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
 var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
+var countryList = require('country-list')();
 require('./assets/js/utils.js');
 require('./app/date.min.js');
 
@@ -172,6 +173,7 @@ app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mon
 app.get('/places/confirm/:id', require('./app/routes/places/confirm.js')(placeManager));
 app.get('/subscriptions/confirm/:id', require('./app/routes/subscriptions/confirm.js')(subscriptionManager));
 
+app.get('/ajax/countries', require('./app/routes/ajax/countries.js')(countryList));
 app.get('/ajax/religionGroups', require('./app/routes/ajax/religionGroups.js')(religionGroupManager));
 app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(denominationManager));
 app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));

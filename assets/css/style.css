@@ -261,10 +261,8 @@ ul.tagit.ui-widget {
 	max-width: 200px;
 }
 
-.job-link {
-	font-size: 130%;
-}
-
-.job-info {
+.job-link,
+.job-info,
+.sponsor-link {
 	font-size: 130%;
 }

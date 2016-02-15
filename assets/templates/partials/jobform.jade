@@ -12,7 +12,7 @@
 				.col-md-9
 					select.form-control(name="type", ng-model="job.type", required)
 						option(value="",selected, disabled)
-						option(value="Partial") Partial
+						option(value="Part time") Part time
 						option(value="Full time") Full time
 			.form-group(ng-class="{'has-error': (form.$submitted || form.description.$touched) && form.description.$error.required}")
 				label.col-md-3.control-label Description

@@ -87,23 +87,22 @@ function sendGeocodeRequest(address, cb, delay) {
 	delay = delay || 0;
 	setTimeout(function(){
 		geocoder.geocode(address, function ( err, res ) {
-			if (res.status == 'OVER_QUERY_LIMIT') {
+			var status = res ? res.status : 'REQUEST_ERROR';
+			if (status == 'OVER_QUERY_LIMIT' || status == 'REQUEST_ERROR') {
 				sendGeocodeRequest(address, cb, delay + delayIncrement);
-				console.log(res.status);
+				console.log(status);
 			}
 			else {
 				cb(null, res);
 			}
 
 			// Gather some stats
-			if (!codesStats[res.status]) {
-				codesStats[res.status] = 1;
+			if (!codesStats[status]) {
+				codesStats[status] = 1;
 			}
 			else {
-				codesStats[res.status]++;
+				codesStats[status]++;
 			}
-
-		//}, {key: 'AIzaSyDANhr6hDNSuCe4451dQBdXHhO_bojAgZU'});
 		}, {key: config.apiKeys.googleMapsServer});
 
 
@@ -128,7 +127,6 @@ function sendNewRequestFromQueue() {
 		if (existingPlaceHashes.indexOf(hash) == -1) {
 			sendGeocodeRequest(place.sourceAddress, function (err, res) {
 				if (res.results.length) {
-					//console.log(JSON.stringify(res.results, null, ' '));
 					var tempAddress = {
 						street_number: '',
 						street_name: '',
@@ -170,12 +168,11 @@ function sendNewRequestFromQueue() {
 					place.jsonLd = createJsonLd(place);
 
 					place.hash = hash;
-					//console.log(JSON.stringify(place, null, ' '));
 					console.log("Location was found: ", place.name);
 					outContent.push(place);
 				}
 				else {
-					console.log("Location was not found: ", place);
+					console.log("Location was not found: ", place.name);
 				}
 				finishedRequests++;
 				sendNewRequestFromQueue();
