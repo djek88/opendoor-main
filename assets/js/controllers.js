@@ -784,11 +784,12 @@ opendoorControllers.controller('JobFormCtrl', ['$scope', '$rootScope', '$locatio
 	}
 ]);
 
-opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
-	function($scope, $rootScope) {
+opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope', '$location', '$http',
+	function($scope, $rootScope, $location, $http) {
 		var geocoder = new google.maps.Geocoder();
 		var map = $rootScope.getMapInstance($('#results-map'));
 		var $datetimepicker = $('#datetimepicker');
+		var $locationEl = $('[name="location"]');
 		$datetimepicker.datetimepicker();
 		$datetimepicker.on('dp.change', function(){
 			$scope.date = $('input', $datetimepicker).val();
@@ -811,15 +812,50 @@ opendoorControllers.controller('EventAddCtrl', ['$scope', '$rootScope',
 					map.removeMarkers();
 					if (results.length) {
 						var firstResult = results[0];
-						var $locationEl = $('[name="location"]');
 						$locationEl.val([firstResult.geometry.location.lng(), firstResult.geometry.location.lat()].join(', '));
 						$locationEl.trigger('change');
-						map.setMarker([firstResult.geometry.location.lat(), firstResult.geometry.location.lat()], firstResult.geometry.bounds);
+						map.setMarker([firstResult.geometry.location.lng(), firstResult.geometry.location.lat()], firstResult.geometry.bounds);
 					}
 				}
 			});
 		};
 
+
+		var locationParts = $location.url().split('/');
+		var placeId = locationParts[locationParts.length - 2];
+		console.log(placeId);
+		$scope.placeId = placeId;
+
+
+		function setData($place) {
+
+			$scope.place = $place;
+			$scope.address  = $place.concatenatedAddress;
+			$scope.location = $place.location.coordinates.join(', ');
+			$locationEl.val($scope.location);
+			map.setMarker([$place.location.coordinates[0], $place.location.coordinates[1]]);
+		}
+
+		if ($rootScope.selectedPlace) {
+			setData($rootScope.selectedPlace);
+		}
+		else {
+			$http({
+				url: '/ajax/places/' + placeId
+				, method: 'GET'
+			}).
+			success(function (data) {
+				if (typeof data== 'object') {
+					setData(data);
+				}
+				else {
+					$location.url('/notfound');
+				}
+			}).
+			error(function () {
+				$location.url('/notfound');
+			});
+		}
 	}
 ]);
 

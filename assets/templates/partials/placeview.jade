@@ -63,7 +63,7 @@
 						h3 Contact form
 						ng-include(src="'assets/templates/partials/contactform.html'")
 					#contacts-block.col-sm-4
-						h3 Other contacts
+						h3 Contact Details
 						div(ng-show="place.concatenatedAddress")
 							.fa.fa-home
 							|  {{place.concatenatedAddress}}
@@ -98,7 +98,7 @@
 							div.m-t-5 {{review.text}}
 				.row(ng-if="isMaintainer || place.events.length")
 					.col-lg-12.p-l-40.p-r-40.p-b-40
-						h3 More events
+						h3 Events
 							| &nbsp;
 							a.btn.btn-sm.btn-primary.m-l-5(ng-if="isMaintainer", href="/places/event/{{place._id}}/add")  Add an event
 						div(ng-hide="place.events.length") There are no events
