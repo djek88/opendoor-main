@@ -241,7 +241,7 @@ fs.readFile(outFileName, 'utf8', function (err, data) {
 						, promotions: []
 						, jobs: []
 						, ratingsCount: 0
-						, averageRating: 0
+						, averageRating: 1
 					};
 
 					placeQueue.push(place);

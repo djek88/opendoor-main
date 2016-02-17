@@ -165,7 +165,7 @@ module.exports = function(mongoose, email, config) {
 		var data = {
 				'@type': 'Place'
 			,	name: place.name
-			,	mainentitiyofpage: config.url + place.uri
+			,	mainentitiyofpage: config.url + '/' + place.uri
 			,	geo: {
 				'@type': 'GeoCoordinates'
 				, latitude: place.location.coordinates[1]

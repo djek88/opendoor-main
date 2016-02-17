@@ -1,3 +1,4 @@
+
 var config = require('./config.js');
 var http = require('http');
 var querystring = require('querystring');
@@ -75,7 +76,16 @@ global.religionGroupManager = religionGroupManager;
 global.denominationManager = denominationManager;
 global.placeNotificationManager = placeNotificationManager;
 
-
+var siteconfig = {
+	sitename: config.sitename
+	, url: config.url
+	, imagesPath: global.imagesPath
+	, twitterAccount: config.social.twitterAccount
+	, apiKeys: {
+		stripePublic: config.apiKeys.stripePublic
+	}
+	, frontend: config.frontend
+};
 
 
 var frontendPages = [
@@ -102,7 +112,7 @@ var frontendPages = [
 	,	'/places/donate/:id'
 	,	'/places/event/:id/add'
 	,	'/places/editorproposal/:id'
-	, /\/places\/(.*)/
+	//, /\/places\/(.*)/
 	,	'/jobs/search'
 	, '/jobs/add'
 	,	'/jobs/:id'
@@ -110,6 +120,11 @@ var frontendPages = [
 	, '/jobs/fund/:id'
 ];
 
+var placesFrontEndPages = [
+		'/places/:id'
+	, '/places/:country/:region/:locality/:religion/:groupName/:name'
+];
+app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
@@ -151,7 +166,7 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 });
 
 
-app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(config));
+app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(siteconfig));
 
 app.post('/login', require('./app/routes/login.js')(userManager, sha1));
 app.get('/logout', require('./app/routes/logout.js')());
@@ -192,7 +207,7 @@ app.post('/places/message', require('./app/routes/places/message.js')(placeManag
 app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));
 app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
 
-app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager));
+app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager, placeManager));
 app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimManager));
 app.get('/claims/:id/deny', require('./app/routes/claims/deny.js')(claimManager));
 
@@ -206,13 +221,40 @@ app.post('/subscribefornotification', require('./app/routes/subscribefornotifica
 
 
 app.get(frontendPages, function(req, res) {
-	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys}, function (err, content) {
+	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys, pretty: true}, function (err, content) {
 		if (!err) {
 			res.send(content);
 		}
 		else {
 			console.log(err);
 		}
+	});
+});
+
+app.get(placesFrontEndPages, function(req, res) {
+	var query = {};
+	if (req.params.country) {
+		query.uri = req.path.substr(8);
+	}
+	else {
+		query._id = req.params.id;
+	}
+	placeManager.findOne(query, function(err, place){
+		var options = {
+				apiKeys: config.apiKeys
+			, isPlace: true
+			, place: place
+			, siteconfig: siteconfig
+			, pretty: true
+		};
+		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
+			if (!err) {
+				res.send(content);
+			}
+			else {
+				console.log(err);
+			}
+		});
 	});
 });
 

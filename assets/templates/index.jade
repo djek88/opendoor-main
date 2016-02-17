@@ -1,6 +1,9 @@
 html(ng-app="opendoorApp")
 	head
-		title Church Finder
+		if isPlace
+			title= place.name
+		else
+			title Church Finder
 		meta(content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport")
 		base(href="/")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
@@ -42,6 +45,38 @@ html(ng-app="opendoorApp")
 		script(src="assets/js/locationpicker.js")
 		script(src="assets/js/app.js")
 		script(src="assets/js/controllers.js")
+		if isPlace
+			script(type="application/ld+json")!= JSON.stringify(place.jsonLd, ' ')
+			meta(name="description", content="#{place.name}")
+			meta(itemprop="name", content="#{place.name}")
+			if place.about
+				meta(itemprop="description", content="#{place.about}")
+			if place.bannerPhoto
+			meta(itemprop="image", content="/photos/#{place.bannerPhoto}")
+		
+		
+			meta(name="twitter:card", content="Information about #{place.name}")
+			meta(name="twitter:site", content="#{siteconfig.twitterAccount}")
+			meta(name="twitter:title", content="#{place.name}")
+			if place.about
+				meta(name="twitter:description", content="#{place.about}")
+			//+ '<meta(name="twitter:creator", content="@author_handle">'
+			if place.bannerPhoto
+				meta(name="twitter:image:src", content="'+ #{siteconfig.imagesPath + place.bannerPhoto}")
+		
+			meta(property="og:title", content="#{place.name}")
+			meta(property="og:type", content="article")
+			meta(property="og:url", content="#{siteconfig.url + '/places/' + place.uri}")
+			if place.bannerPhoto
+				meta(property="og:image", content="#{siteconfig.imagesPath + place.bannerPhoto}")
+			if place.about
+				meta(property="og:description", content="#{place.about}")
+			meta(property="og:site_name", content="#{siteconfig.sitename}")
+			meta(property="article:published_time", content="#{place.createdAt}")
+			meta(property="article:modified_time", content="#{place.updatedAt}")
+			//+ '<meta(property="article:section", content="#{place.about
+			//+ '<meta(property="article:tag", content="#{place.about
+			//+ '<meta(property="fb:admins", content="#{place.about
 	block body
 		body
 			#header.header.navbar.navbar-default.navbar-fixed-top

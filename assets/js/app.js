@@ -80,7 +80,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 	$rootScope.siteconfig = siteconfig;
 
 	$rootScope.openPlace = function($event, place) {
-		$rootScope.selectedPlace = place;
+		//$rootScope.selectedPlace = place;
 		if ($event.which == 2) {
 			$window.open('/places/' + place.uri, '_blank');
 		}
@@ -101,7 +101,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		if (!$rootScope.map) {
 			var div = $('<div id="map"></div>');
 			$(targetEl).append(div);
-			var map = $rootScope.map = new google.maps.Map(div[0], {scrollwheel: false});
+			var map = $rootScope.map = new google.maps.Map(div[0], {scrollwheel: false, draggable: !('ontouchend' in document)});
 			map.markers=[];
 
 			map.icons = {
@@ -182,7 +182,7 @@ opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($root
 opendoorApp.config(
 	function($locationProvider, $routeProvider) {
 		$locationProvider.html5Mode(true);
-		var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
+		//var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
 		$routeProvider.
 		when('/', {
 				title: 'Find nearest places'
@@ -297,8 +297,13 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/editorproposalform.html'
 			, controller: 'EditorProposalCtrl'
 		}).
-		when('/places/:id', {
+		when('/places/:country/:region/:locality/:religion/:groupName/:name', {
 				title: 'View place'
+			,	templateUrl: 'assets/templates/partials/placeview.html'
+			, controller: 'PlaceViewCtrl'
+		}).
+		when('/places/:id', {
+			title: 'View place'
 			,	templateUrl: 'assets/templates/partials/placeview.html'
 			, controller: 'PlaceViewCtrl'
 		}).
@@ -344,5 +349,5 @@ opendoorApp.config(
 		otherwise({
 			redirectTo: '/notfound'
 		});
-		$route.routes['/places/:id'].regexp = /^\/places\/(.*)$/;
+		//$route.routes['/places/:id'].regexp = /^\/places\/(.*)$/;
 	});

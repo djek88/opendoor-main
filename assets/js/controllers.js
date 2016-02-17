@@ -40,36 +40,6 @@ opendoorControllers.controller('RegisterCtrl', ['$scope', '$location',
 
 opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 	function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
-		function addMeta($place) {
-			var $head = $('head');
-			$head.append(
-					'<meta class="social" name="description" content="'+ $place.name + '" />'
-				+ '<meta class="social" itemprop="name" content="'+ $place.name + '">'
-				+ '<meta class="social" itemprop="description" content="'+ $place.about + '">'
-				+ '<meta class="social" itemprop="image" content="/photos/'+ $place.bannerPhoto + '">'
-
-
-				+ '<meta class="social" name="twitter:card" content="Information about '+ $place.name + '">'
-				+ '<meta class="social" name="twitter:site" content="' + siteconfig.twitterAccount + '">'
-				+ '<meta class="social" name="twitter:title" content="'+ $place.name + '">'
-				+ '<meta class="social" name="twitter:description" content="'+ $place.about + '">'
-				//+ '<meta class="social" name="twitter:creator" content="@author_handle">'
-				+ '<meta class="social" name="twitter:image:src" content="'+ siteconfig.imagesPath + $place.bannerPhoto + '">'
-
-				+ '<meta class="social" property="og:title" content="'+ $place.name + '" />'
-				+ '<meta class="social" property="og:type" content="article" />'
-				+ '<meta class="social" property="og:url" content="'+ siteconfig.url + '/places/' + $place.uri + '" />'
-				+ '<meta class="social" property="og:image" content="'+ siteconfig.imagesPath + $place.bannerPhoto + '" />'
-				+ '<meta class="social" property="og:description" content="'+ $place.about + '" />'
-				+ '<meta class="social" property="og:site_name" content="' + siteconfig.sitename + '" />'
-				+ '<meta class="social" property="article:published_time" content="'+ $place.createdAt + '" />'
-				+ '<meta class="social" property="article:modified_time" content="'+ $place.updatedAt + '" />'
-				//+ '<meta class="social" property="article:section" content="'+ $place.about + '" />'
-				//+ '<meta class="social" property="article:tag" content="'+ $place.about + '" />'
-				//+ '<meta class="social" property="fb:admins" content="'+ $place.about + '" />'
-			);
-			$('title').html($place.name);
-		}
 		var placeId = $location.url().substr(8);
 		$scope.placeId = placeId;
 		var userPosition = 0;
@@ -140,7 +110,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 
 		function setData($place) {
-			addMeta($place);
 			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
 			if ($place.updatedAt) {
 				$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
@@ -152,10 +121,10 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				}
 			}
 
-			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1) {
+			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1 || navigator.userAgent.toLowerCase().indexOf("linux") != -1) {
 				$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '&q=' + $place.name);
 			}
-			else if( navigator.userAgent.toLowerCase().indexOf("android") != -1 || navigator.userAgent.toLowerCase().indexOf("windows") != -1) {
+			else if( navigator.userAgent.toLowerCase().indexOf("android") != -1) {
 				$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '(' + $place.name + ')');
 			}
 
@@ -222,7 +191,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			$place.about = $sce.trustAsHtml($place.about);
 			$place.travelInformation = $sce.trustAsHtml($place.travelInformation);
 
-			$(document.head).append('<script type="application/ld+json">' + JSON.stringify($place.jsonLd) + '</script>');
+
 			$scope.place = $place;
 
 
@@ -267,11 +236,6 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				$location.url('/notfound');
 			});
 		}
-
-		$scope.$on("$destroy", function() {
-			$('script[type="application/ld+json"]').detach();
-			$('meta.social').detach();
-		});
 
 
 	}
@@ -589,7 +553,7 @@ opendoorControllers.controller('JobFundCtrl', ['$scope', '$rootScope', '$locatio
 	function($scope, $rootScope, $location, $http) {
 		$scope.alertType = 'info';
 		$scope.alertTitle = 'Success';
-		$scope.alertMessage = 'Your job was added successfully. Please pay $1 in order to publish it.';
+		$scope.alertMessage = 'Your job was added successfully. Please pay $1 to publish the job on the Opportunities page.';
 
 		$scope.submitForm = function() {
 			$scope.form.$submitted = true;
@@ -1205,7 +1169,7 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 		$scope.users = null;
 
 		$scope.openUser = function($event, user) {
-			$rootScope.selectedUser = user;
+			//$rootScope.selectedUser = user;
 			if ($event.which == 2) {
 				$window.open('/users/' + user._id, '_blank');
 			}

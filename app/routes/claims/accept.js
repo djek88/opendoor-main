@@ -4,10 +4,10 @@ module.exports = function(claimManager){
 			var id = req.params.id;
 			claimManager.acceptClaim(id, function(err, place){
 				if (!err && place) {
-					res.redirect('/message?message=claimaccepted&back=' + encodeURIComponent('/places/' + place.uri));
+					res.redirect('/message?message=claimaccepted&back=' + encodeURIComponent('/places/claims'));
 				}
 				else {
-					res.redirect('/error&back=' + encodeURIComponent('/places/' + place.uri));
+					res.redirect('/error&back=' + encodeURIComponent('/places/claims'));
 				}
 			});
 		}

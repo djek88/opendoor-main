@@ -43,7 +43,7 @@
 						h5.inline.semi-bold {{place.nextEvent.name}}&nbsp;
 						div.m-t-5(ng-show="place.nextEvent.date") {{place.nextEvent.date}}
 						div.m-t-5(ng-show="place.nextEvent.address") {{place.nextEvent.address}}&nbsp;
-							a(href="http://maps.google.com/?q={{place.nextEvent.location.coordinates.join(',')}}", target="_blank") Show on map
+							a(href="http://maps.google.com/?q={{place.nextEvent.location.coordinates[1]}},{{place.nextEvent.location.coordinates[0]}}", target="_blank") Show on map
 						div.m-t-5(ng-show="place.nextEvent.description") {{event.description}}
 				.row.p-40.p-b-10
 					.col-lg-12
@@ -106,7 +106,7 @@
 							h5.inline.semi-bold {{event.name}}&nbsp;
 							div.m-t-5(ng-show="event.date") {{event.date}}
 							div.m-t-5(ng-show="event.address") {{event.address}}&nbsp;
-								a(href="http://maps.google.com/?q={{event.location.coordinates.join(',')}}", target="_blank") Show on map
+								a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
 							div.m-t-5(ng-show="event.description") {{event.description}}
 						div(ng-if="place.pastEvents.length")
 							span.link(ng-click="showPastEvents = !showPastEvents")
@@ -120,7 +120,7 @@
 								h5.inline.semi-bold {{event.name}}&nbsp;
 								div.m-t-5(ng-show="event.date") {{event.date}}
 								div.m-t-5(ng-show="event.address") {{event.address}}&nbsp;
-									a(href="http://maps.google.com/?q={{event.location.coordinates.join(',')}}", target="_blank") Show on map
+									a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
 								div.m-t-5(ng-show="event.description") {{event.description}}
 			.col-lg-4.row
 				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10(ng-show="place.activePromotions.length")
@@ -160,7 +160,7 @@
 						span(ng-if="!isMaintainer") Suggest changes
 					h6(ng-show="place.updatedAt") Last updated on {{place.updatedAt}}
 						| &nbsp;
-						a(ng-if="isMaintainer", href="/places/uptodate/{{place._id}}") This place is up to date
+						a(ng-if="isMaintainer", href="/places/uptodate/{{place._id}}", target="_self") This place is up to date
 				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
 					h3 Nearby places
 					div(ng-show='nearbyPlacesMessage.length') {{nearbyPlacesMessage}}

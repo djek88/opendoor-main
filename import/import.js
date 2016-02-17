@@ -207,7 +207,7 @@ fs.readFile(outFileName, 'utf8', function (err, data) {
 							, promotions: []
 							, jobs: []
 							, ratingsCount: 0
-							, averageRating: 0
+							, averageRating: 1
 						};
 
 						place.uri = [place.address.country, place.address.region, place.address.locality, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
