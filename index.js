@@ -42,6 +42,11 @@ else {
 	console.err("No valid transport was found");
 	process.exit(1);
 }
+var currentYear;
+function setYear(){
+	currentYear = (new Date).getFullYear();
+}
+setYear();
 
 var Email = require('./app/email.js');
 var email = new Email(config, transporter);
@@ -221,7 +226,7 @@ app.post('/subscribefornotification', require('./app/routes/subscribefornotifica
 
 
 app.get(frontendPages, function(req, res) {
-	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys, pretty: true}, function (err, content) {
+	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys, currentYear: currentYear, pretty: true}, function (err, content) {
 		if (!err) {
 			res.send(content);
 		}
@@ -246,7 +251,9 @@ app.get(placesFrontEndPages, function(req, res) {
 			, place: place
 			, siteconfig: siteconfig
 			, pretty: true
+			, currentYear: currentYear
 		};
+		console.log(options);
 		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 			if (!err) {
 				res.send(content);
@@ -261,3 +268,4 @@ app.get(placesFrontEndPages, function(req, res) {
 
 schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
 
+schedule.scheduleJob('* * 0 * * *', setYear);
