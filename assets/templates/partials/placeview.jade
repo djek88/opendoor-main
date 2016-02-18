@@ -1,13 +1,13 @@
-#content.content(ng-show="place")
+#content.content
 	.container
 		.row
-			.col-lg-8.bg-white.m-b-10
-				.row.p-l-40.p-r-40.p-b-20
-					.col-sm-12
+			.col-lg-8#place-main
+				.row
+					.col.col-sm-12
 						h3
-							.label.label-danger.m-t-10.pull-right(ng-if="!place.isConfirmed") UNVERIFIED
+							.label.label-danger.pull-right(ng-if="!place.isConfirmed") UNVERIFIED
 						h1 {{place.name}}
-						a.rating-group.link.m-b-20(ng-click="scrollTo('reviews')")
+						a.rating-group.link(ng-click="scrollTo('reviews')")
 							span.fa(ng-class="place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="place.averageRating >= 2 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="place.averageRating >= 3 ? 'fa-star' : 'fa-star-o'")
@@ -17,52 +17,58 @@
 						h4 {{place.religion}}
 							span(ng-show="place.groupName") , {{place.groupName}}
 						h5(ng-show="place.denominations.length")
-							.label.label-primary.m-r-5(ng-repeat="denomination in place.denominations") {{denomination}}
+							.label.label-primary(ng-repeat="denomination in place.denominations") {{denomination}}
 
 
 
-				.row
+				.row#photos(ng-if="place.bannerPhoto || place.leaderPhoto")
 					.place-photo-wrap(ng-if="place.bannerPhoto")
 						img.place-photo(ng-src="{{siteconfig.imagesPath + place.bannerPhoto}}", ng-show="place.bannerPhoto")
-					.leader-photo-wrap(ng-if="place.leaderPhoto")
+					.leader-photo-wrap(ng-if="place.bannerPhoto && place.leaderPhoto")
 						img.leader-photo(ng-src="{{siteconfig.imagesPath + place.leaderPhoto}}", ng-image-load="onLeaderPhotoLoad()")
-					h3.m-l-40.p-l-10(ng-if="!place.leaderPhoto && place.leaderName") Place leader
-					h4.leader-title(ng-class="place.leaderPhoto ? 'photo-title' : 'alone-title'") {{place.leaderRole}} {{place.leaderName}}
-
-				.row.p-40.p-t-40.p-b-10(ng-show="mainMeetingText")
-					.col-lg-12
+					h3.leader-title.photo-title(ng-if="place.leaderPhoto && place.leaderName") {{place.leaderRole}} {{place.leaderName}}
+				.row(ng-if="!place.bannerPhoto && place.leaderPhoto")
+					.col.col-lg-12
+						.leader-photo-wrap
+							img.leader-photo.alone-photo(ng-src="{{siteconfig.imagesPath + place.leaderPhoto}}", ng-image-load="onLeaderPhotoLoad()")
+				.row(ng-if="!place.leaderPhoto && place.leaderName")
+					.col.col-lg-12
+						h3(ng-if="!place.leaderPhoto && place.leaderName") Place leader
+						h5.leader-title.alone-title {{place.leaderRole}} {{place.leaderName}}
+				.row(ng-show="mainMeetingText")
+					.col.col-lg-12
 						h6
 							strong {{mainMeetingText}}
-				.row.p-40.p-b-0(ng-show="place.about")
-					.col-lg-12
+				.row(ng-show="place.about")
+					.col.col-lg-12
 						h3 About
 						p(ng-bind-html="place.about")
-				.row.p-40.p-b-0(ng-show="place.nextEvent")
-					.col-lg-12
+				.row(ng-show="place.nextEvent")
+					.col.col-lg-12.single-event
 						h3 Next event
-						h5.inline.semi-bold {{place.nextEvent.name}}&nbsp;
-						div.m-t-5(ng-show="place.nextEvent.date") {{place.nextEvent.date}}
-						div.m-t-5(ng-show="place.nextEvent.address") {{place.nextEvent.address}}&nbsp;
+						p
+							h5.inline.semi-bold {{place.nextEvent.name}}&nbsp;
+						p(ng-show="place.nextEvent.date") {{place.nextEvent.date}}
+						p(ng-show="place.nextEvent.address") {{place.nextEvent.address}}&nbsp;
 							a(href="http://maps.google.com/?q={{place.nextEvent.location.coordinates[1]}},{{place.nextEvent.location.coordinates[0]}}", target="_blank") Show on map
-						div.m-t-5(ng-show="place.nextEvent.description") {{event.description}}
-				.row.p-40.p-b-10
-					.col-lg-12
+						p(ng-show="place.nextEvent.description") {{event.description}}
+				.row
+					.col.col-lg-12
 						h3 Location
 							h4
 								a(ng-if="place.externalMapsLink", href="{{place.externalMapsLink}}", target="_system") Open in Maps app&nbsp;
 									.fa.fa-external-link
 				.row
-					.col-lg-12
 					#results-map
-				.row.p-40(ng-show="place.travelInformation")
-					.col-lg-12
+				.row(ng-show="place.travelInformation")
+					.col.col-lg-12
 						h3 Travel information
 						p(ng-bind-html="place.travelInformation")
-				.row.p-40
-					.col-sm-8(ng-if="place.email")
+				.row
+					.col.col-sm-8(ng-if="place.email")
 						h3 Contact form
 						ng-include(src="'assets/templates/partials/contactform.html'")
-					#contacts-block.col-sm-4
+					#contacts-block.col.col-sm-4
 						h3 Contact Details
 						div(ng-show="place.concatenatedAddress")
 							.fa.fa-home
@@ -75,11 +81,11 @@
 							.fa.fa-link
 							a(href="{{place.homepage}}", target="_blank", rel="nofollow")  {{place.homepage}}
 				#reviews.row
-					.col-lg-12.p-l-40.p-r-40.p-b-40
+					.col.col-lg-12
 						h3 Reviews
 							| &nbsp;
-							a.btn.btn-sm.btn-primary.m-l-5(href="/places/review/{{place._id}}")  Add a review
-						.rating-group.m-b-40
+							a.btn.btn-sm.btn-primary(href="/places/review/{{place._id}}")  Add a review
+						.rating-group
 							span.fa(ng-class="place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="place.averageRating >= 2 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="place.averageRating >= 3 ? 'fa-star' : 'fa-star-o'")
@@ -87,7 +93,7 @@
 							span.fa(ng-class="place.averageRating >= 5 ? 'fa-star' : 'fa-star-o'")
 							span  ({{place.ratingsCount}})
 						div(ng-hide="place.reviews.length") There are no reviews
-						div.m-b-40(ng-repeat="review in place.reviews")
+						div.review(ng-repeat="review in place.reviews")
 							h5.inline.semi-bold {{review.name}}&nbsp;
 							span.rating-group
 								.fa(ng-class="review.rating >= 1 ? 'fa-star' : 'fa-star-o'")
@@ -95,19 +101,20 @@
 								.fa(ng-class="review.rating >= 3 ? 'fa-star' : 'fa-star-o'")
 								.fa(ng-class="review.rating >= 4 ? 'fa-star' : 'fa-star-o'")
 								.fa(ng-class="review.rating >= 5 ? 'fa-star' : 'fa-star-o'")
-							div.m-t-5 {{review.text}}
+							div {{review.text}}
 				.row(ng-if="isMaintainer || place.events.length")
-					.col-lg-12.p-l-40.p-r-40.p-b-40
+					.col.col-lg-12
 						h3 Events
 							| &nbsp;
-							a.btn.btn-sm.btn-primary.m-l-5(ng-if="isMaintainer", href="/places/event/{{place._id}}/add")  Add an event
+							a.btn.btn-sm.btn-primary(ng-if="isMaintainer", href="/places/event/{{place._id}}/add")  Add an event
 						div(ng-hide="place.events.length") There are no events
-						div.m-b-40(ng-repeat="event in place.events")
-							h5.inline.semi-bold {{event.name}}&nbsp;
-							div.m-t-5(ng-show="event.date") {{event.date}}
-							div.m-t-5(ng-show="event.address") {{event.address}}&nbsp;
+						div.event(ng-repeat="event in place.events")
+							p
+								h5.inline.semi-bold {{event.name}}&nbsp;
+							p(ng-show="event.date") {{event.date}}
+							p(ng-show="event.address") {{event.address}}&nbsp;
 								a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
-							div.m-t-5(ng-show="event.description") {{event.description}}
+							p(ng-show="event.description") {{event.description}}
 						div(ng-if="place.pastEvents.length")
 							span.link(ng-click="showPastEvents = !showPastEvents")
 								.fa.fa-plus-square-o(ng-hide="showPastEvents")
@@ -116,80 +123,83 @@
 								span(ng-hide="showPastEvents") Show past events
 								span(ng-show="showPastEvents") Hide past events
 
-							div.m-t-20(ng-show="showPastEvents", ng-repeat="event in place.pastEvents")
-								h5.inline.semi-bold {{event.name}}&nbsp;
-								div.m-t-5(ng-show="event.date") {{event.date}}
-								div.m-t-5(ng-show="event.address") {{event.address}}&nbsp;
+							div.event(ng-show="showPastEvents", ng-repeat="event in place.pastEvents")
+								p
+									h5.inline.semi-bold {{event.name}}&nbsp;
+								p(ng-show="event.date") {{event.date}}
+								p(ng-show="event.address") {{event.address}}&nbsp;
 									a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
-								div.m-t-5(ng-show="event.description") {{event.description}}
-			.col-lg-4.row
-				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10(ng-show="place.activePromotions.length")
-					h3 Proud to be a Sponsor
-					.bg-white
-						.m-t-15(ng-repeat="promotion in place.activePromotions")
-							a.sponsor-link(ng-if="promotion.url" href="{{promotion.url}}", target="_blank") {{promotion.name}}
-							.sponsor-link(ng-if="!promotion.url") {{promotion.name}}
-				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10(ng-show="jobs.length || isMaintainer")
-					h3 Jobs
-					.bg-white(ng-show='place.jobs.length')
-						div.m-t-5(ng-repeat="job in (isMaintainer ? place.jobs : place.activeJobs)")
+								p(ng-show="event.description") {{event.description}}
+			.col-lg-4
+				.row#place-sidebar
+					.col.col-lg-12(ng-show="place.activePromotions.length")
+						h3 Proud to be a Sponsor
+						.bg-white
+							.m-t-15(ng-repeat="promotion in place.activePromotions")
+								a.sponsor-link(ng-if="promotion.url" href="{{promotion.url}}", target="_blank") {{promotion.name}}
+								.sponsor-link(ng-if="!promotion.url") {{promotion.name}}
+					.col.col-lg-12(ng-show="jobs.length || isMaintainer")
+						h3 Jobs
+						div(ng-show='place.jobs.length')
+							div.job(ng-repeat="job in (isMaintainer ? place.jobs : place.activeJobs)")
+								h5
+									a.valign-middle(href="/jobs/{{job._id}}", ng-class="{'text-muted': job.expireDate<=$root.currentDate}") {{job.title}}
+								span.job-fund-btdn.pull-right(ng-if="job.expireDate<=$root.currentDate")
+									form.inline(method="POST", novalidate, name="form", action="{{job.action}}", ng-controller="JobFundCtrl")
+										input.hidden(name="token")
+										input.hidden(name="sum", value="1")
+										span.btn.btn-xs.btn-primary(ng-click="submitForm()") Publish
 
-							a.job-link.valign-middle(href="/jobs/{{job._id}}", ng-class="{'text-muted': job.expireDate<=$root.currentDate}") {{job.title}}
-							span.job-fund-btdn.pull-right(ng-if="job.expireDate<=$root.currentDate")
-								form.inline(method="POST", novalidate, name="form", action="{{job.action}}", ng-controller="JobFundCtrl")
-									input.hidden(name="token")
-									input.hidden(name="sum", value="1")
-									span.btn.btn-xs.btn-primary(ng-click="submitForm()") Publish
-
-					a.btn.btn-sm.btn-primary.m-t-10(ng-if="isMaintainer", href="/jobs/add?place={{place._id}}")  Add job
-				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
-					h3.m-b-20 Edit
-					div(ng-show="place.maintainer")
-						h6 This page is maintained by {{place.maintainer.name}}
-							span(ng-if="isMaintainer")  (you)
-						div.m-b-10(ng-if="!isMaintainer")
+						a.btn.btn-sm.btn-primary(ng-if="isMaintainer", href="/jobs/add?place={{place._id}}")  Add job
+					.col.col-lg-12
+						h3 Edit
+						div(ng-show="place.maintainer")
+							h6 This page is maintained by {{place.maintainer.name}}
+								span(ng-if="isMaintainer")  (you)
+							div(ng-if="!isMaintainer")
+								h6
+									a(href="/claims/{{place._id}}/add", target="_self") Claim to be the editor
+						div(ng-show="!place.maintainer")
+							h5 Important!
+							| There is nobody currently managing this page. Please help us keep this profile up to date by either make a&nbsp;
 							a(href="/claims/{{place._id}}/add", target="_self") Claim to be the editor
-					div(ng-show="!place.maintainer")
-						h5 Important!
-						| There is nobody currently managing this page. Please help us keep this profile up to date by either make a&nbsp;
-						a(href="/claims/{{place._id}}/add", target="_self") Claim to be the editor
-						| &nbsp;or&nbsp;
-						a(href="/places/editorproposal/{{place._id}}", target="_self") notify the person that should be the editor
-					a.btn.btn-primary(ng-if="place.maintainer", href="/places/edit/{{place._id}}")
-						span(ng-if="isMaintainer") Edit place
-						span(ng-if="!isMaintainer") Suggest changes
-					h6(ng-show="place.updatedAt") Last updated on {{place.updatedAt}}
-						| &nbsp;
-						a(ng-if="isMaintainer", href="/places/uptodate/{{place._id}}", target="_self") This place is up to date
-				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
-					h3 Nearby places
-					div(ng-show='nearbyPlacesMessage.length') {{nearbyPlacesMessage}}
-					.bg-white(ng-show='nearbyPlaces.length')
-						table#search-table.table
-							tbody
-								tr.place-link(ng-repeat="place in nearbyPlaces", ng-mousedown="openPlace($event, place)", ng-mouseover="mouseOver($index)", ng-mouseout="mouseOut($index)")
-									td {{place.name}}
-									td {{place.distance}}m
-				.col-lg-12.bg-white.place-sidebar.p-10.m-b-10
-					h3 Support us
-					ul
-						li Share this profile socially
-						li Do you run a Blog? then please link to this page
-						li Awareness campaign&nbsp;
-							a(href="/places/donate/{{place._id}}") [Donate]
-				.col-lg-12.bg-white.place-sidebar.p-10
-					h3 Join our mailing list
-					h5 Receive information and updates about {{place.name}}
-					form(method="POST", action="/places/subscribe", novalidate name="form", ng-controller="FormCtrl")
-						.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.isLoggedIn")
-							label.control-label Name
-							input.form-control(type="text", name="name", ng-model="name", ng-required="!$root.isLoggedIn")
-						.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.error.email)}", ng-show="!$root.isLoggedIn")
-							label.control-label Email
-							div(ng-show="form.$submitted || form.email.$touched")
-								label.control-label(ng-show="form.email.error.email") This is not a valid email.
-							input.form-control(type="email", name="email", ng-model="email", ng-required="!$root.isLoggedIn")
-							input(name="place", type="hidden", value="{{place._id}}")
-						.form-group
-							label.control-label
-							input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Sign up now")
+							| &nbsp;or&nbsp;
+							a(href="/places/editorproposal/{{place._id}}", target="_self") notify the person that should be the editor
+						a.btn.btn-primary(ng-if="place.maintainer", href="/places/edit/{{place._id}}")
+							span(ng-if="isMaintainer") Edit place
+							span(ng-if="!isMaintainer") Suggest changes
+						h6(ng-show="place.updatedAt") Last updated on {{place.updatedAt}}
+							| &nbsp;
+							a(ng-if="isMaintainer", href="/places/uptodate/{{place._id}}", target="_self") This place is up to date
+					.col.col-lg-12
+						h3 Nearby places
+						div(ng-show='nearbyPlacesMessage.length') {{nearbyPlacesMessage}}
+						div(ng-show='nearbyPlaces.length')
+							table#search-table.table
+								tbody
+									tr.place-link(ng-repeat="place in nearbyPlaces", ng-mousedown="openPlace($event, place)", ng-mouseover="mouseOver($index)", ng-mouseout="mouseOut($index)")
+										td {{place.name}}
+										td {{place.distance}}m
+					.col.col-lg-12
+						h3 Support us
+						ul
+							li Share this profile socially
+							li Do you run a Blog? then please link to this page
+							li Awareness campaign&nbsp;
+								a(href="/places/donate/{{place._id}}") [Donate]
+					.col.col-lg-12
+						h3 Join our mailing list
+						h5 Receive information and updates about {{place.name}}
+						form(method="POST", action="/places/subscribe", novalidate name="form", ng-controller="FormCtrl")
+							.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.isLoggedIn")
+								label.control-label Name
+								input.form-control(type="text", name="name", ng-model="name", ng-required="!$root.isLoggedIn")
+							.form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.error.email)}", ng-show="!$root.isLoggedIn")
+								label.control-label Email
+								div(ng-show="form.$submitted || form.email.$touched")
+									label.control-label(ng-show="form.email.error.email") This is not a valid email.
+								input.form-control(type="email", name="email", ng-model="email", ng-required="!$root.isLoggedIn")
+								input(name="place", type="hidden", value="{{place._id}}")
+							div
+								label.control-label
+								input.btn.btn-sm.btn-primary(type="button", ng-click="submitForm()", value="Sign up now")

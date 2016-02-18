@@ -101,8 +101,13 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		if (!$rootScope.map) {
 			var div = $('<div id="map"></div>');
 			$(targetEl).append(div);
-			var map = $rootScope.map = new google.maps.Map(div[0], {scrollwheel: false, draggable: !('ontouchend' in document)});
+			var map = $rootScope.map = new google.maps.Map(div[0], {
+				scrollwheel: false
+				, streetViewControl: false
+				, draggable: !('ontouchend' in document)
+			});
 			map.markers=[];
+			map.infoWindows = [];
 
 			map.icons = {
 				brightPoi: '/assets/img/spotlight-poi-bright.png'
@@ -110,10 +115,24 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 				, location: '/assets/img/mylocation.png'
 			};
 
+			var setPosition = google.maps.InfoWindow.prototype.setPosition;
+			google.maps.InfoWindow.prototype.setPosition = function () {
+				map.infoWindows.push(this);
+				setPosition.apply(this, arguments);
+			};
+
+
 			map.removeMarkers=function(){
 				var marker;
 				while (marker = map.markers.pop()) {
 					marker.setMap(null);
+				}
+			};
+
+			map.removeInfoWindows=function(){
+				var infoWindow;
+				while (infoWindow = map.infoWindows.pop()) {
+					infoWindow.setMap(null);
 				}
 			};
 
@@ -143,6 +162,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		else {
 			$(targetEl).append($rootScope.map.getDiv());
 			$rootScope.map.removeMarkers();
+			$rootScope.map.removeInfoWindows();
 		}
 		return $rootScope.map;
 	}
@@ -259,12 +279,6 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/userview.html'
 			, controller: 'UserViewCtrl'
 		}).
-		when('/promotion/:id', {
-			title: 'View promotion'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/promotion.html'
-			//, controller: 'PromotionCtrl'
-		}).
 		when('/places/last', {
 			title: 'Last places'
 			,	shouldLogin: true
@@ -338,6 +352,11 @@ opendoorApp.config(
 		}).
 		when('/message', {
 				title: 'Server message'
+			,	templateUrl: 'assets/templates/partials/error.html'
+			, controller: 'ErrorCtrl'
+		}).
+		when('/promotion/:id', {
+			title: 'View promotion'
 			,	templateUrl: 'assets/templates/partials/error.html'
 			, controller: 'ErrorCtrl'
 		}).

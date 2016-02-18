@@ -339,8 +339,6 @@ module.exports = function(mongoose, email, config) {
 				matchOption['maintainer'] = {$ne: null};
 			}
 
-			console.log(options);
-
 			Place.aggregate(options, function(err, places){
 				options.push({ $group: { _id: null, count: { $sum: 1 } } });
 
@@ -368,6 +366,7 @@ module.exports = function(mongoose, email, config) {
 		this.getById = function(id, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}).populate('maintainer', 'name').exec(callback);
 		};
+
 
 		this.markAsConfirmed = function(id, callback) {
 			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, function(err, place){
@@ -474,6 +473,7 @@ module.exports = function(mongoose, email, config) {
 
 		this.find = Place.find.bind(Place);
 		this.findOne = Place.findOne.bind(Place);
+		this.findById = Place.findById.bind(Place);
 		this.findOneAndUpdate = Place.findOneAndUpdate.bind(Place);
 		this.aggregate = Place.aggregate.bind(Place);
 

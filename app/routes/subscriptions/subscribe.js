@@ -16,10 +16,9 @@ module.exports = function(subscriptionManager, placeManager, email){
 			data.isConfirmed = false;
 		}
 
-		placeManager.find({_id: data.place}, function(err, place) {
+		placeManager.findOne({_id: data.place}, function(err, place) {
 			if (place) {
 				subscriptionManager.add(data, function(err, subscription) {
-					console.log(JSON.stringify(err));
 					if (!err && subscription) {
 						if (subscription.isConfirmed) {
 							res.redirect('/message?message=subscriptionadded&back=' + encodeURIComponent('/places/' + place.uri))

@@ -253,7 +253,6 @@ app.get(placesFrontEndPages, function(req, res) {
 			, pretty: true
 			, currentYear: currentYear
 		};
-		console.log(options);
 		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 			if (!err) {
 				res.send(content);

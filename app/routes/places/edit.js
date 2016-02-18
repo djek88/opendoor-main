@@ -1,6 +1,45 @@
 module.exports = function(mongoose, userManager, placeChangeManager, placeNotificationManager, email) {
 	var fs = require('fs');
 	var extend = require('util')._extend;
+
+	function equals(a, b) {
+		var atype = typeof a;
+		var btype = typeof b;
+		if (atype != btype) {
+			return false;
+		}
+		if (Array.isArray(a)) {
+			atype = 'array';
+		}
+		switch (atype) {
+			case 'array':
+				return JSON.stringify(a) == JSON.stringify(b);
+			break;
+
+			case 'object':
+
+				var aProps = Object.keys(a);
+				var bProps = Object.keys(b);
+
+				if (aProps.length != bProps.length) {
+					return false;
+				}
+
+				for (var i = 0; i < aProps.length; i++) {
+					var propName = aProps[i];
+
+					if (!equals(a[propName], b[propName])) {
+						return false;
+					}
+				}
+				return true;
+			break;
+			default:
+				return a == b;
+			break;
+		}
+	}
+
 	return function (req, res) {
 		if (!req.session.user) {
 			return res.end();
@@ -38,15 +77,16 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			delete fields.maintainer;
 			var place = extend({}, fields);
 			place = extend(place, files);
-			var locationAsString = fields.location.split(',');
-			place.location = {
-				type: 'Point',
-				coordinates: [
-					parseFloat(locationAsString[0])
-					, parseFloat(locationAsString[1])
-				]
-			};
-
+			if (fields.location) {
+				var locationAsString = fields.location.split(',');
+				place.location = {
+					type: 'Point',
+					coordinates: [
+						parseFloat(locationAsString[0])
+						, parseFloat(locationAsString[1])
+					]
+				};
+			}
 			if (place.denominations && place.denominations.length) {
 				place.denominations = place.denominations.split(',');
 			}
@@ -82,17 +122,16 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				placeManager.add(place, finishRequest);
 			}
 			else {
-				placeManager.getById(req.params.id, function (err, currentPlace) {
+				placeManager.findById(req.params.id).populate('maintainer').lean().exec(function (err, currentPlace) {
 					if (currentPlace) {
+						console.log(currentPlace);
 						if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
 							placeManager.update(req.params.id, place, finishRequest);
 						}
 						else {
 							for (var i in place) {
 								if (place.hasOwnProperty(i)) {
-									if (JSON.stringify(currentPlace[i]) != JSON.stringify(place[i]) //stringify helps to compare arrays
-										&& (place[i] || currentPlace[i])) { // there is no reason to change one empty value to another
-
+									if (place[i] && !equals(currentPlace[i], place[i])) {
 										placeChangeManager.add({
 											user: mongoose.Types.ObjectId(req.session.user._id)
 											, place: mongoose.Types.ObjectId(req.params.id)

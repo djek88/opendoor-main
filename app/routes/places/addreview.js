@@ -11,12 +11,15 @@ module.exports = function(placeManager){
 			placeManager.addReview(id, data, function(err, place){
 				if (!err && place) {
 					console.log('Review for place ' + id + ' was added');
-					res.redirect('/message?message=reviewsaved');
+					res.redirect('/message?message=reviewsaved&back=' + encodeURIComponent('/places/' + place.uri));
 				}
 				else {
 					res.redirect('/error');
 				}
 			});
+		}
+		else {
+			res.redirect('/message?message=pleaselogin');
 		}
 	};
 };

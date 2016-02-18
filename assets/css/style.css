@@ -1,3 +1,5 @@
+/* general layout */
+
 @media (min-width: 768px) {
 	.form-inline .form-group {
 		margin-right: 10px;
@@ -16,8 +18,15 @@
 }
 
 @media (min-width: 1200px) {
-	.place-sidebar {
+	#place-sidebar{
 		margin-left: 10px;
+	}
+}
+
+@media (max-width: 767px) {
+	.content {
+		margin-left: 0;
+		padding: 6px;
 	}
 }
 
@@ -30,6 +39,8 @@ html, body {
 	margin-left: 0;
 	margin-top: 80px;
 }
+
+/* various typography elements */
 
 .pointer {
 	cursor: pointer;
@@ -49,9 +60,12 @@ html, body {
 	text-decoration: underline;
 }
 
+/* tables */
+
 .table {
 	background-color: white;
 	border-radius: 0;
+	margin-bottom: 0;
 }
 
 .table>thead>tr>th {
@@ -62,6 +76,8 @@ html, body {
 	padding: 10px;
 	border-top: 2px solid #2A72B5;
 }
+
+/* UI elements */
 
 .location-picker-results {
 	position: absolute;
@@ -107,8 +123,47 @@ ul.tagit.ui-widget {
 	border-color: #2A72B5!important;
 }
 
-.table {
+.trumbowyg-box, .trumbowyg-editor {
+	margin: 0;
+	width: 100%;
+}
+
+/* place page */
+
+#place-main
+, #place-sidebar>*{
+	background-color: white;
+	margin-bottom: 20px;
+}
+
+#place-main {
+	padding-bottom: 20px;
+}
+
+#place-sidebar>.col{
+	padding: 10px;
+}
+
+#place-sidebar>.col>*:first-child{
+	margin-top: 0;
+}
+
+#place-sidebar>.col>*:last-child{
 	margin-bottom: 0;
+}
+
+
+@media (min-width: 1024px) {
+	#place-main > .row > .col:first-child {
+		padding-left: 40px;
+	}
+
+	#place-main > .row > .col:last-child {
+		padding-right: 40px;
+	}
+	#place-main > .row {
+		padding: 5px 0;
+	}
 }
 
 .place-photo-wrap,
@@ -134,30 +189,15 @@ ul.tagit.ui-widget {
 }
 
 .leader-photo-wrap {
-	margin-left: 45px;
-	border: 5px solid white;
 	height: 160px;
 	width: 160px;
 }
 
 
 .place-photo-wrap + .leader-photo-wrap {
-	margin-top: -80px;
-}
-
-@media (max-width: 768px) {
-	.place-photo-wrap {
-		height: 200px;
-	}
-
-	.leader-photo-wrap {
-		height: 100px;
-		width: 100px;
-	}
-
-	.place-photo-wrap + .leader-photo-wrap {
-		margin-top: -50px;
-	}
+	border: 5px solid white;
+	margin-left: 35px;
+	margin-top: -120px;
 }
 
 .leader-photo {
@@ -170,18 +210,49 @@ ul.tagit.ui-widget {
 	width: 100%;
 }
 
-.leader-title.alone-title {
-	margin-left: 50px;
-}
-
 .leader-title.photo-title {
-	width: 250px;
-	text-align: center;
+	position: absolute;
+	bottom: 0;
+	left: 196px;
 }
 
-.place-edit-btn {
-	margin-right: 50px;
+#photos {
+	position: relative;
 }
+
+@media (max-width: 768px) {
+	.place-photo-wrap {
+		height: 200px;
+	}
+
+	.leader-photo-wrap {
+		height: 100px;
+		width: 100px;
+		margin-left: 5px;
+	}
+
+	.place-photo-wrap + .leader-photo-wrap {
+		margin-left: 5px;
+		margin-top: -68px;
+	}
+
+	.leader-title.photo-title {
+		position: absolute;
+		bottom: -6px;
+		left: 103px;
+	}
+}
+
+.single-event p,
+.event p{
+	margin: 3px 0;
+}
+
+.review, .event {
+	margin: 10px 0;
+}
+
+
 
 #contacts-block div {
 	font-size: 110%;
@@ -252,10 +323,6 @@ ul.tagit.ui-widget {
 	font-size: 120%;
 }
 
-.trumbowyg-box, .trumbowyg-editor {
-	margin: 0;
-	width: 100%;
-}
 
 .change-preview-photo {
 	max-width: 200px;
@@ -265,4 +332,12 @@ ul.tagit.ui-widget {
 .job-info,
 .sponsor-link {
 	font-size: 130%;
+}
+
+.job h5 {
+	display: inline-block;
+}
+
+.job span {
+	margin-top: 3px;
 }

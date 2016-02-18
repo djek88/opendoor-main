@@ -937,9 +937,10 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		};
 
 		var addMarkers = function(data) {
+
 			var bounds = new google.maps.LatLngBounds();
 			var location = $scope.location.split(', ');
-
+			map.removeMarkers();
 			map.markers.push(new google.maps.Marker({
 				position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])}
 				,	map: map
@@ -1400,14 +1401,23 @@ opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location
 opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 	function($scope, $location) {
 		var search = $location.search();
+		var message;
 		if ($location.path() == '/notfound') {
-			var message = 'notfound';
+			message = 'notfound';
+		}
+		else if (!$location.path().indexOf('/promotion/')) {
+			message = 'donation';
 		}
 		else {
-			var message = search.message;
+			message = search.message;
 		}
+		console.log($location);
 		switch (message) {
-
+			case 'donation':
+				$scope.alertType = 'default';
+				$scope.alertTitle = 'Donation was successful';
+				$scope.alertMessage = 'Thank you for your donation.';
+			break;
 			case 'pleaselogin':
 				$scope.alertType = 'danger';
 				$scope.alertTitle = 'Error';
