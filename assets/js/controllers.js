@@ -121,16 +121,21 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				}
 			}
 
-			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1 || navigator.userAgent.toLowerCase().indexOf("linux") != -1) {
-				$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '&q=' + $place.name);
-			}
-			else if( navigator.userAgent.toLowerCase().indexOf("android") != -1) {
+			if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1 ||  navigator.userAgent.toLowerCase().indexOf("android") != -1) {
 				$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '(' + $place.name + ')');
 			}
 
-			if ($place.phone) {
-				$place.phoneUrl = $sce.trustAsResourceUrl('tel:' + $place.phone);
-			}
+
+			//if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1 || navigator.userAgent.toLowerCase().indexOf("linux") != -1) {
+			//	$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '&q=' + $place.name);
+			//}
+			//else if( navigator.userAgent.toLowerCase().indexOf("android") != -1) {
+			//	$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '(' + $place.name + ')');
+			//}
+			//
+			//if ($place.phone) {
+			//	$place.phoneUrl = $sce.trustAsResourceUrl('tel:' + $place.phone);
+			//}
 
 			$scope.mainMeetingText = '';
 			if ($place.mainMeetingTime || $place.mainMeetingDay) {
