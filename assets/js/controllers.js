@@ -1106,22 +1106,11 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 		};
 
 
-		function getPages() {
-			$scope.itemsPerPage = $scope.limit || siteconfig.frontend.itemsPerPage;
-			$scope.pages = Math.ceil($scope.count / $scope.itemsPerPage);
-			var pagesList = [];
-			for (var i = 1; i <= $scope.pages; i++) {
-				pagesList.push(i);
-			}
-			$scope.pagesAsArray = pagesList;
-			$scope.page = $scope.skip ?  $scope.skip / $scope.itemsPerPage : 0;
-			$scope.page++;
-		}
-
 		function onError() {
 			$scope.message = 'An error happened during request';
 			$scope.places = null;
 		}
+
 
 
 		var requestParams = $location.search();
@@ -1152,7 +1141,7 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 				}
 				$scope.places = places;
 				$scope.count = response.count;
-				getPages();
+				$rootScope.getPages($scope);
 			}
 			else {
 				onError();
@@ -1179,12 +1168,26 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 			}
 		};
 
+		$scope.setPage = function(n) {
+			$scope.skip = (n-1) * $scope.itemsPerPage;
+			$scope.form.$submitted = true;
+			setSearchParams();
+		};
+
 		function setSearchParams() {
 
 			var requestParams = {
-				maintainers: $scope.maintainers
+					maintainers: $scope.maintainers
+				, name: $scope.name
+				, email: $scope.email
+				, skip: $scope.skip
+				, limit: $scope.limit
 			};
 
+			$location.search('skip', requestParams.skip || null);
+			$location.search('limit', requestParams.limit || null);
+			$location.search('name', requestParams.name || null);
+			$location.search('email', requestParams.email || null);
 			$location.search('maintainers', requestParams.maintainers || null);
 		}
 		$scope.searchUsers = function() {
@@ -1198,6 +1201,10 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 		}
 
 		var requestParams = $location.search();
+		$scope.skip = requestParams.skip;
+		$scope.limit = requestParams.limit;
+		$scope.name = requestParams.name;
+		$scope.email = requestParams.email;
 		$scope.maintainers = requestParams.maintainers;
 		$scope.message = 'Searching…';
 		$http({
@@ -1205,8 +1212,9 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 			, method: 'GET'
 			, params: requestParams
 		}).
-		success(function (data){
-			if (Array.isArray(data)) {
+		success(function (response){
+			if (typeof response == 'object' && Array.isArray(response.results)) {
+				var data = response.results;
 				if (data.length) {
 					$scope.message = '';
 				}
@@ -1214,6 +1222,8 @@ opendoorControllers.controller('UsersListCtrl', ['$scope', '$http', '$rootScope'
 					$scope.message = 'There are no users';
 				}
 				$scope.users = data;
+				$scope.count = response.count;
+				$rootScope.getPages($scope);
 			}
 			else {
 				onError();

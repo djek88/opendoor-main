@@ -97,12 +97,41 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 		}
 	};
 
+	$rootScope.getPages = function($scope) {
+		$scope.itemsPerPage = $scope.limit || siteconfig.frontend.itemsPerPage;
+		$scope.pages = Math.ceil($scope.count / $scope.itemsPerPage);
+		$scope.page = $scope.skip ?  $scope.skip / $scope.itemsPerPage : 0;
+		var pagesList = [];
+		var i;
+		if ($scope.pages < 6) {
+			for (i = 1; i <= $scope.pages; i++) {
+				pagesList.push(i);
+			}
+		}
+		else {
+			var minPage = $scope.page - 3;
+			if (minPage < 1) {
+				minPage = 1;
+			}
+			var maxPage = minPage + 8;
+			if (maxPage > $scope.pages) {
+				maxPage = $scope.pages;
+			}
+			for (i = minPage; i <= maxPage; i++) {
+				pagesList.push(i);
+			}
+		}
+		$scope.pagesAsArray = pagesList;
+		$scope.page++;
+	};
+
+
 	$rootScope.getMapInstance = function(targetEl) {
 		if (!$rootScope.map) {
 			var div = $('<div id="map"></div>');
 			$(targetEl).append(div);
 			var map = $rootScope.map = new google.maps.Map(div[0], {
-				scrollwheel: false
+					scrollwheel: false
 				, streetViewControl: false
 				, draggable: !('ontouchend' in document)
 			});

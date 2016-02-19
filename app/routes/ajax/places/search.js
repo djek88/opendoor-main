@@ -1,14 +1,6 @@
 module.exports = function(config, placeManager){
 	return function (req, res) {
-		var data = {
-				religion: req.query.religion
-			,	maxDistance: req.query.maxDistance
-			,	limit: req.query.limit
-			,	skip: req.query.skip
-			,	exclude: req.query.exclude
-			, name: req.query.name
-			, maintained: req.query.maintained
-		};
+		var data = req.query;
 		if (req.query.lat && req.query.lng) {
 			data.coordinates = [
 				parseFloat(req.query.lng)

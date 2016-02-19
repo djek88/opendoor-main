@@ -51,7 +51,7 @@ setYear();
 var Email = require('./app/email.js');
 var email = new Email(config, transporter);
 
-var UserManager = require('./app/usermanager.js')(mongoose);
+var UserManager = require('./app/usermanager.js')(mongoose, config);
 var userManager = new UserManager;
 
 var PlaceManager = require('./app/placemanager.js')(mongoose, email, config);
@@ -179,7 +179,7 @@ app.post('/register', require('./app/routes/register.js')(userManager, sha1));
 
 
 app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
-app.get('/ajax/users/:id', require('./app/routes/ajax/users.js')(userManager));
+app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));
 app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
 app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
 app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
