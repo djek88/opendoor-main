@@ -75,7 +75,7 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 
 	$rootScope.currentDate = new Date;
 
-	$rootScope.year = (new Date).getFullYear();
+	$rootScope.year = (new Date).browserToUTC().getFullYear();
 
 	$rootScope.siteconfig = siteconfig;
 

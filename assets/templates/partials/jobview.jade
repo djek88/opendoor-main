@@ -1,18 +1,14 @@
 #content.content
 	.container
 		.row
-			h2 Job info
+			h1 {{job.title}}
+			h2
+				a(href="/places/{{job.placeuri}}") {{job.place}}
 			.col-lg-12.bg-white.p-25.m-b-20
-				h4.m-t-20 Title
-				h5 {{job.title}}
-				h4.m-t-20 Place
-				h5
-					a(href="/places/{{job.placeuri}}") {{job.place}}
-				h4.m-t-20 Type
 				h5 {{job.type}}
 				h4.m-t-20(ng-show="job.description") Description
 				h5 {{job.description}}
-				h4.m-t-40 Contact with employer
+				h4.m-t-40 If your are interested in this job please send a message directly to the place of worship
 				form(method="POST", novalidate, name="form", ng-controller="FormCtrl")
 					.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.isLoggedIn")
 						label.control-label Name

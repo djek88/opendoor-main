@@ -1,6 +1,6 @@
 #content.content
    .container.bg-white.p-t-10
-      h3.m-b-15 Notify the person
+      h3.m-b-15 Notify the person who you think should be the editor of this place profile page
       form.form-horizontal(method="POST", action="{{action}}", novalidate name="form")
          .form-group(ng-class="{'has-error': (form.$submitted || form.email.$touched) && (form.email.$error.required || form.email.error.email)}")
             label.col-md-3.control-label Email address

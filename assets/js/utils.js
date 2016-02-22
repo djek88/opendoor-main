@@ -23,3 +23,12 @@ Array.prototype.cleanArray = function() {
 	}
 	return this;
 };
+
+Date.prototype.nodeToUTC = function() {
+	return this.add(-this.getTimezoneOffset()).minutes();
+};
+
+
+Date.prototype.browserToUTC = function() {
+	return this.add(this.getTimezoneOffset()).minutes();
+};

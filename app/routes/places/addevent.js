@@ -5,9 +5,12 @@ module.exports = function(placeManager){
 			placeManager.findOne({_id: id}, function(err, place){
 				if (place.maintainer == req.session.user._id)	{
 					var locationAsString = req.body.location.split(',');
+					var eventDate = new Date(req.body.date);
+					console.log(req.body.date, eventDate);
+					eventDate = eventDate.nodeToUTC();
 					var data = {
 						name: req.body.name
-						,	date: new Date(req.body.date)
+						,	date: eventDate
 						,	description: req.body.description
 						,	address: req.body.address
 						, location: {

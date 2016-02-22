@@ -62,10 +62,7 @@ module.exports = function(mongoose, email, config) {
 				,	required: true
 			}
 			, address: {
-					line1: {
-						type: String
-						,	required: true
-					}
+					line1: String
 				,	line2: String
 				, locality: {
 					type: String
@@ -257,6 +254,7 @@ module.exports = function(mongoose, email, config) {
 
 		this.setMaintainer = function(id, maintainerId, callback) {
 			Place.findOne({_id: id}, function(err, place) {
+				console.log('place.findone', arguments);
 				if (place.maintainer) {
 					global.userManager.findOne({_id: place.maintainer}, function(err, user){
 						if (user) {

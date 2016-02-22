@@ -95,7 +95,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			}
 
 			if (place.mainMeetingTime) {
-				place.mainMeetingTime = new Date(place.mainMeetingTime + ' 01.01.1970');
+				place.mainMeetingTime = (new Date(place.mainMeetingTime + ' 01.01.1970')).nodeToUTC();
 			}
 
 			place.address = {

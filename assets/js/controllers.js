@@ -112,7 +112,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		function setData($place) {
 			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
 			if ($place.updatedAt) {
-				$place.updatedAt = (new Date($place.updatedAt)).toString('dd.MM.yyyy');
+				$place.updatedAt = (new Date($place.updatedAt)).browserToUTC().toString('dd.MM.yyyy');
 			}
 
 			if (typeof $place.homepage == 'string' && $place.homepage) {
@@ -141,19 +141,20 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			if ($place.mainMeetingTime || $place.mainMeetingDay) {
 				$scope.mainMeetingText += 'Main service ';
 				if ($place.mainMeetingTime) {
-					$scope.mainMeetingText += (new Date($place.mainMeetingTime)).toString('HH:mm') + ' ';
+					$scope.mainMeetingText += (new Date($place.mainMeetingTime)).browserToUTC().toString('HH:mm') + ' ';
 				}
 				if ($place.mainMeetingDay) {
 					$scope.mainMeetingText += 'every ' + $place.mainMeetingDay;
 				}
 			}
 
-			var currentDate = new Date();
+			var currentDate = (new Date).browserToUTC();
 			$place.pastEvents = [];
 			if ($place.events) {
 				for (var i=0; i<$place.events.length; i++) {
 					$place.events[i].dateObject = new Date($place.events[i].date);
-					$place.events[i].date = (new Date($place.events[i].date)).toString('dd/MM/yyyy HH:mm');
+					var eventDate = new Date($place.events[i].date).browserToUTC();
+					$place.events[i].date = eventDate.toString('dd/MM/yyyy HH:mm');
 					if ($place.events[i].dateObject<currentDate) {
 						$place.pastEvents.push($place.events[i]);
 						$place.events.splice(i, 1);
@@ -171,7 +172,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			if ($place.promotions) {
 				for (var i=0; i<$place.promotions.length; i++) {
 					var promotion = $place.promotions[i];
-					promotion.dateObject = new Date(promotion.expireDate);
+					promotion.dateObject = (new Date(promotion.expireDate)).browserToUTC();
 					if (promotion.dateObject>currentDate) {
 						if (promotion.url && promotion.url.substr(0, 4) != 'http') {
 							promotion.url = 'http://' + promotion.url;
@@ -185,7 +186,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			$place.activeJobs = [];
 			if ($place.jobs.length) {
 				for (var i = 0; i < $place.jobs.length; i++) {
-					$place.jobs[i].expireDate = new Date($place.jobs[i].expireDate);
+					$place.jobs[i].expireDate = (new Date($place.jobs[i].expireDate)).browserToUTC();
 					$place.jobs[i].action = $sce.trustAsResourceUrl('/jobs/fund/' + $place.jobs[i]._id);
 					if ($place.jobs[i].expireDate>$rootScope.currentDate) {
 						$place.activeJobs.push($place.jobs[i]);
@@ -502,7 +503,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 		function setData($place) {
 			if ($place.mainMeetingTime){
-				var mainMeetingTime = new Date($place.mainMeetingTime);
+				var mainMeetingTime = (new Date($place.mainMeetingTime)).browserToUTC();
 				$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
 			}
 
@@ -919,7 +920,7 @@ opendoorControllers.controller('SearchCtrl', ['$scope', '$http', '$rootScope', '
 		var $locationInputEl = $('.location-picker-address');
 
 		$scope.places = null;
-		$scope.message = 'Press "Search" to find nearest places';
+		$scope.message = 'Press "Search" to find nearest place of worship to you';
 		var $table = $('#search-table');
 		var map;
 
@@ -1136,7 +1137,7 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 				if (places.length) {
 					for (var i=0; i< places.length; i++) {
 						if (places[i].updatedAt) {
-							places[i].updatedAt = (new Date(places[i].updatedAt)).toString('MM/dd/yyyy');
+							places[i].updatedAt = (new Date(places[i].updatedAt)).browserToUTC().toString('MM/dd/yyyy');
 						}
 					}
 					$scope.message = '';
@@ -1402,6 +1403,7 @@ opendoorControllers.controller('FooterCtrl', ['$scope', '$rootScope', '$location
 		var feedbackPage = '/feedback';
 		$scope.leaveFeedback = function($event) {
 			var targetPage = feedbackPage + '#' + $location.path();
+
 			if ($event.which == 2) {
 				$window.open(targetPage, '_blank');
 			}
@@ -1456,7 +1458,7 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 			case 'messagesent':
 				$scope.alertType = 'info';
 				$scope.alertTitle = 'Success';
-				$scope.alertMessage = 'Your message has been sent';
+				$scope.alertMessage = 'Your message has been sent to the place of worship';
 				break;
 			case 'feedbacksaved':
 				$scope.alertType = 'info';
@@ -1557,7 +1559,8 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 			case 'jobfunded':
 				$scope.alertType = 'info';
 				$scope.alertTitle = 'Success';
-				$scope.alertMessage = 'Job was funded successfully';
+				$scope.alertMessage = 'Your job was successfully published';
+				$scope.backTitle = 'View job';
 				break;
 			default:
 				$scope.alertType = 'danger';
@@ -1565,8 +1568,6 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.alertMessage = 'An unexpected error happened';
 			break;
 		}
-		console.log(search);
-		console.log(search);
 		$scope.back = search.back;
 	}
 ]);
