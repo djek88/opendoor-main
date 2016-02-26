@@ -384,23 +384,40 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		map.setCenter(pos);
 		map.setZoom(2);
 
-		$('.timepicker-input').timepicker({showMeridian: false, defaultTime: false});
-		$('.location-picker').locationpicker();
-		//$('textarea').trumbowyg();
-
-
-		$denominationsEl.tagit({
-				availableTags: denominations
-			,	autocomplete: {
-						delay: 0
-				}
+		$('.input-group.date').datetimepicker({
+			format: siteconfig.l10n.timeFormat
 		});
+		$('.location-picker').locationpicker();
+
+
+		$denominationsEl.tagsinput({
+			typeahead: {
+				source: function(query){
+					var results = [];
+					var currentTags = $denominationsEl.val().slice(',');
+					for (var i in denominations) {
+						if (denominations.hasOwnProperty(i)) {
+							if (currentTags.indexOf(denominations[i]) == -1) {
+								results.push(denominations[i]);
+							}
+						}
+					}
+					return results;
+				}
+			}
+			, freeInput: true
+			, tagClass: 'label label-primary'
+		});
+
+		$('.bootstrap-tagsinput').addClass('form-control');
+
 
 		$scope.religions = $rootScope.religions;
 
 		$groupsEl.selectpicker({
 			style: 'form-control btn-white',
-			liveSearch: true
+			liveSearch: true,
+			noneSelectedText: ''
 		});
 		var $bsSearchbox = $('.bs-searchbox input');
 		$bsSearchbox.on('input', function(){
@@ -462,6 +479,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			success(function (data){
 				$groupsEl.empty();
 				groups = data;
+				$groupsEl.append('<option value="" selected disabled></option>');
 				for (var i=0; i<data.length; i++) {
 					$groupsEl.append('<option value="' + data[i].name + '">' + data[i].name + '</option>');
 				}
@@ -478,15 +496,10 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 				}
 			}).
 			success(function (data){
-				$denominationsEl.tagit('removeAll');
-				while (denominations.pop()) {
-				}
+				while (denominations.pop()) {};
 				for (var i=0; i<data.length; i++) {
 					var denomination = data[i].name;
 					denominations.push(denomination);
-					if ($scope.place.denominations && $scope.place.denominations.indexOf(denomination) != -1) {
-						$denominationsEl.tagit('createTag', denomination);
-					}
 				}
 			});
 		}
@@ -503,7 +516,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 
 		function setData($place) {
 			if ($place.mainMeetingTime){
-				var mainMeetingTime = (new Date($place.mainMeetingTime)).browserToUTC();
+				var mainMeetingTime = (new Date($place.mainMeetingTime)); //.browserToUTC();
 				$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
 			}
 
@@ -514,6 +527,9 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 			loadOptionsForReligion($place.religion);
 			$groupsEl.selectpicker('val', $place.groupName);
 			map.setMarker($place.location.coordinates);
+			for (var i=0; i < $place.denominations.length; i++) {
+				$denominationsEl.tagsinput('add', $place.denominations[i]);
+			}
 		}
 
 

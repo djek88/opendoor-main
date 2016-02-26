@@ -113,14 +113,22 @@ select.form-control,
 .select2-container--default .select2-selection--single,
 .input-group-addon,
 .trumbowyg-box,
+.bootstrap-select.form-control button,
 .form-control {
 	border-color: #2A72B5;
 	border-radius: 3px;
 }
 
+.bootstrap-select ul.dropdown-menu li.disabled {
+	display: none;
+}
 
-ul.tagit.ui-widget {
-	border-color: #2A72B5!important;
+.twitter-typeahead {
+	vertical-align: top;
+}
+
+.label {
+	padding: .6em 1em;
 }
 
 .trumbowyg-box, .trumbowyg-editor {

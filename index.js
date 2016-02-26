@@ -90,6 +90,7 @@ var siteconfig = {
 		stripePublic: config.apiKeys.stripePublic
 	}
 	, frontend: config.frontend
+	, l10n: config.l10n
 };
 
 

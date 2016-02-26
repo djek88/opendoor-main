@@ -73,6 +73,9 @@ opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $loc
 	,	'Tenriism'
 	];
 
+
+
+
 	$rootScope.currentDate = new Date;
 
 	$rootScope.year = (new Date).browserToUTC().getFullYear();

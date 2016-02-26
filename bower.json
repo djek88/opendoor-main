@@ -32,6 +32,9 @@
     "bootstrap-select": "~1.9.4",
     "trumbowyg": "~1.1.7",
     "trumbowyg-ng": "~0.0.3",
-    "eonasdan-bootstrap-datetimepicker": "~4.17.37"
+    "eonasdan-bootstrap-datetimepicker": "~4.17.37",
+    "bootstrap-tagsinput": "~0.8.0",
+    "typeahead.js": "~0.11.1",
+    "bootstrap3-typeahead": "bassjobsen/Bootstrap-3-Typeahead#~4.0.0"
   }
 }

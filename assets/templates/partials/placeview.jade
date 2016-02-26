@@ -16,8 +16,9 @@
 							span  ({{place.ratingsCount}})
 						h4 {{place.religion}}
 							span(ng-show="place.groupName") , {{place.groupName}}
-						h5(ng-show="place.denominations.length")
-							.label.label-primary(ng-repeat="denomination in place.denominations") {{denomination}}
+						div.m-t-15(ng-show="place.denominations.length")
+							.label.label-primary.m-r-5(ng-repeat="denomination in place.denominations") {{denomination}}
+
 
 
 
@@ -152,7 +153,7 @@
 
 						a.btn.btn-sm.btn-primary(ng-if="isMaintainer", href="/jobs/add?place={{place._id}}")  Add job
 					.col.col-lg-12
-						h3 Edit
+						h3 Editor
 						div(ng-show="place.maintainer")
 							h6 This page is maintained by {{place.maintainer.name}}
 								span(ng-if="isMaintainer")  (you)
