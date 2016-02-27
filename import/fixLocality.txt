@@ -1,4 +1,25 @@
-db.places.update({"address.region": "", "address.locality": ""}, {$set: {isConfirmed: false}}, false, true)
+db.places.update({"address.region": "", "address.locality": ""}, {$set: {isConfirmed: false}}, false, true);
+
+
+
+Array.cleanArray = function(actual) {
+	var newArray = [];
+	for (var i = 0; i < actual.length; i++) {
+		if (actual[i]) {
+			newArray.push(actual[i]);
+		}
+	}
+	return newArray;
+};
+
+Array.prototype.cleanArray = function() {
+	for (var i = 0; i < this.length; i++) {
+		if (!this[i]) {
+			this.splice(i--, 1);
+		}
+	}
+	return this;
+};
 
 
 var cursor = db.places.find({'address.locality': ''});
