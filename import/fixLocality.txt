@@ -4,8 +4,12 @@ db.places.update({"address.region": "", "address.locality": ""}, {$set: {isConfi
 var cursor = db.places.find({'address.locality': ''});
 
 while (cursor.hasNext()) {
-	var currentDocument = cursor.next();
-	currentDocument.address.locality = currentDocument.address.region.split(', ').pop();
-	print(currentDocument.address.region);
-	db.places.update({_id: currentDocument._id}, currentDocument);
+	var place = cursor.next();
+	place.address.locality = place.address.region.split(', ').pop();
+	place.uri = [place.address.country, place.address.region, place.address.locality, place.religion, place.groupName, place.name].join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+	place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+	
+	place.jsonLd.address.addressLocality = place.address.locality;
+	db.places.update({_id: place._id}, place);
 }
+
