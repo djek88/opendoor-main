@@ -131,7 +131,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 						else {
 							for (var i in place) {
 								if (place.hasOwnProperty(i)) {
-									if (place[i] && !equals(currentPlace[i], place[i])) {
+									if (place[i] && !equals(currentPlace[i], place[i]) && (currentPlace[i] || place[i])) {
 										placeChangeManager.add({
 											user: mongoose.Types.ObjectId(req.session.user._id)
 											, place: mongoose.Types.ObjectId(req.params.id)

@@ -41,8 +41,9 @@ html(ng-app="opendoorApp")
 		script(src="/assets/js/locationpicker.js")
 		script(src="/assets/js/app.js")
 		script(src="/assets/js/controllers.js")
+		script(src="/assets/js/ga.js")
 		if isPlace
-			script(type="application/ld+json")!= JSON.stringify(place.jsonLd, ' ')
+			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
 			meta(name="description", content="#{place.name}")
 			meta(itemprop="name", content="#{place.name}")
 			if place.about

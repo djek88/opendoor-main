@@ -1,0 +1,11 @@
+db.places.update({"address.region": "", "address.locality": ""}, {$set: {isConfirmed: false}}, false, true)
+
+
+var cursor = db.places.find({'address.locality': ''});
+
+while (cursor.hasNext()) {
+	var currentDocument = cursor.next();
+	currentDocument.address.locality = currentDocument.address.region.split(', ').pop();
+	print(currentDocument.address.region);
+	db.places.update({_id: currentDocument._id}, currentDocument);
+}

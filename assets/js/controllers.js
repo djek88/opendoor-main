@@ -112,7 +112,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 		function setData($place) {
 			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
 			if ($place.updatedAt) {
-				$place.updatedAt = (new Date($place.updatedAt)).browserToUTC().toString('dd.MM.yyyy');
+				$place.updatedAt = (new Date($place.updatedAt)).browserToUTC().toString(siteconfig.l10n.dateFormat);
 			}
 
 			if (typeof $place.homepage == 'string' && $place.homepage) {
@@ -141,7 +141,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 			if ($place.mainMeetingTime || $place.mainMeetingDay) {
 				$scope.mainMeetingText += 'Main service ';
 				if ($place.mainMeetingTime) {
-					$scope.mainMeetingText += (new Date($place.mainMeetingTime)).browserToUTC().toString('HH:mm') + ' ';
+					$scope.mainMeetingText += (new Date($place.mainMeetingTime)).browserToUTC().toString(siteconfig.l10n.timeFormat) + ' ';
 				}
 				if ($place.mainMeetingDay) {
 					$scope.mainMeetingText += 'every ' + $place.mainMeetingDay;
@@ -154,7 +154,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 				for (var i=0; i<$place.events.length; i++) {
 					$place.events[i].dateObject = new Date($place.events[i].date);
 					var eventDate = new Date($place.events[i].date).browserToUTC();
-					$place.events[i].date = eventDate.toString('dd/MM/yyyy HH:mm');
+					$place.events[i].date = eventDate.toString(siteconfig.l10n.dateTimeFormat);
 					if ($place.events[i].dateObject<currentDate) {
 						$place.pastEvents.push($place.events[i]);
 						$place.events.splice(i, 1);
@@ -517,7 +517,7 @@ opendoorControllers.controller('PlaceFormCtrl', ['$scope', '$rootScope', '$locat
 		function setData($place) {
 			if ($place.mainMeetingTime){
 				var mainMeetingTime = (new Date($place.mainMeetingTime)); //.browserToUTC();
-				$place.mainMeetingTime = mainMeetingTime.toString('HH:mm');
+				$place.mainMeetingTime = mainMeetingTime.toString(siteconfig.l10n.timeFormat);
 			}
 
 
@@ -1153,7 +1153,7 @@ opendoorControllers.controller('PlacesListCtrl', ['$scope', '$http', '$rootScope
 				if (places.length) {
 					for (var i=0; i< places.length; i++) {
 						if (places[i].updatedAt) {
-							places[i].updatedAt = (new Date(places[i].updatedAt)).browserToUTC().toString('MM/dd/yyyy');
+							places[i].updatedAt = (new Date(places[i].updatedAt)).browserToUTC().toString(siteconfig.l10n.dateTimeFormat);
 						}
 					}
 					$scope.message = '';
