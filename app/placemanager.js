@@ -316,8 +316,6 @@ module.exports = function(mongoose, email, config) {
 				matchOption['name'] = new RegExp(data.name, 'i');
 			}
 
-			console.log(data);
-
 			if (data.country) {
 				matchOption['address.country'] = new RegExp(decodeURI(data.country).replace(/-/g, ' '), 'i');
 			}

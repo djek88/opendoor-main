@@ -313,19 +313,16 @@ opendoorApp.config(
 		}).
 		when('/places/', {
 			title: 'Countries list'
-			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/countrieslist.html'
 			, controller: 'CountriesListCtrl'
 		}).
 		when('/places/:country/', {
 			title: 'Localities list'
-			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/localitieslist.html'
 			, controller: 'LocalitiesListCtrl'
 		}).
 		when('/places/:country/:locality/', {
 			title: 'Places list'
-			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placesbylocalitieslist.html'
 			, controller: 'PlacesByLocalitiesListCtrl'
 		}).
