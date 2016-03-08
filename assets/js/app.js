@@ -311,6 +311,24 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/userview.html'
 			, controller: 'UserViewCtrl'
 		}).
+		when('/places/', {
+			title: 'Countries list'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/countrieslist.html'
+			, controller: 'CountriesListCtrl'
+		}).
+		when('/places/:country/', {
+			title: 'Localities list'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/localitieslist.html'
+			, controller: 'LocalitiesListCtrl'
+		}).
+		when('/places/:country/:locality/', {
+			title: 'Places list'
+			,	shouldLogin: true
+			,	templateUrl: 'assets/templates/partials/placesbylocalitieslist.html'
+			, controller: 'PlacesByLocalitiesListCtrl'
+		}).
 		when('/places/last', {
 			title: 'Last places'
 			,	shouldLogin: true

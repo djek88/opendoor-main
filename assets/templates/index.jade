@@ -41,6 +41,9 @@ html(ng-app="opendoorApp")
 		script(src="/assets/js/locationpicker.js")
 		script(src="/assets/js/app.js")
 		script(src="/assets/js/controllers.js")
+		script(src="/assets/js/controllers/countrieslist.js")
+		script(src="/assets/js/controllers/localitieslist.js")
+		script(src="/assets/js/controllers/placesbylocalitieslist.js")
 		script(src="/assets/js/ga.js")
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
@@ -94,6 +97,8 @@ html(ng-app="opendoorApp")
 									| HOME
 							li(ng-show="$root.isLoggedIn")
 								a(href='/places/add') ADD A PLACE
+							li
+								a(href='/places/') PLACES
 							li
 								a(href='/jobs/search') JOBS
 							li(ng-show="$root.isAdmin")

@@ -114,6 +114,9 @@ var frontendPages = [
 	,	'/users/:id'
 	,	'/promotion/:id'
 	,	'/places/maintained'
+	,	'/places/'
+	,	'/places/:country/'
+	,	'/places/:country/:locality/'
 	,	'/places/review/:id'
 	,	'/places/donate/:id'
 	,	'/places/event/:id/add'
@@ -197,7 +200,8 @@ app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mon
 app.get('/places/confirm/:id', require('./app/routes/places/confirm.js')(placeManager));
 app.get('/subscriptions/confirm/:id', require('./app/routes/subscriptions/confirm.js')(subscriptionManager));
 
-app.get('/ajax/countries', require('./app/routes/ajax/countries.js')(countryList));
+app.get('/ajax/countries', require('./app/routes/ajax/countries.js')(placeManager, countryList));
+app.get('/ajax/localities', require('./app/routes/ajax/localities.js')(placeManager));
 app.get('/ajax/religionGroups', require('./app/routes/ajax/religionGroups.js')(religionGroupManager));
 app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(denominationManager));
 app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));

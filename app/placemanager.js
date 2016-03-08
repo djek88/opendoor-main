@@ -315,6 +315,16 @@ module.exports = function(mongoose, email, config) {
 			if (data.name) {
 				matchOption['name'] = new RegExp(data.name, 'i');
 			}
+
+			console.log(data);
+
+			if (data.country) {
+				matchOption['address.country'] = new RegExp(decodeURI(data.country).replace(/-/g, ' '), 'i');
+			}
+			if (data.locality) {
+				matchOption['address.locality'] = new RegExp(decodeURI(data.locality).replace(/-/g, ' '), 'i');
+			}
+
 			if (data.maxDistance) {
 				geoNearOption.maxDistance = parseInt(data.maxDistance);
 			}
@@ -467,6 +477,14 @@ module.exports = function(mongoose, email, config) {
 				}
 			});
 		};
+
+		this.getCountries = function(callback) {
+			Place.distinct('address.country').exec(callback);
+		}
+
+		this.getLocalities = function(country, callback) {
+			Place.find({'address.country': country.replace(/-/g, ' ')}).distinct('address.locality').exec(callback);
+		}
 
 
 		this.find = Place.find.bind(Place);
