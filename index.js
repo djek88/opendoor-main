@@ -135,7 +135,7 @@ app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
-
+app.use(require('prerender-node'));
 
 mongoose.connect(config.mongoURI);
 
