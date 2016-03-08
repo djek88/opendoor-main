@@ -145,6 +145,9 @@ app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
 app.use('/favicon.ico', express.static('favicon.ico'));
 
+app.use('/google1acb6cef178f3dbe.html', express.static('google1acb6cef178f3dbe.html'));
+app.use('/BingSiteAuth.xml', express.static('BingSiteAuth.xml'));
+
 
 db.on('error', console.error);
 db.once('open', function () {
