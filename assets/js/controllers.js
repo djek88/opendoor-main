@@ -110,6 +110,7 @@ opendoorControllers.controller('PlaceViewCtrl', ['$scope', '$rootScope', '$locat
 
 
 		function setData($place) {
+			document.title = $place.name + ' | OpenDoor.ooo';
 			$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
 			if ($place.updatedAt) {
 				$place.updatedAt = (new Date($place.updatedAt)).browserToUTC().toString(siteconfig.l10n.dateFormat);

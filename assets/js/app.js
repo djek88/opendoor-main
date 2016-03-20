@@ -3,7 +3,7 @@
  * Created by Vavooon on 17.12.2015.
  */
 
-var titlePostfix = ' - OpenDoor';
+var titlePostfix = ' | OpenDoor.ooo';
 
 
 var opendoorApp = angular.module('opendoorApp', [
@@ -237,12 +237,12 @@ opendoorApp.config(
 		//var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
 		$routeProvider.
 		when('/', {
-				title: 'Find nearest places'
+				title: 'Search for local Place of Worship'
 			,	templateUrl: 'assets/templates/partials/search.html'
 			, controller: 'SearchCtrl'
 		}).
 		when('/jobs/search', {
-			title: 'Find a job'
+			title: 'Search for Jobs at Places of Worship'
 			,	templateUrl: 'assets/templates/partials/jobsearch.html'
 			, controller: 'JobSearchCtrl'
 		}).
@@ -270,7 +270,7 @@ opendoorApp.config(
 			, controller: 'JobViewCtrl'
 		}).
 		when('/places/add', {
-				title: 'Add place'
+				title: 'Add a Place of Worship'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
@@ -282,13 +282,13 @@ opendoorApp.config(
 			, controller: 'PlaceFormCtrl'
 		}).
 		when('/places/claims', {
-			title: 'Place claims'
+			title: 'Places of Worship you claimed'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeclaims.html'
 			, controller: 'PlaceClaimsCtrl'
 		}).
 		when('/places/changes', {
-			title: 'Suggested changes'
+			title: 'Suggested changes to Place of Worship'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placechanges.html'
 			, controller: 'PlaceChangesCtrl'
@@ -312,7 +312,7 @@ opendoorApp.config(
 			, controller: 'UserViewCtrl'
 		}).
 		when('/places/', {
-			title: 'Countries list'
+			title: 'Places of Worship listed by Country'
 			,	templateUrl: 'assets/templates/partials/countrieslist.html'
 			, controller: 'CountriesListCtrl'
 		}).
@@ -333,7 +333,7 @@ opendoorApp.config(
 			, controller: 'LastPlacesCtrl'
 		}).
 		when('/places/maintained', {
-			title: 'Maintained places'
+			title: 'Places of Worship you maintain'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
 			, controller: 'MaintainedPlacesCtrl'
@@ -374,12 +374,12 @@ opendoorApp.config(
 			, controller: 'SubscribeForNotificationFormCtrl'
 		}).
 		when('/login', {
-				title: 'Login'
+				title: 'Login to Open Door'
 			,	templateUrl: 'assets/templates/partials/login.html'
 			, controller: 'LoginCtrl'
 		}).
 		when('/register', {
-				title: 'Register'
+				title: 'Register your account at Open Door'
 			,	templateUrl: 'assets/templates/partials/register.html'
 			, controller: 'RegisterCtrl'
 		}).
@@ -389,7 +389,7 @@ opendoorApp.config(
 			, controller: 'FeedbackCtrl'
 		}).
 		when('/about', {
-				title: 'About'
+				title: 'About the Open Door Project'
 			,	templateUrl: 'assets/templates/partials/about.html'
 		}).
 		when('/error', {
