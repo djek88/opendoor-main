@@ -148,9 +148,10 @@ app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
 app.use('/favicon.ico', express.static('favicon.ico'));
 
-app.use('/google1acb6cef178f3dbe.html', express.static('google1acb6cef178f3dbe.html'));
-app.use('/BingSiteAuth.xml', express.static('BingSiteAuth.xml'));
-
+app.use('/google1acb6cef178f3dbe.html', express.static(__dirname + '/google1acb6cef178f3dbe.html'));
+app.use('/BingSiteAuth.xml', express.static(__dirname + '/BingSiteAuth.xml'));
+app.use('/sitemap.xml', express.static(__dirname + '/sitemap.xml'));
+app.use('/robots.txt', express.static(__dirname + '/robots.txt'));
 
 db.on('error', console.error);
 db.once('open', function () {
