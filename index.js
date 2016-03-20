@@ -133,12 +133,14 @@ var placesFrontEndPages = [
 		'/places/:id'
 	, '/places/:country/:region/:locality/:religion/:groupName/:name'
 ];
+if (config.prerenderServiceUrl) {
+	app.use(require('prerender-node').set('prerenderServiceUrl', config.prerenderServiceUrl));
+}
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
-app.use(require('prerender-node'));
 
 mongoose.connect(config.mongoURI);
 
