@@ -41,4 +41,5 @@ module.exports = {
 		, dateFormat: 'yyyy-MM-dd'
 		, dateTimeFormat: 'yyyy-MM-dd hh:mm tt'
 	}
+	, staticFiles: ['/sitemap.xml']
 };
