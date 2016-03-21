@@ -213,9 +213,12 @@ opendoorApp.config( [
 ]);
 
 opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
+	var $metaInfoEl = $('#metaInfo');
 	$rootScope.$on('$routeChangeSuccess', function() {
 		document.title = $route.current.title + titlePostfix;
+		$metaInfoEl.html($route.current.meta || '');
 	});
+
 	$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
 		if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope._id) {
 			$location.url('/message?message=pleaselogin');
@@ -238,11 +241,13 @@ opendoorApp.config(
 		$routeProvider.
 		when('/', {
 				title: 'Search for local Place of Worship'
+			, meta: 'Find your Place of Worship anywhere in the World. Check to make sure your Place of Worship is listed and correct so others can find it.'
 			,	templateUrl: 'assets/templates/partials/search.html'
 			, controller: 'SearchCtrl'
 		}).
 		when('/jobs/search', {
 			title: 'Search for Jobs at Places of Worship'
+			, meta: 'Find your ideal job anywhere in the World. Jobs listed associated with running a Place of Worship'
 			,	templateUrl: 'assets/templates/partials/jobsearch.html'
 			, controller: 'JobSearchCtrl'
 		}).
@@ -271,6 +276,7 @@ opendoorApp.config(
 		}).
 		when('/places/add', {
 				title: 'Add a Place of Worship'
+			, meta: 'Add your Place of Worship for free, list events, get reviews and allow others to find it.'
 			,	shouldLogin: true
 			,	templateUrl: 'assets/templates/partials/placeform.html'
 			, controller: 'PlaceFormCtrl'
@@ -313,18 +319,9 @@ opendoorApp.config(
 		}).
 		when('/places/', {
 			title: 'Places of Worship listed by Country'
+			, meta: 'Find your Place of Worship anywhere in the World. A list of all Places of Worship by Country. Check to make sure your Place of Worship is listed and correct so others can find it.'
 			,	templateUrl: 'assets/templates/partials/countrieslist.html'
 			, controller: 'CountriesListCtrl'
-		}).
-		when('/places/:country/', {
-			title: 'Localities list'
-			,	templateUrl: 'assets/templates/partials/localitieslist.html'
-			, controller: 'LocalitiesListCtrl'
-		}).
-		when('/places/:country/:locality/', {
-			title: 'Places list'
-			,	templateUrl: 'assets/templates/partials/placesbylocalitieslist.html'
-			, controller: 'PlacesByLocalitiesListCtrl'
 		}).
 		when('/places/last', {
 			title: 'Last places'
@@ -358,6 +355,16 @@ opendoorApp.config(
 			,	templateUrl: 'assets/templates/partials/editorproposalform.html'
 			, controller: 'EditorProposalCtrl'
 		}).
+		when('/places/:country/', {
+			title: 'Localities list'
+			,	templateUrl: 'assets/templates/partials/localitieslist.html'
+			, controller: 'LocalitiesListCtrl'
+		}).
+		when('/places/:country/:locality/', {
+			title: 'Places list'
+			,	templateUrl: 'assets/templates/partials/placesbylocalitieslist.html'
+			, controller: 'PlacesByLocalitiesListCtrl'
+		}).
 		when('/places/:country/:region/:locality/:religion/:groupName/:name', {
 				title: 'View place'
 			,	templateUrl: 'assets/templates/partials/placeview.html'
@@ -375,11 +382,13 @@ opendoorApp.config(
 		}).
 		when('/login', {
 				title: 'Login to Open Door'
+			, meta: 'Log into your Open Door account so you can keep your Place of Worship up to date. Add events and post jobs'
 			,	templateUrl: 'assets/templates/partials/login.html'
 			, controller: 'LoginCtrl'
 		}).
 		when('/register', {
 				title: 'Register your account at Open Door'
+			, meta: 'Update your local Place of Worship details so that the details are correct and let others find it.'
 			,	templateUrl: 'assets/templates/partials/register.html'
 			, controller: 'RegisterCtrl'
 		}).
@@ -390,6 +399,7 @@ opendoorApp.config(
 		}).
 		when('/about', {
 				title: 'About the Open Door Project'
+			,  meta: 'The biggest resource for finding a Place of Worship. The Open Door Project needs your help'
 			,	templateUrl: 'assets/templates/partials/about.html'
 		}).
 		when('/error', {

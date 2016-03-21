@@ -1,6 +1,8 @@
 
 var config = require('./config.js');
 var http = require('http');
+var fs = require('fs');
+var path = require('path');
 var querystring = require('querystring');
 var express = require('express');
 var nodemailer = require('nodemailer');
@@ -17,6 +19,8 @@ var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
 var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
 var countryList = require('country-list')();
+var sm = require('sitemap');
+
 require('./assets/js/utils.js');
 require('./app/date.min.js');
 
@@ -26,8 +30,6 @@ function getUniqueFilename() {
 }
 global.getUniqueFilename = getUniqueFilename;
 
-
-var path = require('path');
 global.appDir = path.dirname(require.main.filename);
 global.imagesPath = '/photos/';
 
@@ -142,6 +144,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
 
+
+
 mongoose.connect(config.mongoURI);
 
 
@@ -149,11 +153,23 @@ app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
 app.use('/favicon.ico', express.static('favicon.ico'));
-
-app.use('/google1acb6cef178f3dbe.html', express.static(__dirname + '/google1acb6cef178f3dbe.html'));
-app.use('/BingSiteAuth.xml', express.static(__dirname + '/BingSiteAuth.xml'));
-app.use('/sitemap.xml', express.static(__dirname + '/sitemap.xml'));
-app.use('/robots.txt', express.static(__dirname + '/robots.txt'));
+app.use('/generateSitemap', require('./app/sitemap.js')(placeManager, sm, config, fs, path));
+app.use(config.staticFiles, function(req, res){
+	var filename = path.join(__dirname, 'static', req.baseUrl);
+	fs.stat(filename, function(err, stats){
+		if (stats) {
+			if (filename.match(/\.xml$/)) {
+				console.log('match');
+				res.set('Content-Type', 'text/xml');
+			}
+			res.sendFile(filename);
+		}
+		else {
+			res.status(404);
+			res.end();
+		}
+	});
+});
 
 db.on('error', console.error);
 db.once('open', function () {
@@ -233,7 +249,6 @@ app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(p
 
 
 app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));
-
 
 
 app.get(frontendPages, function(req, res) {

@@ -1523,6 +1523,11 @@ opendoorControllers.controller('ErrorCtrl', ['$scope', '$location',
 				$scope.alertMessage = 'Thank you for taking the time to place a review.';
 				break;
 
+			case 'sitemapgenerated':
+				$scope.alertType = 'info';
+				$scope.alertTitle = 'Success';
+				$scope.alertMessage = 'Sitemap was successfully generated';
+				break;
 			case 'eventadded':
 				$scope.alertType = 'info';
 				$scope.alertTitle = 'Success';

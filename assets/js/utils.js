@@ -32,3 +32,7 @@ Date.prototype.nodeToUTC = function() {
 Date.prototype.browserToUTC = function() {
 	return this.add(this.getTimezoneOffset()).minutes();
 };
+
+String.prototype.endsWith = function(suffix) {
+	return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};

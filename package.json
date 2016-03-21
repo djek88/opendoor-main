@@ -28,6 +28,7 @@
     "sanitize-html": "^1.11.3",
     "seq-queue": "0.0.5",
     "sha1": "^1.1.1",
+    "sitemap": "^1.5.0",
     "stripe": "^4.3.0"
   }
 }
