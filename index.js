@@ -136,7 +136,10 @@ var placesFrontEndPages = [
 	, '/places/:country/:region/:locality/:religion/:groupName/:name'
 ];
 if (config.prerenderServiceUrl) {
-	app.use(require('prerender-node').set('prerenderServiceUrl', config.prerenderServiceUrl));
+	app.use(require('prerender-node')
+		.set('prerenderServiceUrl', config.prerenderServiceUrl)
+		.set('host', config.hostname + ':' + config.port)
+		.set('protocol', 'http'));
 }
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
