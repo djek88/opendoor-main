@@ -3,11 +3,12 @@
  */
 define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
-	opendoorApp.registerController('LocalitiesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
+
+	opendoorApp.registerController('PlacesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 		function ($scope, $http, $rootScope, $location, $window) {
 
-			var splittedUrl = $location.url().split('/');
-			$scope.country = splittedUrl[splittedUrl.length - 2];
+			$scope.places = null;
+			var $table = $('#search-table');
 			$scope.religionsList = $rootScope.religions;
 			$scope.religion = '';
 
@@ -16,15 +17,15 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 
 				var requestParams = {
 					name: $scope.name
-					//, skip: $scope.skip
-					//, limit: $scope.limit
+					, skip: $scope.skip
+					, limit: $scope.limit
 					, religion: $scope.religion
 					, maintained: $scope.maintained
 				};
 
 				$location.search('name', requestParams.name || null);
-				//$location.search('skip', requestParams.skip || null);
-				//$location.search('limit', requestParams.limit || null);
+				$location.search('skip', requestParams.skip || null);
+				$location.search('limit', requestParams.limit || null);
 				$location.search('religion', requestParams.religion || null);
 				$location.search('maintained', requestParams.maintained || null);
 			}
@@ -34,12 +35,12 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				$scope.form.$submitted = true;
 				setSearchParams();
 			};
-			//
-			//$scope.setPage = function(n) {
-			//	$scope.skip = (n-1) * $scope.itemsPerPage;
-			//	$scope.form.$submitted = true;
-			//	setSearchParams();
-			//};
+
+			$scope.setPage = function (n) {
+				$scope.skip = (n - 1) * $scope.itemsPerPage;
+				$scope.form.$submitted = true;
+				setSearchParams();
+			};
 
 
 			function onError() {
@@ -47,42 +48,35 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				$scope.places = null;
 			}
 
-			$scope.openLocality = function ($event, country) {
-				//$rootScope.selectedPlace = place;
-				if ($event.which == 2) {
-					$window.open('/places/' + $scope.getLink(country), '_blank');
-				}
-				else {
-					$location.url('/places/' + $scope.getLink(country));
-				}
-			};
-
-			$scope.getLink = function (locality) {
-				return $scope.country + '/' + locality.replace(/ /g, '-');
-			}
 
 			var requestParams = $location.search();
 			$scope.name = requestParams.name;
-			//$scope.skip = requestParams.skip;
-			//$scope.limit = requestParams.limit;
+			$scope.skip = requestParams.skip;
+			$scope.limit = requestParams.limit;
 			$scope.religion = requestParams.religion;
 			$scope.maintained = requestParams.maintained;
 			$scope.message = 'Searching…';
 			$http({
-				url: '/ajax/localities?country=' + $scope.country
+				url: '/ajax/places/search'
 				, method: 'GET'
 				, params: requestParams
 			}).success(function (response) {
-				if (typeof response == 'object' && Array.isArray(response)) {
-					var localities = response;
-					if (localities.length) {
+				if (typeof response == 'object' && Array.isArray(response.results)) {
+					var places = response.results;
+					if (places.length) {
+						for (var i = 0; i < places.length; i++) {
+							if (places[i].updatedAt) {
+								places[i].updatedAt = (new Date(places[i].updatedAt)).browserToUTC().toString(siteconfig.l10n.dateTimeFormat);
+							}
+						}
 						$scope.message = '';
 					}
 					else {
-						$scope.message = 'There are no places';
+						$scope.message = 'There are no places of worship';
 					}
-					$scope.localities = localities;
+					$scope.places = places;
 					$scope.count = response.count;
+					$rootScope.getPages($scope);
 				}
 				else {
 					onError();

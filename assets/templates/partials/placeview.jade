@@ -191,7 +191,7 @@
 					.col.col-lg-12
 						h3 Join our mailing list
 						h5 Receive information and updates about {{place.name}}
-						form(method="POST", action="/places/subscribe", novalidate name="form", ng-controller="FormCtrl")
+						form(method="POST", action="/places/subscribe", novalidate name="form")
 							.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.isLoggedIn")
 								label.control-label Name
 								input.form-control(type="text", name="name", ng-model="name", ng-required="!$root.isLoggedIn")

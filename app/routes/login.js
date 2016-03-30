@@ -7,7 +7,9 @@ module.exports = function(userManager, sha1){
 			if(req.body.email && req.body.password) {
 				userManager.findOne({email: req.body.email, password: sha1(req.body.password)}, function (err, user) {
 					if (user) {
+						console.log(user);
 						req.session.user = user;
+						console.log(req.session.user);
 						res.cookie('_id', user._id);
 						res.cookie('email', user.email);
 						res.cookie('isAdmin', user.isAdmin);

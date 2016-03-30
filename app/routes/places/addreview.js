@@ -1,5 +1,8 @@
 module.exports = function(placeManager){
 	return function (req, res) {
+		console.log('req.session');
+		console.log(req.session);
+		console.log(req.session.user);
 		if (req.session.user) {
 			var id = req.params.id;
 			var data = {

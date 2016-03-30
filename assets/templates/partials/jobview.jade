@@ -9,7 +9,7 @@
 				h4.m-t-20(ng-show="job.description") Description
 				h5 {{job.description}}
 				h4.m-t-40 If your are interested in this job please send a message directly to the place of worship
-				form(method="POST", novalidate, name="form", ng-controller="FormCtrl")
+				form(method="POST", novalidate, name="form")
 					.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}", ng-show="!$root.isLoggedIn")
 						label.control-label Name
 						input.form-control(type="text", name="name", ng-model="name", ng-required="!$root.isLoggedIn")

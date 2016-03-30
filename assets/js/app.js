@@ -3,427 +3,282 @@
  * Created by Vavooon on 17.12.2015.
  */
 
-var titlePostfix = ' | OpenDoor.ooo';
+
+define([
+	'angular',
+	// './controllers/search',
+	 // './controllers',
+	 'angular-route',
+	 'angular-cookies',
+	 'trumbowyg-ng'
+], function (angular) {
+	'use strict';
 
 
-var opendoorApp = angular.module('opendoorApp', [
-	'ngRoute',
-	'ngCookies',
-	'opendoorControllers',
-	'trumbowyg-ng'
-]);
+	var titlePostfix = ' | OpenDoor.ooo';
 
-opendoorApp.directive('ngImageLoad', ['$parse', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.ngImageLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
+
+	var opendoorApp = angular.module('opendoorApp', [
+		'ngRoute',
+		'ngCookies',
+		// 'opendoorControllers',
+		'trumbowyg-ng'
+	]);
+
+	opendoorApp.directive('ngImageLoad', ['$parse', function ($parse) {
+		return {
+			restrict: 'A',
+			link: function (scope, elem, attrs) {
+				var fn = $parse(attrs.ngImageLoad);
+				elem.on('load', function (event) {
+					scope.$apply(function() {
+						fn(scope, { $event: event });
+					});
+				});
+			}
+		};
+	}]);
+
+	opendoorApp.directive('ngLocation', function() {
+		return {
+			restrict: 'A',
+			require: 'ngModel',
+
+			link: function(scope, element, attr, ctrl) {
+				var $element = $(element);
+				var options = {
+					autoDetect: !!attr.ngLocationAutodetect
+				};
+				if ($element.next().prop('tagName')=='INPUT') {
+					options.locationField = $element.next();
+				}
+				$element.locationpicker(options);
+				function customValidator(ngModelValue) {
+					ctrl.$setValidity('valid', !!$element.val());
+					return ngModelValue;
+				}
+				customValidator();
+				ctrl.$parsers.push(customValidator);
+				scope.$watch(attr['ngModel'], customValidator);
+			}
+		};
+	});
+
+	opendoorApp.config(['$routeProvider', '$controllerProvider',
+		function($routeProvider, $controllerProvider) {
+
+
+			opendoorApp.registerController = $controllerProvider.register;
+
+
+			function resolveDependencies ($q, $rootScope, dependencies) {
+				var defer = $q.defer();
+				require(dependencies, function () {
+					defer.resolve();
+					$rootScope.$apply();
+				});
+
+				return defer.promise;
+			}
+
+			opendoorApp.resolveController = function(path) {
+				return {
+					load: ['$q', '$rootScope', function ($q, $rootScope) {
+						return resolveDependencies($q, $rootScope, [path]);
+					}]
+				}
+			}
+		}
+	]);
+
+
+
+	opendoorApp.run(['$rootScope', '$location', '$window', '$q', function($rootScope, $location, $window, $q) {
+		$rootScope.religions = [
+			'Christianity'
+			,	'Islam'
+			,	'Hinduism'
+			,	'Chinese'
+			,	'Buddism'
+			,	'Taoism'
+			,	'Shinto'
+			,	'Sikhism'
+			,	'Judaism'
+			,	'Korean Shamanism'
+			,	'Caodaism'
+			,	'Bahá\'í Faith'
+			,	'Jainism'
+			,	'Cheondoism'
+			,	'Hoahaoism'
+			,	'Tenriism'
+		];
+
+
+
+		$rootScope.currentDate = new Date;
+
+		$rootScope.year = (new Date).browserToUTC().getFullYear();
+
+		$rootScope.siteconfig = siteconfig;
+
+		$rootScope.openPlace = function($event, place) {
+			//$rootScope.selectedPlace = place;
+			if ($event.which == 2) {
+				$window.open('/places/' + place.uri, '_blank');
+			}
+			else {
+				$location.url('/places/' + place.uri);
+			}
+		};
+
+
+		$rootScope.submitForm = function() {
+			this.form.$submitted = true;
+			if (this.form.$valid) {
+				document.forms.form.submit();
+			}
+		};
+
+		$rootScope.getPages = function($scope) {
+			$scope.itemsPerPage = $scope.limit || siteconfig.frontend.itemsPerPage;
+			$scope.pages = Math.ceil($scope.count / $scope.itemsPerPage);
+			$scope.page = $scope.skip ?  $scope.skip / $scope.itemsPerPage : 0;
+			var pagesList = [];
+			var i;
+			if ($scope.pages < 6) {
+				for (i = 1; i <= $scope.pages; i++) {
+					pagesList.push(i);
+				}
+			}
+			else {
+				var minPage = $scope.page - 3;
+				if (minPage < 1) {
+					minPage = 1;
+				}
+				var maxPage = minPage + 8;
+				if (maxPage > $scope.pages) {
+					maxPage = $scope.pages;
+				}
+				for (i = minPage; i <= maxPage; i++) {
+					pagesList.push(i);
+				}
+			}
+			$scope.pagesAsArray = pagesList;
+			$scope.page++;
+		};
+
+
+		$rootScope.getMapInstance = function(targetEl) {
+			return $q(function(resolve, reject) {
+				require(['libs/googlemaps'], function (google) {
+					window.google = google;
+					if (!$rootScope.map) {
+						var div = $('<div id="map"></div>');
+						$(targetEl).append(div);
+						var map = $rootScope.map = new google.maps.Map(div[0], {
+							scrollwheel: false
+							, streetViewControl: false
+							, draggable: !('ontouchend' in document)
+						});
+						map.markers = [];
+						map.infoWindows = [];
+
+						map.icons = {
+							brightPoi: '/assets/img/spotlight-poi-bright.png'
+							, defaultPoi: '/assets/img/spotlight-poi.png'
+							, location: '/assets/img/mylocation.png'
+						};
+
+						var setPosition = google.maps.InfoWindow.prototype.setPosition;
+						google.maps.InfoWindow.prototype.setPosition = function () {
+							map.infoWindows.push(this);
+							setPosition.apply(this, arguments);
+						};
+
+
+						map.removeMarkers = function () {
+							var marker;
+							while (marker = map.markers.pop()) {
+								marker.setMap(null);
+							}
+						};
+
+						map.removeInfoWindows = function () {
+							var infoWindow;
+							while (infoWindow = map.infoWindows.pop()) {
+								infoWindow.setMap(null);
+							}
+						};
+
+						map.addMarker = function (opts) {
+							opts.map = map;
+							var marker = new google.maps.Marker(opts);
+							map.markers.push(marker);
+							return marker;
+						};
+
+						map.setMarker = function (location, bounds) {
+							if (bounds) {
+								map.fitBounds(bounds);
+							}
+							else {
+								map.setZoom(16);
+							}
+							var pos = new google.maps.LatLng(location[1], location[0]);
+							map.addMarker({
+								position: pos
+								, map: map
+								, icon: map.icons.defaultPoi
+							});
+							map.setCenter(pos);
+						}
+					}
+					else {
+						$(targetEl).append($rootScope.map.getDiv());
+						$rootScope.map.removeMarkers();
+						$rootScope.map.removeInfoWindows();
+					}
+					resolve($rootScope.map);
 				});
 			});
 		}
-	};
-}]);
+	}]);
 
-opendoorApp.directive('ngLocation', function() {
-	return {
-		restrict: 'A',
-		require: 'ngModel',
+	opendoorApp.config(['$httpProvider', function($httpProvider) {
+		$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+	}]);
 
-		link: function(scope, element, attr, ctrl) {
-			var $element = $(element);
-			var options = {
-				autoDetect: !!attr.ngLocationAutodetect
-			};
-			if ($element.next().prop('tagName')=='INPUT') {
-				options.locationField = $element.next();
-			}
-			$element.locationpicker(options);
-			function customValidator(ngModelValue) {
-				ctrl.$setValidity('valid', !!$element.val());
-				return ngModelValue;
-			}
-			customValidator();
-			ctrl.$parsers.push(customValidator);
-			scope.$watch(attr['ngModel'], customValidator);
+	opendoorApp.config( [
+		'$compileProvider',
+		function( $compileProvider )
+		{
+			$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
 		}
-	};
-});
+	]);
 
-
-opendoorApp.run(['$rootScope', '$location', '$window', function($rootScope, $location, $window) {
-	$rootScope.religions = [
-		'Christianity'
-	,	'Islam'
-	,	'Hinduism'
-	,	'Chinese'
-	,	'Buddism'
-	,	'Taoism'
-	,	'Shinto'
-	,	'Sikhism'
-	,	'Judaism'
-	,	'Korean Shamanism'
-	,	'Caodaism'
-	,	'Bahá\'í Faith'
-	,	'Jainism'
-	,	'Cheondoism'
-	,	'Hoahaoism'
-	,	'Tenriism'
-	];
-
-
-
-
-	$rootScope.currentDate = new Date;
-
-	$rootScope.year = (new Date).browserToUTC().getFullYear();
-
-	$rootScope.siteconfig = siteconfig;
-
-	$rootScope.openPlace = function($event, place) {
-		//$rootScope.selectedPlace = place;
-		if ($event.which == 2) {
-			$window.open('/places/' + place.uri, '_blank');
-		}
-		else {
-			$location.url('/places/' + place.uri);
-		}
-	};
-
-
-	$rootScope.submitForm = function() {
-		this.form.$submitted = true;
-		if (this.form.$valid) {
-			document.forms.form.submit();
-		}
-	};
-
-	$rootScope.getPages = function($scope) {
-		$scope.itemsPerPage = $scope.limit || siteconfig.frontend.itemsPerPage;
-		$scope.pages = Math.ceil($scope.count / $scope.itemsPerPage);
-		$scope.page = $scope.skip ?  $scope.skip / $scope.itemsPerPage : 0;
-		var pagesList = [];
-		var i;
-		if ($scope.pages < 6) {
-			for (i = 1; i <= $scope.pages; i++) {
-				pagesList.push(i);
-			}
-		}
-		else {
-			var minPage = $scope.page - 3;
-			if (minPage < 1) {
-				minPage = 1;
-			}
-			var maxPage = minPage + 8;
-			if (maxPage > $scope.pages) {
-				maxPage = $scope.pages;
-			}
-			for (i = minPage; i <= maxPage; i++) {
-				pagesList.push(i);
-			}
-		}
-		$scope.pagesAsArray = pagesList;
-		$scope.page++;
-	};
-
-
-	$rootScope.getMapInstance = function(targetEl) {
-		if (!$rootScope.map) {
-			var div = $('<div id="map"></div>');
-			$(targetEl).append(div);
-			var map = $rootScope.map = new google.maps.Map(div[0], {
-					scrollwheel: false
-				, streetViewControl: false
-				, draggable: !('ontouchend' in document)
-			});
-			map.markers=[];
-			map.infoWindows = [];
-
-			map.icons = {
-				brightPoi: '/assets/img/spotlight-poi-bright.png'
-				, defaultPoi: '/assets/img/spotlight-poi.png'
-				, location: '/assets/img/mylocation.png'
-			};
-
-			var setPosition = google.maps.InfoWindow.prototype.setPosition;
-			google.maps.InfoWindow.prototype.setPosition = function () {
-				map.infoWindows.push(this);
-				setPosition.apply(this, arguments);
-			};
-
-
-			map.removeMarkers=function(){
-				var marker;
-				while (marker = map.markers.pop()) {
-					marker.setMap(null);
-				}
-			};
-
-			map.removeInfoWindows=function(){
-				var infoWindow;
-				while (infoWindow = map.infoWindows.pop()) {
-					infoWindow.setMap(null);
-				}
-			};
-
-			map.addMarker=function(opts){
-				opts.map = map;
-				var marker = new google.maps.Marker(opts);
-				map.markers.push(marker);
-				return marker;
-			}
-
-			map.setMarker = function(location, bounds) {
-				if (bounds) {
-					map.fitBounds(bounds);
-				}
-				else {
-					map.setZoom(16);
-				}
-				var pos = new google.maps.LatLng(location[1], location[0]);
-				map.addMarker({
-					position: pos
-					,	map: map
-					,	icon: map.icons.defaultPoi
-				});
-				map.setCenter(pos);
-			}
-		}
-		else {
-			$(targetEl).append($rootScope.map.getDiv());
-			$rootScope.map.removeMarkers();
-			$rootScope.map.removeInfoWindows();
-		}
-		return $rootScope.map;
-	}
-}]);
-
-opendoorApp.config(['$httpProvider', function($httpProvider) {
-	$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
-}]);
-
-opendoorApp.config( [
-	'$compileProvider',
-	function( $compileProvider )
-	{
-		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
-	}
-]);
-
-opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
-	var $metaInfoEl = $('#metaInfo');
-	$rootScope.$on('$routeChangeSuccess', function() {
-		document.title = $route.current.title + titlePostfix;
-		$metaInfoEl.html($route.current.meta || '');
-	});
-
-	$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
-		if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope._id) {
-			$location.url('/message?message=pleaselogin');
-		}
-	});
-
-	var id = $cookies.get('_id');
-	if (typeof id == 'string'){
-		$rootScope._id = id.substring(3,id.length-1);
-	}
-	$rootScope.email = $cookies.get('email');
-	$rootScope.isAdmin = $cookies.get('isAdmin') == 'true';
-	$rootScope.isLoggedIn = !!$rootScope.email;
-}]);
-
-opendoorApp.config(
-	function($locationProvider, $routeProvider) {
-		$locationProvider.html5Mode(true);
-		//var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
-		$routeProvider.
-		when('/', {
-				title: 'Search for local Place of Worship'
-			, meta: 'Find your Place of Worship anywhere in the World. Check to make sure your Place of Worship is listed and correct so others can find it.'
-			,	templateUrl: 'assets/templates/partials/search.html'
-			, controller: 'SearchCtrl'
-		}).
-		when('/jobs/search', {
-			title: 'Search for Jobs at Places of Worship'
-			, meta: 'Find your ideal job anywhere in the World. Jobs listed associated with running a Place of Worship'
-			,	templateUrl: 'assets/templates/partials/jobsearch.html'
-			, controller: 'JobSearchCtrl'
-		}).
-		when('/jobs/add', {
-			title: 'Add job'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/jobform.html'
-			, controller: 'JobFormCtrl'
-		}).
-		when('/jobs/edit/:id', {
-			title: 'Edit job'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/jobform.html'
-			, controller: 'JobFormCtrl'
-		}).
-		when('/jobs/fund/:id', {
-			title: 'Fund job'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/jobfund.html'
-			, controller: 'JobFundCtrl'
-		}).
-		when('/jobs/:id', {
-			title: 'View job'
-			,	templateUrl: 'assets/templates/partials/jobview.html'
-			, controller: 'JobViewCtrl'
-		}).
-		when('/places/add', {
-				title: 'Add a Place of Worship'
-			, meta: 'Add your Place of Worship for free, list events, get reviews and allow others to find it.'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placeform.html'
-			, controller: 'PlaceFormCtrl'
-		}).
-		when('/places/edit/:id', {
-			title: 'Edit place'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placeform.html'
-			, controller: 'PlaceFormCtrl'
-		}).
-		when('/places/claims', {
-			title: 'Places of Worship you claimed'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placeclaims.html'
-			, controller: 'PlaceClaimsCtrl'
-		}).
-		when('/places/changes', {
-			title: 'Suggested changes to Place of Worship'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placechanges.html'
-			, controller: 'PlaceChangesCtrl'
-		}).
-		when('/places/list', {
-			title: 'Places list'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/placeslist.html'
-			, controller: 'PlacesListCtrl'
-		}).
-		when('/users/list', {
-			title: 'Users list'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/userslist.html'
-			, controller: 'UsersListCtrl'
-		}).
-		when('/users/:id', {
-			title: 'View user'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/userview.html'
-			, controller: 'UserViewCtrl'
-		}).
-		when('/places/', {
-			title: 'Places of Worship listed by Country'
-			, meta: 'Find your Place of Worship anywhere in the World. A list of all Places of Worship by Country. Check to make sure your Place of Worship is listed and correct so others can find it.'
-			,	templateUrl: 'assets/templates/partials/countrieslist.html'
-			, controller: 'CountriesListCtrl'
-		}).
-		when('/places/last', {
-			title: 'Last places'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/lastplaces.html'
-			, controller: 'LastPlacesCtrl'
-		}).
-		when('/places/maintained', {
-			title: 'Places of Worship you maintain'
-			,	shouldLogin: true
-			,	templateUrl: 'assets/templates/partials/maintainedplaces.html'
-			, controller: 'MaintainedPlacesCtrl'
-		}).
-		when('/places/donate/:id', {
-			title: 'Donate'
-			,	templateUrl: 'assets/templates/partials/donate.html'
-			, controller: 'DonateCtrl'
-		}).
-		when('/places/review/:id', {
-			title: 'Add review'
-			,	templateUrl: 'assets/templates/partials/reviewadd.html'
-			, controller: 'FormCtrl'
-		}).
-		when('/places/event/:id/add', {
-			title: 'Add an event'
-			,	templateUrl: 'assets/templates/partials/eventadd.html'
-			, controller: 'EventAddCtrl'
-		}).
-		when('/places/editorproposal/:id', {
-			title: 'Notify the person'
-			,	templateUrl: 'assets/templates/partials/editorproposalform.html'
-			, controller: 'EditorProposalCtrl'
-		}).
-		when('/places/:country/', {
-			title: 'Localities list'
-			,	templateUrl: 'assets/templates/partials/localitieslist.html'
-			, controller: 'LocalitiesListCtrl'
-		}).
-		when('/places/:country/:locality/', {
-			title: 'Places list'
-			,	templateUrl: 'assets/templates/partials/placesbylocalitieslist.html'
-			, controller: 'PlacesByLocalitiesListCtrl'
-		}).
-		when('/places/:country/:region/:locality/:religion/:groupName/:name', {
-				title: 'View place'
-			,	templateUrl: 'assets/templates/partials/placeview.html'
-			, controller: 'PlaceViewCtrl'
-		}).
-		when('/places/:id', {
-			title: 'View place'
-			,	templateUrl: 'assets/templates/partials/placeview.html'
-			, controller: 'PlaceViewCtrl'
-		}).
-		when('/subscribefornotification', {
-			title: 'Subscribe fo notification'
-			,	templateUrl: 'assets/templates/partials/subscribefornotification.html'
-			, controller: 'SubscribeForNotificationFormCtrl'
-		}).
-		when('/login', {
-				title: 'Login to Open Door'
-			, meta: 'Log into your Open Door account so you can keep your Place of Worship up to date. Add events and post jobs'
-			,	templateUrl: 'assets/templates/partials/login.html'
-			, controller: 'LoginCtrl'
-		}).
-		when('/register', {
-				title: 'Register your account at Open Door'
-			, meta: 'Update your local Place of Worship details so that the details are correct and let others find it.'
-			,	templateUrl: 'assets/templates/partials/register.html'
-			, controller: 'RegisterCtrl'
-		}).
-		when('/feedback', {
-				title: 'Leave feedback'
-			,	templateUrl: 'assets/templates/partials/feedback.html'
-			, controller: 'FeedbackCtrl'
-		}).
-		when('/about', {
-				title: 'About the Open Door Project'
-			,  meta: 'The biggest resource for finding a Place of Worship. The Open Door Project needs your help'
-			,	templateUrl: 'assets/templates/partials/about.html'
-		}).
-		when('/error', {
-				title: 'Error'
-			,	templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
-		when('/message', {
-				title: 'Server message'
-			,	templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
-		when('/promotion/:id', {
-			title: 'View promotion'
-			,	templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
-		when('/notfound', {
-			title: 'Not found'
-			,	templateUrl: 'assets/templates/partials/error.html'
-			, controller: 'ErrorCtrl'
-		}).
-		otherwise({
-			redirectTo: '/notfound'
+	opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
+		var $metaInfoEl = $('#metaInfo');
+		$rootScope.$on('$routeChangeSuccess', function() {
+			document.title = $route.current.title + titlePostfix;
+			$metaInfoEl.html($route.current.meta || '');
 		});
-		//$route.routes['/places/:id'].regexp = /^\/places\/(.*)$/;
-	});
+
+		$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
+			if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope._id) {
+				$location.url('/message?message=pleaselogin');
+			}
+		});
+
+		var id = $cookies.get('_id');
+		if (typeof id == 'string'){
+			$rootScope._id = id.substring(3,id.length-1);
+		}
+		$rootScope.email = $cookies.get('email');
+		$rootScope.isAdmin = $cookies.get('isAdmin') == 'true';
+		$rootScope.isLoggedIn = !!$rootScope.email;
+	}]);
+
+	console.log('return opendoorApp');
+	return opendoorApp;
+
+});

@@ -90,6 +90,7 @@ var siteconfig = {
 	, twitterAccount: config.social.twitterAccount
 	, apiKeys: {
 		stripePublic: config.apiKeys.stripePublic
+		, googleMaps: config.apiKeys.googleMaps
 	}
 	, frontend: config.frontend
 	, l10n: config.l10n
@@ -255,6 +256,7 @@ app.post('/subscribefornotification', require('./app/routes/subscribefornotifica
 
 
 app.get(frontendPages, function(req, res) {
+	console.log(req.session.user);
 	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys, currentYear: currentYear, pretty: true}, function (err, content) {
 		if (!err) {
 			res.send(content);

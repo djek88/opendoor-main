@@ -1,4 +1,4 @@
-html(ng-app="opendoorApp")
+html
 	head
 		if isPlace
 			title= place.name.length >= 65 ? place.name : place.name + ' | OpenDoor.ooo'
@@ -11,7 +11,7 @@ html(ng-app="opendoorApp")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/font-awesome/css/font-awesome.min.css')
-		link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
+		//link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/css/animate.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/css/style.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/css/style-responsive.min.css')
@@ -22,30 +22,34 @@ html(ng-app="opendoorApp")
 
 		link(rel='stylesheet', href='/assets/css/style.css')
 		script(src="/siteconfig.js")
-		script(src="https://checkout.stripe.com/checkout.js")
-		script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}&language=en')
+
+
+		script(src="/bower_components/requirejs/require.js", data-main="/assets/js/requirejs-config.js")
+
+		//script(src="https://checkout.stripe.com/checkout.js")
+		//script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}&language=en')
 		script(src="/bower_components/jquery/dist/jquery.min.js")
 		script(src="/bower_components/Datejs/build/date.js")
-		script(src="/bower_components/moment/min/moment.min.js")
+		//script(src="/bower_components/moment/min/moment.min.js")
 		script(src="/bower_components/bootstrap/dist/js/bootstrap.min.js")
-		script(src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
-		script(src="/bower_components/bootstrap-select/dist/js/bootstrap-select.min.js")
-		script(src="/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js")
-		script(src="/bower_components/trumbowyg/dist/trumbowyg.min.js")
-
-		script(src="/bower_components/angular/angular.min.js")
-		script(src="/bower_components/angular-route/angular-route.js")
-		script(src="/bower_components/angular-cookies/angular-cookies.js")
-
-		script(src="/bower_components/trumbowyg-ng/dist/trumbowyg-ng.min.js")
-		script(src="/assets/js/bootstrap3-typeahead.js")
+		//script(src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
+		//script(src="/bower_components/bootstrap-select/dist/js/bootstrap-select.min.js")
+		//script(src="/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js")
+		//script(src="/bower_components/trumbowyg/dist/trumbowyg.min.js")
+		//
+		//script(src="/bower_components/angular/angular.min.js")
+		//script(src="/bower_components/angular-route/angular-route.js")
+		//script(src="/bower_components/angular-cookies/angular-cookies.js")
+		//
+		//script(src="/bower_components/trumbowyg-ng/dist/trumbowyg-ng.min.js")
+		//script(src="/assets/js/bootstrap3-typeahead.js")
 		script(src="/assets/js/utils.js")
-		script(src="/assets/js/locationpicker.js")
-		script(src="/assets/js/app.js")
-		script(src="/assets/js/controllers.js")
-		script(src="/assets/js/controllers/countrieslist.js")
-		script(src="/assets/js/controllers/localitieslist.js")
-		script(src="/assets/js/controllers/placesbylocalitieslist.js")
+		//script(src="/assets/js/locationpicker.js")
+		//script(src="/assets/js/app.js")
+		//script(src="/assets/js/controllers.js")
+		//script(src="/assets/js/controllers/countrieslist.js")
+		//script(src="/assets/js/controllers/localitieslist.js")
+		//script(src="/assets/js/controllers/placesbylocalitieslist.js")
 		script(src="/assets/js/ga.js")
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
@@ -104,7 +108,7 @@ html(ng-app="opendoorApp")
 							li
 								a(href='/jobs/search') JOBS
 							li(ng-show="$root.isAdmin")
-								a.link(data-toggle='dropdown' ng-disabled)
+								a.link(data-toggle='dropdown')
 									| ADMIN
 									b.caret
 								ul.dropdown-menu
@@ -116,7 +120,7 @@ html(ng-app="opendoorApp")
 										a(href='/users/list') USERS LIST
 
 							li(ng-show="isLoggedIn")
-								a.link(data-toggle='dropdown' ng-disabled)
+								a.link(data-toggle='dropdown')
 									| MY PLACES
 									b.caret
 								ul.dropdown-menu
@@ -133,7 +137,7 @@ html(ng-app="opendoorApp")
 							li(ng-hide="$root.isLoggedIn")
 								a(href='/register') REGISTER
 			#wrap.ng-view
-			footer#footer.my-footer(ng-controller="FooterCtrl")
+			footer#footer.my-footer
 				| © #{currentYear} OpenDoor -
 				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage")  Suggest an improvement
 				| &nbsp;-&nbsp;
