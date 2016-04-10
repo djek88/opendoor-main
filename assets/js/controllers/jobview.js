@@ -5,7 +5,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
 	opendoorApp.registerController('JobViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 		function($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
-			var jobId = $location.url().split('/').pop();
+			var jobId = $location.path().split('/').pop();
 			$scope.jobId = jobId;
 
 
@@ -18,7 +18,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				, method: 'GET'
 			}).
 			success(function (data) {
-				console.log(data);
 				if (typeof data== 'object') {
 					setData(data);
 				}

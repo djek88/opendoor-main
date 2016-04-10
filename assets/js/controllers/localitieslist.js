@@ -6,7 +6,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 	opendoorApp.registerController('LocalitiesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
 		function ($scope, $http, $rootScope, $location, $window) {
 
-			var splittedUrl = $location.url().split('/');
+			var splittedUrl = $location.path().split('/');
 			$scope.country = splittedUrl[splittedUrl.length - 2];
 			$scope.religionsList = $rootScope.religions;
 			$scope.religion = '';

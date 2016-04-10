@@ -4,3 +4,4 @@ node_modules/*
 templates/*
 photos/*
 static/*
+temp/*

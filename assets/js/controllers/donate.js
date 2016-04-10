@@ -40,7 +40,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			});
 
 
-			var placeId = $location.url().split('/').pop();
+			var placeId = $location.path().split('/').pop();
 			$scope.placeId = placeId;
 
 

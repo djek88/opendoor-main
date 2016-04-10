@@ -5,7 +5,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
 	opendoorApp.registerController('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 		function ($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
-			var placeId = $location.url().substr(8);
+			var placeId = $location.path().substr(8);
 			$scope.placeId = placeId;
 
 			$scope.scrollTo = function (id) {

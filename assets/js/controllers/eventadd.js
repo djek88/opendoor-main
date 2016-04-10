@@ -45,7 +45,7 @@ define(['angular'
 			};
 
 
-			var locationParts = $location.url().split('/');
+			var locationParts = $location.path().split('/');
 			var placeId = locationParts[locationParts.length - 2];
 			$scope.placeId = placeId;
 

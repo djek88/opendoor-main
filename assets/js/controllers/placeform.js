@@ -27,7 +27,8 @@ define([
 			var $newReligionGroupOption;
 
 
-			var placeId = $location.url().split('/').pop();
+			console.log($location);
+			var placeId = $location.path().split('/').pop();
 
 			if (placeId == 'add') {
 				placeId = 0;

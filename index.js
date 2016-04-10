@@ -256,8 +256,13 @@ app.post('/subscribefornotification', require('./app/routes/subscribefornotifica
 
 
 app.get(frontendPages, function(req, res) {
-	console.log(req.session.user);
-	jade.renderFile(__dirname + '/assets/templates/index.jade', {apiKeys: config.apiKeys, currentYear: currentYear, pretty: true}, function (err, content) {
+	var options = {
+		apiKeys: config.apiKeys
+		, pretty: true
+		, currentYear: currentYear
+		, originalCss: req.query.originalCss
+	};
+	jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 		if (!err) {
 			res.send(content);
 		}
@@ -283,6 +288,7 @@ app.get(placesFrontEndPages, function(req, res) {
 			, siteconfig: siteconfig
 			, pretty: true
 			, currentYear: currentYear
+			, originalCss: req.query.originalCss
 		};
 		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 			if (!err) {

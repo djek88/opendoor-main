@@ -41,6 +41,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 	}
 
 	return function (req, res) {
+		console.log(req.session);
 		if (!req.session.user) {
 			return res.end();
 		}

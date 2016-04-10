@@ -264,7 +264,10 @@ define([
 		});
 
 		$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
-			if ($newRoute.$$route && $newRoute.$$route.shouldLogin && !$rootScope._id) {
+			if ($newRoute.$$route
+					&& !$location.search().disableLoginRedirect
+					&& $newRoute.$$route.shouldLogin
+					&& !$rootScope._id) {
 				$location.url('/message?message=pleaselogin');
 			}
 		});

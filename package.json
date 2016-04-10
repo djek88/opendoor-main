@@ -29,10 +29,12 @@
     "seq-queue": "0.0.5",
     "sha1": "^1.1.1",
     "sitemap": "^1.5.0",
-    "stripe": "^4.3.0"
+    "stripe": "^4.3.0",
+    "tough-cookie": "^2.2.2"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
+    "grunt-http": "^2.0.1",
     "grunt-uncss": "^0.5.0"
   }
 }
