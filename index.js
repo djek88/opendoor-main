@@ -156,7 +156,7 @@ mongoose.connect(config.mongoURI);
 app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
-app.use('/favicon.ico', express.static('favicon.ico'));
+app.use('/favicon.ico', express.static('assets/img/favicon.ico'));
 app.use('/generateSitemap', require('./app/sitemap.js')(placeManager, sm, config, fs, path));
 app.use(config.staticFiles, function(req, res){
 	var filename = path.join(__dirname, 'static', req.baseUrl);
