@@ -13,13 +13,10 @@ module.exports = function(placeManager, sm, config, fs, path) {
 		});
 		var placesPath = '/places/';
 		placeManager.find({}, {uri: true}, function(err, places){
-			console.log(places[0]);
 			for (var i=0; i < places.length; i++) {
 				sitemap.add({url: placesPath + places[i].uri});
 			}
-			console.log(path.join(__dirname, '../static', 'sitemap.xml'));
 			fs.writeFile(path.join(__dirname, '../static', 'sitemap.xml'), sitemap.toString(), function(err){
-				console.log(arguments);
 				if (!err) {
 					res.redirect('/message?message=sitemapgenerated');
 				}

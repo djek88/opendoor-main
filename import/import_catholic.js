@@ -90,7 +90,6 @@ function sendGeocodeRequest(address, cb, delay) {
 			var status = res ? res.status : 'REQUEST_ERROR';
 			if (status == 'OVER_QUERY_LIMIT' || status == 'REQUEST_ERROR') {
 				sendGeocodeRequest(address, cb, delay + delayIncrement);
-				console.log(status);
 			}
 			else {
 				cb(null, res);

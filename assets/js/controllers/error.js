@@ -19,7 +19,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			else {
 				message = search.message;
 			}
-			console.log($location);
 			switch (message) {
 				case 'donation':
 					$scope.alertType = 'default';

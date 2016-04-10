@@ -6,10 +6,7 @@ module.exports = function(placeManager){
 				if (place.maintainer == req.session.user._id)	{
 					var locationAsString = req.body.location.split(',');
 					var eventDate = new Date(req.body.date);
-					console.log(req.body.date);
-					console.log(eventDate.toISOString());
 					eventDate.nodeToUTC();
-					console.log(eventDate.toISOString());
 					var data = {
 						name: req.body.name
 						,	date: eventDate

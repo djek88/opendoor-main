@@ -30,7 +30,6 @@ module.exports = function(subscriptionManager, placeManager, email){
 							};
 
 							email.sendSubscriptionConfirmation(options, function(){
-								console.log(arguments);
 								res.redirect('/message?message=verifysubscription&back=' + encodeURIComponent('/places/' + place.uri))
 							});
 						}

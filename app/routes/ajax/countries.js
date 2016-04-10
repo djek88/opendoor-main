@@ -1,6 +1,5 @@
 module.exports = function(placeManager, countryList){
 	return function (req, res) {
-		console.log(req.query);
 		if (req.query.withPlaces) {
 			placeManager.getCountries(
 				function(err, countries) {

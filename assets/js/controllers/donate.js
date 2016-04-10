@@ -28,14 +28,12 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					document.forms.form.elements.token.value = token.id;
 					document.forms.form.submit();
 
-					console.log(token);
 					// Use the token to create the charge with a server-side script.
 					// You can access the token ID with `token.id`
 				}
 			});
 
 			$scope.$on("$destroy", function () {
-				console.log('close handler');
 				handler.close();
 			});
 

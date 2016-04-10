@@ -23,7 +23,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			};
 
 			function loadOptionsForReligion(religion) {
-				console.log(religion);
 				if (!religion || religion == 'All religions') {
 					$scope.groupsList = ['Select religion'];
 					$scope.groupName = $scope.groupsList[0];
@@ -93,7 +92,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			$scope.locality = requestParams.locality;
 			$scope.religion = requestParams.religion;
 			$scope.groupName = requestParams.groupName;
-			console.log(requestParams);
 			hiddenGroupName = $scope.groupName;
 			loadOptionsForReligion($scope.religion);
 			$scope.message = 'Searching…';

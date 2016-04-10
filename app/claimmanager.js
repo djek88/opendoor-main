@@ -34,15 +34,11 @@ module.exports = function(mongoose, email) {
 		};
 
 		this.acceptClaim = function(id, callback) {
-			console.log('acceptClaim');
 			Claim.findOne({_id: id}, function(err, claim){
-				console.log(claim);
 				if (claim) {
 					global.placeManager.setMaintainer(claim.place, claim.user, function(err, place){
-						console.log('setMaintainer', arguments);
 						if (place) {
 							global.userManager.findOne(claim.user, function(err, user){
-								console.log('findOne', arguments);
 								email.sendClaimConfirmation({id: claim.place, recipientEmail: user.email});
 							});
 							claim.remove({}, callback);

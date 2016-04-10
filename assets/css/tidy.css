@@ -113,6 +113,14 @@ input {
   line-height: normal;
 }
 
+input[type=checkbox],
+input[type=radio] {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+}
+
 textarea {
   overflow: auto;
 }
@@ -166,12 +174,14 @@ th {
     max-width: 100%!important;
   }
 
+  h2,
   h3,
   p {
     orphans: 3;
     widows: 3;
   }
 
+  h2,
   h3 {
     page-break-after: avoid;
   }
@@ -214,6 +224,10 @@ th {
 
 .glyphicon-time:before {
   content: "\e023";
+}
+
+.glyphicon-calendar:before {
+  content: "\e109";
 }
 
 * {
@@ -273,6 +287,7 @@ img {
 }
 
 h1,
+h2,
 h3,
 h4,
 h5,
@@ -284,6 +299,7 @@ h6 {
 }
 
 h1,
+h2,
 h3 {
   margin-top: 20px;
   margin-bottom: 10px;
@@ -298,6 +314,10 @@ h6 {
 
 h1 {
   font-size: 36px;
+}
+
+h2 {
+  font-size: 30px;
 }
 
 h3 {
@@ -332,11 +352,13 @@ small {
   text-align: center;
 }
 
+ol,
 ul {
   margin-top: 0;
   margin-bottom: 10px;
 }
 
+ol ul,
 ul ul {
   margin-bottom: 0;
 }
@@ -472,11 +494,20 @@ label {
   font-weight: 700;
 }
 
+input[type=checkbox],
+input[type=radio] {
+  margin: 4px 0 0;
+  margin-top: 1px\9;
+  line-height: normal;
+}
+
 input[type=file] {
   display: block;
 }
 
-input[type=file]:focus {
+input[type=file]:focus,
+input[type=checkbox]:focus,
+input[type=radio]:focus {
   outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
@@ -525,6 +556,34 @@ textarea.form-control {
   margin-bottom: 15px;
 }
 
+.checkbox,
+.radio {
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.checkbox label,
+.radio label {
+  min-height: 20px;
+  padding-left: 20px;
+  margin-bottom: 0;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.checkbox input[type=checkbox],
+.radio input[type=radio] {
+  position: absolute;
+  margin-top: 4px\9;
+  margin-left: -20px;
+}
+
+.radio+.radio {
+  margin-top: -5px;
+}
+
 .input-lg {
   height: 46px;
   padding: 10px 16px;
@@ -559,6 +618,32 @@ textarea.form-control {
   .form-inline .input-group>.form-control {
     width: 100%;
   }
+
+  .form-inline .checkbox {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+
+  .form-inline .checkbox label {
+    padding-left: 0;
+  }
+
+  .form-inline .checkbox input[type=checkbox] {
+    position: relative;
+    margin-left: 0;
+  }
+}
+
+.form-horizontal .radio {
+  padding-top: 7px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.form-horizontal .radio {
+  min-height: 27px;
 }
 
 .form-horizontal .form-group {
@@ -1235,6 +1320,63 @@ input[type=button].btn-block {
   margin-bottom: 0;
 }
 
+.panel {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+}
+
+.panel-default {
+  border-color: #ddd;
+}
+
+.panel-default>.panel-heading {
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+}
+
+.panel-info {
+  border-color: #bce8f1;
+}
+
+.panel-info>.panel-heading {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.panel-danger {
+  border-color: #ebccd1;
+}
+
+.panel-danger>.panel-heading {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
 .close {
   float: right;
   font-size: 21px;
@@ -1269,6 +1411,8 @@ input[type=button].btn-block {
 .navbar-header:before,
 .navbar:after,
 .navbar:before,
+.panel-body:after,
+.panel-body:before,
 .row:after,
 .row:before {
   display: table;
@@ -1282,6 +1426,7 @@ input[type=button].btn-block {
 .navbar-collapse:after,
 .navbar-header:after,
 .navbar:after,
+.panel-body:after,
 .row:after {
   clear: both;
 }
@@ -1466,6 +1611,7 @@ body {
 }
 
 h1,
+h2,
 h3,
 h4,
 h5,
@@ -1740,6 +1886,49 @@ select.form-control {
   border-color: #008a8a;
 }
 
+.panel {
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border: none;
+}
+
+.panel-title {
+  line-height: 20px;
+}
+
+.panel-title {
+  font-size: 12px;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.panel-default>.panel-heading {
+  background: #fafafa;
+}
+
+.panel-danger>.panel-heading,
+.panel-info>.panel-heading {
+  color: #fff;
+}
+
+.panel-danger>.panel-heading {
+  background: #cc4946;
+}
+
+.panel-info>.panel-heading {
+  background: #3a92ab;
+}
+
 .table {
   border-color: #e2e7eb;
   -webkit-border-radius: 3px;
@@ -1779,6 +1968,10 @@ select.form-control {
   margin-top: 15px!important;
 }
 
+.m-t-20 {
+  margin-top: 20px!important;
+}
+
 .m-t-30 {
   margin-top: 30px!important;
 }
@@ -1797,6 +1990,14 @@ select.form-control {
 
 .m-b-30 {
   margin-bottom: 30px!important;
+}
+
+.m-b-40 {
+  margin-bottom: 40px!important;
+}
+
+.p-25 {
+  padding: 25px!important;
 }
 
 .p-t-0 {
@@ -2559,11 +2760,13 @@ select.form-control,
   }
 }
 
+.place-photo-wrap,
 .leader-photo-wrap {
   position: relative;
   overflow: hidden;
 }
 
+.place-photo,
 .leader-photo {
   position: absolute;
   left: 50%;
@@ -2575,9 +2778,20 @@ select.form-control,
   transform: translate(-50%,-50%);
 }
 
+.place-photo-wrap {
+  width: 100%;
+  height: 400px;
+}
+
 .leader-photo-wrap {
   height: 160px;
   width: 160px;
+}
+
+.place-photo-wrap + .leader-photo-wrap {
+  border: 5px solid white;
+  margin-left: 35px;
+  margin-top: -120px;
 }
 
 .leader-photo {
@@ -2590,15 +2804,28 @@ select.form-control,
 }
 
 @media (max-width: 768px) {
+  .place-photo-wrap {
+    height: 200px;
+  }
+
   .leader-photo-wrap {
     height: 100px;
     width: 100px;
     margin-left: 5px;
   }
+
+  .place-photo-wrap + .leader-photo-wrap {
+    margin-left: 5px;
+    margin-top: -68px;
+  }
 }
 
 .single-event p {
   margin: 3px 0;
+}
+
+.review {
+  margin: 10px 0;
 }
 
 #contacts-block div {
@@ -2661,6 +2888,10 @@ select.form-control,
 
 #additional-info-link {
   font-size: 120%;
+}
+
+.job h5 {
+  display: inline-block;
 }
 
 /*** uncss> filename: https://fonts.googleapis.com/css?family=Roboto:300,400,500,700 ***/

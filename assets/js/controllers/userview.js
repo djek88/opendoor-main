@@ -48,7 +48,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					, method: 'GET'
 				}).success(function (data) {
 					if (typeof data == 'object') {
-						setData(data[0]);
+						setData(data);
 					}
 					else {
 						$location.url('/notfound');
@@ -62,33 +62,4 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 		}
 	]);
 
-
-	opendoorControllers.controller('JobViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
-		function ($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
-			var jobId = $location.path().split('/').pop();
-			$scope.jobId = jobId;
-
-
-			function setData($job) {
-				$scope.job = $job;
-			}
-
-			$http({
-				url: '/ajax/jobs/' + jobId
-				, method: 'GET'
-			}).success(function (data) {
-				console.log(data);
-				if (typeof data == 'object') {
-					setData(data);
-				}
-				else {
-					$location.url('/notfound');
-				}
-			}).error(function () {
-				$location.url('/notfound');
-			});
-
-
-		}
-	]);
 });

@@ -163,7 +163,6 @@ app.use(config.staticFiles, function(req, res){
 	fs.stat(filename, function(err, stats){
 		if (stats) {
 			if (filename.match(/\.xml$/)) {
-				console.log('match');
 				res.set('Content-Type', 'text/xml');
 			}
 			res.sendFile(filename);
@@ -241,7 +240,7 @@ app.post('/places/event/:id/add', require('./app/routes/places/addevent.js')(pla
 app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
 app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));
-app.post('/feedback', require('./app/routes/feedback.js')(userManager, email));
+app.post('/feedback', require('./app/routes/feedback.js')(userManager, config, email));
 
 app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager, placeManager));
 app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimManager));

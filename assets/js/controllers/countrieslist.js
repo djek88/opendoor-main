@@ -27,7 +27,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				$location.search('maintained', requestParams.maintained || null);
 			}
 			$scope.searchPlaces = function() {
-				console.log($scope.skip);
 				$scope.form.$submitted = true;
 				setSearchParams();
 			};

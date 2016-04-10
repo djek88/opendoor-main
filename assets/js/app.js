@@ -7,7 +7,7 @@
 define([
 	'angular',
 	// './controllers/search',
-	 // './controllers',
+	//  './controllers/footer',
 	 'angular-route',
 	 'angular-cookies',
 	 'trumbowyg-ng'
@@ -21,7 +21,6 @@ define([
 	var opendoorApp = angular.module('opendoorApp', [
 		'ngRoute',
 		'ngCookies',
-		// 'opendoorControllers',
 		'trumbowyg-ng'
 	]);
 
@@ -113,7 +112,16 @@ define([
 			,	'Tenriism'
 		];
 
+		$rootScope.leaveFeedback = function ($event) {
+			var targetPage = '/feedback#' + $location.path();
 
+			if ($event.which == 2) {
+				$window.open(targetPage, '_blank');
+			}
+			else {
+				$location.url(targetPage);
+			}
+		};
 
 		$rootScope.currentDate = new Date;
 
@@ -281,7 +289,6 @@ define([
 		$rootScope.isLoggedIn = !!$rootScope.email;
 	}]);
 
-	console.log('return opendoorApp');
 	return opendoorApp;
 
 });

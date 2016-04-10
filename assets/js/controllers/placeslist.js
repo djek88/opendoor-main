@@ -31,7 +31,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			}
 
 			$scope.searchPlaces = function () {
-				console.log($scope.skip);
 				$scope.form.$submitted = true;
 				setSearchParams();
 			};

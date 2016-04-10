@@ -64,7 +64,6 @@ module.exports = function(mongoose, config) {
 			];
 
 			if (data.maintainers == 'true') {
-				console.log(true);
 				matchOption['maintainedPlaces'] =  { $exists: true, $ne: [] };
 			}
 
@@ -87,7 +86,6 @@ module.exports = function(mongoose, config) {
 				limitPosition = options.push({"$limit": config.frontend.itemsPerPage});
 			}
 
-			console.log(options);
 			User.aggregate(options, function(err, users){
 				options.push({ $group: { _id: null, count: { $sum: 1 } } });
 
@@ -114,6 +112,7 @@ module.exports = function(mongoose, config) {
 		this.findOne = function(options, callback) {
 			User.findOne(options, callback);
 		};
+		this.findById = User.findById.bind(User);
 	}
 	return UserManager;
 };
