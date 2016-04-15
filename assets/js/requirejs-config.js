@@ -4,6 +4,7 @@ require.config({
 	paths: {
 		// 'angular': '../../bower_components/angular/angular'
 		'angular': '../../bower_components/angular/angular.min'
+		, 'libs/bootstrap': '../../bower_components/bootstrap/dist/js/bootstrap.min'
 		, 'angular-route': '/bower_components/angular-route/angular-route.min'
 		, 'angular-cookies': '/bower_components/angular-cookies/angular-cookies.min'
 		, 'trumbowyg-ng': '/bower_components/trumbowyg-ng/dist/trumbowyg-ng.min'

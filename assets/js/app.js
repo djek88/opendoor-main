@@ -276,7 +276,7 @@ define([
 					&& !$location.search().disableLoginRedirect
 					&& $newRoute.$$route.shouldLogin
 					&& !$rootScope._id) {
-				$location.url('/message?message=pleaselogin');
+				$location.url('/message?message=pleaselogin&back=/login');
 			}
 		});
 

@@ -4,6 +4,7 @@
 define([
 		'angular'
 		, 'app'
+		, 'libs/bootstrap'
 		, 'libs/googlemaps'
 		, 'libs/tagsinput'
 		, 'libs/typeahead'
@@ -161,7 +162,6 @@ define([
 				}).success(function (data) {
 					while (denominations.pop()) {
 					}
-					;
 					for (var i = 0; i < data.length; i++) {
 						var denomination = data[i].name;
 						denominations.push(denomination);

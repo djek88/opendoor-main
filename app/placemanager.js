@@ -293,9 +293,8 @@ module.exports = function(mongoose, email, config) {
 				,	"spherical": true
 				,	"query": { "location.type": "Point" }
 			};
-			var matchOption = {
-				'isConfirmed': true
-			};
+			var matchOption = {};
+
 
 			var options = [
 				{
@@ -306,6 +305,10 @@ module.exports = function(mongoose, email, config) {
 				options.unshift({"$geoNear": geoNearOption}, {
 					"$sort": {"distance": 1} // Show the nearest first
 				});
+			}
+
+			if (data.hasOwnProperty('isConfirmed')) {
+				matchOption.isConfirmed = data.isConfirmed == 'true';
 			}
 
 			if (data.religion) {
@@ -345,6 +348,7 @@ module.exports = function(mongoose, email, config) {
 				matchOption['maintainer'] = {$ne: null};
 			}
 
+			console.log(matchOption);
 			Place.aggregate(options, function(err, places){
 				options.push({ $group: { _id: null, count: { $sum: 1 } } });
 

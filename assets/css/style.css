@@ -40,6 +40,13 @@ html, body {
 	margin-top: 80px;
 }
 
+/*header*/
+
+.navbar-brand {
+	width: auto;
+	margin-top: 2px;
+}
+
 /* various typography elements */
 
 .pointer {

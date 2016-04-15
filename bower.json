@@ -29,7 +29,7 @@
     "jquery-ui": "~1.11.4",
     "tag-it": "*",
     "Datejs": "datejs/Datejs",
-    "bootstrap-select": "~1.9.4",
+    "bootstrap-select": "~1.10.0",
     "trumbowyg": "~1.1.7",
     "trumbowyg-ng": "~0.0.3",
     "eonasdan-bootstrap-datetimepicker": "~4.17.37",

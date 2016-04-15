@@ -29,6 +29,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					$scope.alertType = 'danger';
 					$scope.alertTitle = 'Error';
 					$scope.alertMessage = 'Please login first';
+					$scope.backTitle = 'Login';
 					break;
 				case 'alreadyregistered':
 					$scope.alertType = 'danger';

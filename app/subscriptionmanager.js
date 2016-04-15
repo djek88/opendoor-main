@@ -49,13 +49,11 @@ module.exports = function(mongoose) {
 		};
 
 
-		this.getAll = function(query, callback) {
-			Subscription.find(query, callback);
+		this.getAll = function(callback) {
+			Subscription.find({}, callback);
 		};
 
-		this.find = function(query, cb) {
-			Subscription.find(query, cb);
-		};
+		this.find = Subscription.find.bind(Subscription);
 
 
 	}

@@ -9,6 +9,10 @@
 						select.form-control(name="religion", ng-model="religion")
 							option(value="", selected) All religions
 							option(value="{{name}}", ng-repeat="name in religionsList") {{name}}
+					.form-group(ng-class="{'has-error': (form.$submitted || form.isConfirmed.$touched) && form.isConfirmed.$error.required}")
+						select.form-control(name="isConfirmed", ng-model="isConfirmed")
+							option(value="", selected) Confirmed
+							option(value="false") Not confirmed
 					.checkbox
 						label(for="maintained") Only maintained
 						input.form-control(type="checkbox", id="maintained", name="maintained", ng-model="maintained")

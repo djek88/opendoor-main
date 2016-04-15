@@ -21,6 +21,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					, limit: $scope.limit
 					, religion: $scope.religion
 					, maintained: $scope.maintained
+					, isConfirmed: $scope.isConfirmed
 				};
 
 				$location.search('name', requestParams.name || null);
@@ -28,6 +29,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				$location.search('limit', requestParams.limit || null);
 				$location.search('religion', requestParams.religion || null);
 				$location.search('maintained', requestParams.maintained || null);
+				$location.search('isConfirmed', requestParams.isConfirmed || null);
 			}
 
 			$scope.searchPlaces = function () {
@@ -54,6 +56,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			$scope.limit = requestParams.limit;
 			$scope.religion = requestParams.religion;
 			$scope.maintained = requestParams.maintained;
+			$scope.isConfirmed = requestParams.isConfirmed;
 			$scope.message = 'Searching…';
 			$http({
 				url: '/ajax/places/search'

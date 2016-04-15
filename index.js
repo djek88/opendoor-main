@@ -100,6 +100,7 @@ var siteconfig = {
 var frontendPages = [
 	'/'
 	,	'/login'
+	,	'/tools'
 	,	'/register'
 	,	'/feedback'
 	,	'/about'
@@ -157,7 +158,8 @@ app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
 app.use('/favicon.ico', express.static('assets/img/favicon.ico'));
-app.use('/generateSitemap', require('./app/sitemap.js')(placeManager, sm, config, fs, path));
+app.use('/generateSitemap', require('./app/routes/sitemap.js')(placeManager, sm, config, fs, path));
+app.use('/mailingList', require('./app/routes/mailinglist.js')(subscriptionManager, sm, config, fs, path));
 app.use(config.staticFiles, function(req, res){
 	var filename = path.join(__dirname, 'static', req.baseUrl);
 	fs.stat(filename, function(err, stats){

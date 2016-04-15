@@ -182,6 +182,9 @@ define(['./app'], function (opendoorApp) {
 				, templateUrl: 'assets/templates/partials/error.html'
 				, controller: 'ErrorCtrl'
 				, resolve: opendoorApp.resolveController('/assets/js/controllers/error.js')
+			}).when('/tools', {
+				title: 'Tools'
+				, templateUrl: 'assets/templates/partials/tools.html'
 			}).when('/message', {
 				title: 'Server message'
 				, templateUrl: 'assets/templates/partials/error.html'

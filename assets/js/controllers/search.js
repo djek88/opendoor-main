@@ -107,7 +107,6 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					$location.search('religion', requestParams.religion || null);
 					$rootScope.lastSearchAddress = $scope.address;
 				}
-				//$scope.locationIsInvalid = (location.length<2);
 			}
 
 			$scope.searchPlaces = function () {
