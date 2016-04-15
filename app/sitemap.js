@@ -1,29 +1,78 @@
 module.exports = function(placeManager, sm, config, fs, path) {
 	return function (req, res) {
-		var sitemap = sm.createSitemap ({
+		var js2xmlparser = require("js2xmlparser");
+
+
+		var sitemapItemsCount = 50000;
+
+
+		var currentDate = (new Date).toString('yyyy-MM-dd');
+
+		var staticSitemap = sm.createSitemap ({
 			hostname: config.url
 			, cacheTime: 600000
 			, urls: [
-
 				{ url: '/places/' }
 				, { url: '/places/add' }
 				, { url: '/places/search' }
 				, { url: '/jobs/search' }
 			]
 		});
-		var placesPath = '/places/';
-		placeManager.find({}, {uri: true}, function(err, places){
-			for (var i=0; i < places.length; i++) {
-				sitemap.add({url: placesPath + places[i].uri});
+		fs.writeFile(path.join(__dirname, '../static', 'sitemap_static.xml'), staticSitemap.toString());
+
+
+		var sitemapIndex = {
+			'@': {
+				xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9'
 			}
-			fs.writeFile(path.join(__dirname, '../static', 'sitemap.xml'), sitemap.toString(), function(err){
-				if (!err) {
-					res.redirect('/message?message=sitemapgenerated');
+			, sitemap: [{
+				loc: config.url + '/sitemap_static.xml'
+				, lastmod: currentDate
+			}]
+		};
+
+
+		var placesPath = '/places/';
+		var startItem = 0;
+		var endItem = sitemapItemsCount;
+		placeManager.find({}, {uri: true}, function(err, places){
+			var sitemapCount = Math.ceil(places.length / sitemapItemsCount);
+			if (endItem > places.length) {
+				endItem = places.length;
+			}
+			var sitemap;
+			for (var i=0; i < sitemapCount; i++) {
+
+				sitemap = sm.createSitemap ({
+					hostname: config.url
+					, cacheTime: 600000
+					// , urls: predefinedUrls
+				});
+
+
+
+				for (var j = startItem; j < endItem; j++) {
+					sitemap.add({url: placesPath + places[j].uri});
 				}
-				else {
-					res.redirect('/error');
+
+				startItem += j;
+				endItem += j;
+				if (endItem > places.length) {
+					endItem = places.length;
 				}
-			});
+
+				sitemapIndex.sitemap.push({
+					loc: config.url + '/' + 'sitemap_' + i + '.xml'
+					, lastmod: currentDate
+				});
+
+				fs.writeFile(path.join(__dirname, '../static', 'sitemap_' + i + '.xml'), sitemap.toString());
+			}
+			fs.writeFile(path.join(__dirname, '../static', 'sitemapindex.xml'), js2xmlparser('sitemapindex', sitemapIndex));
+
+			// res.end('OK');
+			res.redirect('/message?message=sitemapgenerated');
+
 		});
 	};
 };

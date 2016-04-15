@@ -50,13 +50,15 @@ function Email (config, transporter) {
 	};
 
 	this.sendConfirmationLink = function(id, email, callback) {
-		var mailText = 'Thank you for adding a place!\n' +
+		var mailText = 'Thank you for adding a new place to opendoor.ooo. ' +
+			'Before your place is published on the website you need to click the link below. ' +
+			'If you find you can`t click the link then please copy it into your web browser.' +
 			'Please confirm it by passing the link: ' +
 			config.url + '/places/confirm/' + id;
 		var mailOptions = {
 			from: config.mailConfig.senderAddress,
 			to: email,
-			subject: 'Place confirmation',
+			subject: 'One step away from your Place being published on opendoor.ooo',
 			text: mailText
 		};
 
@@ -115,6 +117,34 @@ function Email (config, transporter) {
 	this.sendEditorProposal = function(options, callback) {
 		var mailText = 'Someone asked you to be an editor of place: ' + config.url + '/places/' + options.id + '\n' +
 			'You can claim to be editor by passing by the link: ' + config.url + '/claims/' + options.id + '/add' + '\n';
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+
+		this.send(mailOptions, callback);
+	};
+
+	this.sendPlaceChanges = function(options, callback) {
+		var mailText = 'Someone suggested changes for place: ' + config.url + '/places/' + options.id + '\n' +
+			'You can check them at ' + config.url + '/places/claims\n';
+		var mailOptions = {
+			from: config.mailConfig.senderAddress,
+			to: options.recipientEmail,
+			subject: 'Message from OpenDoor.ooo',
+			text: mailText
+		};
+
+
+		this.send(mailOptions, callback);
+	};
+
+	this.notifyAboutAcceptedChanges = function(options, callback) {
+		var mailText = 'Place maintainer accepted your suggested changes.\n' +
+			'You can check them at ' + config.url + '/places/' + options.id + '\n';
 		var mailOptions = {
 			from: config.mailConfig.senderAddress,
 			to: options.recipientEmail,

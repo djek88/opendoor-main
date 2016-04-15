@@ -41,7 +41,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 	}
 
 	return function (req, res) {
-		console.log(req.session);
+		
 		if (!req.session.user) {
 			return res.end();
 		}
@@ -52,6 +52,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 		else {
 			var id = mongoose.Types.ObjectId(req.params.id);
 		}
+		
 		var fields = {};
 
 		var files = {};
@@ -69,6 +70,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				res.redirect('/message?message=placesaved&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 			else {
+				email.sendPlaceChanges({id: place._id, recipientEmail: place.maintainer.email});
 				res.redirect('/message?message=changesadded&back=' + encodeURIComponent('/places/' + place.uri));
 			}
 		}
@@ -124,6 +126,8 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			}
 			else {
 				placeManager.findById(req.params.id).populate('maintainer').lean().exec(function (err, currentPlace) {
+					console.log('cuur');
+					console.log(currentPlace);
 					if (currentPlace) {
 						if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
 							placeManager.update(req.params.id, place, finishRequest);

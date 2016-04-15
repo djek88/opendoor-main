@@ -1,4 +1,4 @@
-module.exports = function(placeChangeManager){
+module.exports = function(placeChangeManager, email){
 	return function (req, res) {
 		if (req.session.user) {
 			var id = req.params.id;

@@ -33,7 +33,6 @@ module.exports = function(mongoose) {
 			PlaceChange.findOne({_id: id}, function(err, change){
 				if (change) {
 					global.placeManager.findOne(change.place, function(err, place){
-						console.log(1, change);
 						if (place[change.field] && (change.field == 'bannerPhoto' || change.field == 'leaderPhoto')) {
 							fs.unlink(global.appDir + global.imagesPath + place[change.field]);
 						}

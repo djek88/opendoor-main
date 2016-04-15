@@ -1,4 +1,4 @@
-module.exports = function(placeChangeManager){
+module.exports = function(placeChangeManager, email){
 	return function (req, res) {
 		if (req.session.user) {
 			var id = req.params.id;
@@ -13,6 +13,7 @@ module.exports = function(placeChangeManager){
 						if (place.maintainer == req.session.user._id) {
 							placeChangeManager.acceptChange(id, function (err, place) {
 								if (!err && place) {
+									email.notifyAboutAcceptedChanges({id: place._id, recipientEmail: placeChange});
 									res.redirect('/message?message=changeaccepted&back=' + encodeURIComponent('/places/changes'));
 								}
 								else {

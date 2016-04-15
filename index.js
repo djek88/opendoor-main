@@ -247,8 +247,8 @@ app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimMana
 app.get('/claims/:id/deny', require('./app/routes/claims/deny.js')(claimManager));
 
 
-app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(placeChangeManager));
-app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(placeChangeManager));
+app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(placeChangeManager, email));
+app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(placeChangeManager, email));
 
 
 app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));

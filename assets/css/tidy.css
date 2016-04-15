@@ -2791,12 +2791,23 @@ select.form-control,
 .place-photo-wrap + .leader-photo-wrap {
   border: 5px solid white;
   margin-left: 35px;
-  margin-top: -120px;
+  margin-top: -100px;
 }
 
 .leader-photo {
   height: 100%;
   width: auto;
+}
+
+.leader-name.photo-title,
+.leader-role.photo-title {
+  position: absolute;
+  bottom: 0;
+  left: 196px;
+}
+
+.leader-name.photo-title {
+  bottom: 24px;
 }
 
 #photos {
@@ -2816,7 +2827,13 @@ select.form-control,
 
   .place-photo-wrap + .leader-photo-wrap {
     margin-left: 5px;
-    margin-top: -68px;
+    margin-top: -40px;
+  }
+
+  .leader-name.photo-title,
+  .leader-role.photo-title {
+    position: absolute;
+    left: 103px;
   }
 }
 

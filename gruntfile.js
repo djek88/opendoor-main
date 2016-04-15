@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 		, placesList: '/places/list'
 		, placesClaims: '/places/claims'
 		, usersList: '/users/list'
-		, userView: '/users/56bf7a610551412f205f1407'
+		, userView: '/users/56be079e56166b8713d481f2'
 		, placesListByLocality: '/places/Albania/Tiran%C3%AB/'
 		, jobView: '/jobs/56fba718316dc2e574e83117'
 		// , jobEdit: '/jobs/56fba718316dc2e574e83117/edit'

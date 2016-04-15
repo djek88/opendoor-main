@@ -27,7 +27,8 @@
 						img.place-photo(ng-src="{{siteconfig.imagesPath + place.bannerPhoto}}", ng-show="place.bannerPhoto")
 					.leader-photo-wrap(ng-if="place.bannerPhoto && place.leaderPhoto")
 						img.leader-photo(ng-src="{{siteconfig.imagesPath + place.leaderPhoto}}", ng-image-load="onLeaderPhotoLoad()")
-					h3.leader-title.photo-title(ng-if="place.leaderPhoto && place.leaderName") {{place.leaderRole}} {{place.leaderName}}
+					h3.leader-name.photo-title(ng-if="place.leaderPhoto && place.leaderName") {{place.leaderName}}
+					h4.leader-role.photo-title(ng-if="place.leaderPhoto && place.leaderRole") {{place.leaderRole}}
 				.row(ng-if="!place.bannerPhoto && place.leaderPhoto")
 					.col.col-lg-12
 						.leader-photo-wrap
