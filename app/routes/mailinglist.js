@@ -2,32 +2,31 @@ module.exports = function(subscriptionManager, sm, config, fs, path) {
 
 	var json2csv = require('json2csv');
 	var fields = [
-		// Supports label -> simple path
 		{
 			label: 'Email',
-			value: 'email',
-			default: 'NULL'
+			value: 'email'
 		}
 		, {
 			label: 'Place ID',
-			value: 'place.name',
-			// default: 'NULL'
+			value: 'place.name'
 		}
 		, {
 			label: 'Place URI',
-			value: 'place.uri',
-			// default: 'NULL'
+			value: 'place.uri'
 		}
 		, {
 			label: 'Place religion',
-			value: 'place.religion',
-			// default: 'NULL'
+			value: 'place.religion'
 		}
 		, {
-			label: 'Place ID',
-			value: 'place._id',
-			// default: 'NULL'
+			label: 'Group name',
+			value: 'place.groupName'
 		}
+		// , {
+		// 	label: 'Place ID',
+		// 	value: 'place._id'
+		// 	// default: 'NULL'
+		// }
 	];
 
 	return function (req, res) {
@@ -36,9 +35,10 @@ module.exports = function(subscriptionManager, sm, config, fs, path) {
 
 				json2csv({ data: subscriptions, fields: fields }, function(err, csv) {
 					if (err) console.log(err);
-					console.log(csv);
+					res.header('Content-Type', 'text/csv');
+					res.header('Content-Disposition', 'attachment; filename=mailing_list.csv');
+					res.send(csv);
 				});
-				res.send('OK');
 			});
 		}
 		else {

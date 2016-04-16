@@ -19,7 +19,7 @@ module.exports = function(placeManager, sm, config, fs, path) {
 					, { url: '/jobs/search' }
 				]
 			});
-			fs.writeFile(path.join(__dirname, '../static', 'sitemap_static.xml'), staticSitemap.toString());
+			fs.writeFile(path.join(__dirname, '../../static', 'sitemap_static.xml'), staticSitemap.toString(), function(){});
 
 
 			var sitemapIndex = {
@@ -67,9 +67,9 @@ module.exports = function(placeManager, sm, config, fs, path) {
 						, lastmod: currentDate
 					});
 
-					fs.writeFile(path.join(__dirname, '../static', 'sitemap_' + i + '.xml'), sitemap.toString());
+					fs.writeFile(path.join(__dirname, '../../static', 'sitemap_' + i + '.xml'), sitemap.toString(), function(){});
 				}
-				fs.writeFile(path.join(__dirname, '../static', 'sitemapindex.xml'), js2xmlparser('sitemapindex', sitemapIndex));
+				fs.writeFile(path.join(__dirname, '../../static', 'sitemapindex.xml'), js2xmlparser('sitemapindex', sitemapIndex), function(){});
 
 				res.redirect('/message?message=sitemapgenerated');
 
