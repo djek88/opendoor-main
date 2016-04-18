@@ -50,7 +50,8 @@
 						h3 Next event
 						p
 							h5.inline.semi-bold {{place.nextEvent.name}}&nbsp;
-						p(ng-show="place.nextEvent.date") {{place.nextEvent.date}}
+						p(ng-show="place.nextEvent.startDate") {{place.nextEvent.startDate}}
+							span(ng-show="place.nextEvent.endDate") &nbsp;to {{place.nextEvent.endDate}}
 						p(ng-show="place.nextEvent.address") {{place.nextEvent.address}}&nbsp;
 							a(href="http://maps.google.com/?q={{place.nextEvent.location.coordinates[1]}},{{place.nextEvent.location.coordinates[0]}}", target="_blank") Show on map
 						p(ng-show="place.nextEvent.description") {{event.description}}
@@ -108,12 +109,14 @@
 					.col.col-lg-12
 						h3 Events
 							| &nbsp;
-							a.btn.btn-sm.btn-primary(ng-if="isMaintainer", href="/places/event/{{place._id}}/add")  Add an event
+							a.btn.btn-sm.btn-primary(ng-if="isMaintainer", href="/events/add?place={{place._id}}")  Add an event
 						div(ng-hide="place.events.length") There are no events
 						div.event(ng-repeat="event in place.events")
 							p
 								h5.inline.semi-bold {{event.name}}&nbsp;
-							p(ng-show="event.date") {{event.date}}
+								a.btn.btn-xs.btn-primary(href="/events/{{event._id}}/edit") Edit
+							p(ng-show="event.startDate") {{event.startDate}}
+								span(ng-show="event.endDate") &nbsp;to {{event.endDate}}
 							p(ng-show="event.address") {{event.address}}&nbsp;
 								a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
 							p(ng-show="event.description") {{event.description}}
@@ -128,7 +131,9 @@
 							div.event(ng-show="showPastEvents", ng-repeat="event in place.pastEvents")
 								p
 									h5.inline.semi-bold {{event.name}}&nbsp;
-								p(ng-show="event.date") {{event.date}}
+									a.btn.btn-xs.btn-primary(href="/events/{{event._id}}/edit") Edit
+								p(ng-show="event.startDate") {{event.startDate}}
+									span(ng-show="event.endDate") &nbsp;to {{event.endDate}}
 								p(ng-show="event.address") {{event.address}}&nbsp;
 									a(href="http://maps.google.com/?q={{event.location.coordinates[1]}},{{event.location.coordinates[0]}}", target="_blank") Show on map
 								p(ng-show="event.description") {{event.description}}

@@ -30,31 +30,11 @@ html
 
 		script(src="/assets/js/require.js", data-main="/assets/js/requirejs-config.js")
 
-		//script(src="https://checkout.stripe.com/checkout.js")
-		//script(src='https://maps.googleapis.com/maps/api/js?key=#{apiKeys.googleMaps}&language=en')
 		script(src="/bower_components/jquery/dist/jquery.min.js")
 		script(src="/bower_components/Datejs/build/date.js")
-		//script(src="/bower_components/moment/min/moment.min.js")
-		//script(src="/bower_components/bootstrap/dist/js/bootstrap.min.js")
-		//script(src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
-		//script(src="/bower_components/bootstrap-select/dist/js/bootstrap-select.min.js")
-		//script(src="/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js")
-		//script(src="/bower_components/trumbowyg/dist/trumbowyg.min.js")
-		//
-		//script(src="/bower_components/angular/angular.min.js")
-		//script(src="/bower_components/angular-route/angular-route.js")
-		//script(src="/bower_components/angular-cookies/angular-cookies.js")
-		//
-		//script(src="/bower_components/trumbowyg-ng/dist/trumbowyg-ng.min.js")
-		//script(src="/assets/js/bootstrap3-typeahead.js")
 		script(src="/assets/js/ui.js")
 		script(src="/assets/js/utils.js")
-		//script(src="/assets/js/locationpicker.js")
-		//script(src="/assets/js/app.js")
-		//script(src="/assets/js/controllers.js")
-		//script(src="/assets/js/controllers/countrieslist.js")
-		//script(src="/assets/js/controllers/localitieslist.js")
-		//script(src="/assets/js/controllers/placesbylocalitieslist.js")
+
 		script(src="/assets/js/ga.js")
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
@@ -113,6 +93,8 @@ html
 								a(href='/places/') PLACES
 							li
 								a(href='/jobs/search') JOBS
+							li
+								a(href='/events/search') EVENTS
 							li(ng-show="$root.isAdmin")
 								a.link(data-toggle='dropdown')
 									| ADMIN

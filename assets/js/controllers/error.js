@@ -107,6 +107,11 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					$scope.alertTitle = 'Success';
 					$scope.alertMessage = 'Your event has been added';
 					break;
+				case 'eventsaved':
+					$scope.alertType = 'info';
+					$scope.alertTitle = 'Success';
+					$scope.alertMessage = 'Your event has been saved';
+					break;
 				case 'placeadded':
 					$scope.alertType = 'info';
 					$scope.alertTitle = 'Success';

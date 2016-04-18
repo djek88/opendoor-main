@@ -105,9 +105,16 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				$place.pastEvents = [];
 				if ($place.events) {
 					for (var i = 0; i < $place.events.length; i++) {
-						$place.events[i].dateObject = new Date($place.events[i].date);
-						var eventDate = new Date($place.events[i].date).browserToUTC();
-						$place.events[i].date = eventDate.toString(siteconfig.l10n.dateTimeFormat);
+						$place.events[i].dateObject = new Date($place.events[i].startDate);
+						if ($place.events[i].startDate) {
+							var startDate = new Date($place.events[i].startDate).browserToUTC();
+							$place.events[i].startDate = startDate.toString(siteconfig.l10n.dateTimeFormat);
+						}
+
+						if ($place.events[i].endDate) {
+							var endDate = new Date($place.events[i].endDate).browserToUTC();
+							$place.events[i].endDate = endDate.toString(siteconfig.l10n.dateTimeFormat);
+						}
 						if ($place.events[i].dateObject < currentDate) {
 							$place.pastEvents.push($place.events[i]);
 							$place.events.splice(i, 1);

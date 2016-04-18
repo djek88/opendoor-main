@@ -16,12 +16,6 @@ define(['./app'], function (opendoorApp) {
 				,
 				controller: 'SearchCtrl'
 				, resolve: opendoorApp.resolveController('/assets/js/controllers/search.js')
-			}).when('/jobs/search', {
-				title: 'Search for Jobs at Places of Worship'
-				, meta: 'Find your ideal job anywhere in the World. Jobs listed associated with running a Place of Worship'
-				, templateUrl: 'assets/templates/partials/jobsearch.html'
-				, controller: 'JobSearchCtrl'
-				, resolve: opendoorApp.resolveController('/assets/js/controllers/jobsearch.js')
 			}).when('/jobs/add', {
 				title: 'Add job'
 				, shouldLogin: true
@@ -118,11 +112,22 @@ define(['./app'], function (opendoorApp) {
 				title: 'Add review'
 				, templateUrl: 'assets/templates/partials/reviewadd.html'
 				// , controller: 'FormCtrl'
-			}).when('/places/event/:id/add', {
+			}).when('/events/search', {
+				title: 'Search for events at Places of Worship'
+				// , meta: 'Find your ideal job anywhere in the World. Jobs listed associated with running a Place of Worship'
+				, templateUrl: 'assets/templates/partials/eventsearch.html'
+				, controller: 'EventSearchCtrl'
+				, resolve: opendoorApp.resolveController('/assets/js/controllers/eventsearch.js')
+			}).when('/events/add', {
 				title: 'Add an event'
-				, templateUrl: 'assets/templates/partials/eventadd.html'
-				, controller: 'EventAddCtrl'
-				, resolve: opendoorApp.resolveController('/assets/js/controllers/eventadd.js')
+				, templateUrl: 'assets/templates/partials/eventform.html'
+				, controller: 'EventFormCtrl'
+				, resolve: opendoorApp.resolveController('/assets/js/controllers/eventform.js')
+			}).when('/events/:id/edit', {
+				title: 'Edit event'
+				, templateUrl: 'assets/templates/partials/eventform.html'
+				, controller: 'EventFormCtrl'
+				, resolve: opendoorApp.resolveController('/assets/js/controllers/eventform.js')
 			}).when('/places/editorproposal/:id', {
 				title: 'Notify the person'
 				, templateUrl: 'assets/templates/partials/editorproposalform.html'

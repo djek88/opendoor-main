@@ -145,6 +145,9 @@ define([
 			if (this.form.$valid) {
 				document.forms.form.submit();
 			}
+			else {
+				console.log(this.form);
+			}
 		};
 
 		$rootScope.getPages = function($scope) {

@@ -24,7 +24,8 @@ module.exports = function(mongoose, email, config) {
 
 	var eventSchema = new mongoose.Schema({
 		name: String
-		,	date: Date
+		,	startDate: Date
+		,	endDate: Date
 		,	description: String
 		,	address: String
 		, location : {
@@ -315,6 +316,10 @@ module.exports = function(mongoose, email, config) {
 				matchOption['religion'] = data.religion;
 			}
 
+			if (data.event) {
+				matchOption['events._id'] = mongoose.Types.ObjectId(data.event);
+			}
+
 			if (data.name) {
 				matchOption['name'] = new RegExp(data.name, 'i');
 			}
@@ -440,6 +445,23 @@ module.exports = function(mongoose, email, config) {
 			});
 		};
 
+		this.editEvent = function (id, data, callback) {
+			Place.findOne({ "events._id": id }, function(err,place) {
+				for (var i=0; i < place.events.length; i++) {
+					if (place.events[i]._id.toString() == id.toString()) {
+						for (var j in data) {
+							if (data.hasOwnProperty(j)) {
+								place.events[i][j] = data[j];
+							}
+						}
+						break;
+					}
+				}
+				place.save(callback);
+			});
+
+		}
+
 		this.addPromotion = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
 				if (!err && place) {
@@ -482,11 +504,11 @@ module.exports = function(mongoose, email, config) {
 
 		this.getCountries = function(callback) {
 			Place.distinct('address.country').exec(callback);
-		}
+		};
 
 		this.getLocalities = function(country, callback) {
 			Place.find({'address.country': country.replace(/-/g, ' ')}).distinct('address.locality').exec(callback);
-		}
+		};
 
 
 		this.find = Place.find.bind(Place);

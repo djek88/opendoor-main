@@ -123,9 +123,11 @@ var frontendPages = [
 	,	'/places/:country/:locality/'
 	,	'/places/review/:id'
 	,	'/places/donate/:id'
-	,	'/places/event/:id/add'
 	,	'/places/editorproposal/:id'
 	//, /\/places\/(.*)/
+	, '/events/add'
+	, '/events/search'
+	, '/events/:id/edit'
 	,	'/jobs/search'
 	, '/jobs/add'
 	,	'/jobs/:id'
@@ -218,6 +220,7 @@ app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintai
 app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
 app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
 app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
+app.get(['/ajax/events/:id', '/ajax/events/search'], require('./app/routes/ajax/events.js')(mongoose, placeManager, config));
 
 app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));
 
@@ -238,7 +241,7 @@ app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.
 app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
 app.post('/places/review/:id', require('./app/routes/places/addreview.js')(placeManager));
 app.post('/places/donate/:id', require('./app/routes/promotion.js')(placeManager, stripe));
-app.post('/places/event/:id/add', require('./app/routes/places/addevent.js')(placeManager));
+app.post(['/events/add', '/events/:id/edit'], require('./app/routes/places/upsertevent.js')(placeManager, mongoose));
 app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
 app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
 app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));

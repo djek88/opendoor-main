@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 		, placeEdit: '/places/edit/56fba871316dc2e574e83118'
 		, placeReview: '/places/review/56ceff0eb39de24eeb0bb676'
 		, placeAdd: '/places/add'
-		, placeAddEvent: '/places/event/56ceff0eb39de24eeb0bb676/add'
+		, eventEdit: '/events/57138bc98f01ec310adfd805/edit'
 		, placeAddJob: '/jobs/add?place=56ceff0eb39de24eeb0bb676'
 		, placesMaintained: '/places/maintained'
 		, placesChanges: '/places/changes'
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
 
 	var cookie = '';
 
-	var distFiles = [];
+	var distFiles = ['temp/datepicker.html'];
 
 	var config = {
 		http: {
