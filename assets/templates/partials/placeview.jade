@@ -114,7 +114,7 @@
 						div.event(ng-repeat="event in place.events")
 							p
 								h5.inline.semi-bold {{event.name}}&nbsp;
-								a.btn.btn-xs.btn-primary(href="/events/{{event._id}}/edit") Edit
+								a.btn.btn-xs.btn-primary(ng-if="isMaintainer", href="/events/{{event._id}}/edit") Edit
 							p(ng-show="event.startDate") {{event.startDate}}
 								span(ng-show="event.endDate") &nbsp;to {{event.endDate}}
 							p(ng-show="event.address") {{event.address}}&nbsp;
@@ -131,7 +131,7 @@
 							div.event(ng-show="showPastEvents", ng-repeat="event in place.pastEvents")
 								p
 									h5.inline.semi-bold {{event.name}}&nbsp;
-									a.btn.btn-xs.btn-primary(href="/events/{{event._id}}/edit") Edit
+									a.btn.btn-xs.btn-primary(ng-if="isMaintainer", href="/events/{{event._id}}/edit") Edit
 								p(ng-show="event.startDate") {{event.startDate}}
 									span(ng-show="event.endDate") &nbsp;to {{event.endDate}}
 								p(ng-show="event.address") {{event.address}}&nbsp;
