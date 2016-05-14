@@ -269,10 +269,14 @@ define([
 
 	opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
 		var $metaInfoEl = $('#metaInfo');
-		$rootScope.$on('$routeChangeSuccess', function() {
-			document.title = $route.current.title + titlePostfix;
-			$metaInfoEl.html($route.current.meta || '');
-		});
+		function onRouteChangeSuccess () {
+			if ($route.current) {
+				document.title = $route.current.title + titlePostfix;
+				$metaInfoEl.attr('name', $route.current.meta || '');
+			}
+		}
+
+		$rootScope.$on('$routeChangeSuccess', onRouteChangeSuccess);
 
 		$rootScope.$on('$routeChangeStart', function ($event, $newRoute, $oldRoute) {
 			if ($newRoute.$$route
@@ -290,6 +294,7 @@ define([
 		$rootScope.email = $cookies.get('email');
 		$rootScope.isAdmin = $cookies.get('isAdmin') == 'true';
 		$rootScope.isLoggedIn = !!$rootScope.email;
+		onRouteChangeSuccess();
 	}]);
 
 	return opendoorApp;
