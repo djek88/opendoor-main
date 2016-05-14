@@ -39,7 +39,7 @@ module.exports = function(grunt) {
 
 	var cookie = '';
 
-	var distFiles = ['temp/datepicker.html'];
+	var distFiles = ['temp/locationpicker.html', 'temp/datepicker.html'];
 
 	var config = {
 		http: {
