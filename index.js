@@ -258,6 +258,9 @@ app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(p
 
 app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));
 
+app.get('/version', function(req, res) {
+	res.send('1.0.0');
+});
 
 app.get(frontendPages, function(req, res) {
 	var options = {
@@ -306,6 +309,6 @@ app.get(placesFrontEndPages, function(req, res) {
 });
 
 
-schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
+// schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
 
 schedule.scheduleJob('* * 0 * * *', setYear);
