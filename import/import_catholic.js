@@ -30,7 +30,7 @@ function createJsonLd(place) {
 	var data = {
 		'@type': 'Place'
 		,	name: place.name
-		,	mainentitiyofpage: config.url + place.uri
+		,	mainentityofpage: config.url + '/places/' + place.uri
 		,	geo: {
 			'@type': 'GeoCoordinates'
 			, latitude: place.location.coordinates[1]
@@ -162,7 +162,14 @@ function sendNewRequestFromQueue() {
 					place.address.line1 = [tempAddress.street_number, tempAddress.street_name].cleanArray().join(' ');
 					place.address.region = [tempAddress.subregion, tempAddress.region].cleanArray().join(', ');
 					place.location = {type: 'Point', coordinates: [res.results[0].geometry.location.lng, res.results[0].geometry.location.lat]};
-					place.uri = [place.address.country, place.address.region, place.address.locality, place.religion, place.groupName, place.name].replace(/\//g, '-').join('/').replace(/_/g, '').replace(/[^a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+					place.uri = [
+						place.address.country.replace(/\//g, '-')
+						, place.address.region.replace(/\//g, '-')
+						, place.address.locality.replace(/\//g, '-')
+						, place.religion.replace(/\//g, '-')
+						, place.groupName.replace(/\//g, '-')
+						, place.name.replace(/\//g, '-')
+					].join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 					place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 					place.jsonLd = createJsonLd(place);
 
