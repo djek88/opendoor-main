@@ -1,7 +1,7 @@
 /**
  * Created by vavooon on 29.03.16.
  */
-define(['angular', 'app'], function (angular, opendoorApp) {
+define(['angular', 'app', 'libs/stripe'], function (angular, opendoorApp) {
 	'use strict';
 
 	opendoorApp.registerController('DonateCtrl', ['$scope', '$location', '$rootScope', '$http',
