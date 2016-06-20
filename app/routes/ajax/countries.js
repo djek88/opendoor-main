@@ -1,4 +1,7 @@
 module.exports = function(placeManager, countryList){
+
+
+	
 	return function (req, res) {
 		if (req.query.withPlaces) {
 			placeManager.getCountries(
@@ -6,8 +9,7 @@ module.exports = function(placeManager, countryList){
 					countries.sort();
 					res.send(countries);
 				}
-			)
-			//res.send('["Ukraine"]');
+			);
 		}
 		else {
 			res.send(JSON.stringify(countryList.getNames()));

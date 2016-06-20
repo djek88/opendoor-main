@@ -287,9 +287,9 @@ app.get(placesFrontEndPages, function(req, res) {
 	else {
 		query._id = req.params.id;
 	}
-	placeManager.findOne(query, function(err, place){
+	placeManager.findOne(query, function(err, place) {
 		var options = {
-				apiKeys: config.apiKeys
+			apiKeys: config.apiKeys
 			, isPlace: true
 			, place: place
 			, siteconfig: siteconfig
@@ -297,14 +297,19 @@ app.get(placesFrontEndPages, function(req, res) {
 			, currentYear: currentYear
 			, originalCss: req.query.originalCss
 		};
-		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
-			if (!err) {
-				res.send(content);
-			}
-			else {
-				console.log(err);
-			}
-		});
+		if (!err && place) {
+			jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
+				if (!err) {
+					res.send(content);
+				}
+				else {
+					console.log(err);
+				}
+			});
+		}
+		else {
+			res.sendStatus(404);
+		}
 	});
 });
 

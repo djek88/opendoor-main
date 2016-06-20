@@ -54,7 +54,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			};
 
 			$scope.getLink = function(country) {
-				return country.replace(/ /g, '-') + '/';
+				return removeDiacritics(country).replace(/ /g, '-') + '/';
 			}
 
 			var requestParams = $location.search();
