@@ -251,6 +251,10 @@ module.exports = function(mongoose, email, config) {
 		for (var i=0; i < uriFields.length; i++) {
 			uriFields[i] = removeDiacritics(uriFields[i].replace(/\//g, '-'));
 		}
+
+		place.address.country = removeDiacritics(place.address.country);
+		place.address.locality = removeDiacritics(place.address.locality);
+
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
 		place.uri = uriFields.join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
