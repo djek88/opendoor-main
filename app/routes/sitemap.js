@@ -69,7 +69,7 @@ module.exports = function(placeManager, sm, config, fs, path) {
 
 					fs.writeFile(path.join(__dirname, '../../static', 'sitemap_' + i + '.xml'), sitemap.toString(), function(){});
 				}
-				fs.writeFile(path.join(__dirname, '../../static', 'sitemapindex.xml'), js2xmlparser('sitemapindex', sitemapIndex), function(){});
+				fs.writeFile(path.join(__dirname, '../../static', 'sitemap.xml'), js2xmlparser('sitemapindex', sitemapIndex), function(){});
 
 				res.redirect('/message?message=sitemapgenerated');
 
