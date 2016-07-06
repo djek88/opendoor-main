@@ -256,7 +256,7 @@ module.exports = function(mongoose, email, config) {
 		place.address.locality = removeDiacritics(place.address.locality);
 
 		global.denominationManager.addIfNotExists(place.denominations, place.religion);
-		place.uri = uriFields.join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+		place.uri = uriFields.join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-').toLowerCase();
 		place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
 		place.about = sanitizeHtml(place.about);
 		place.travelInformation = sanitizeHtml(place.travelInformation);
@@ -618,7 +618,7 @@ module.exports = function(mongoose, email, config) {
 		};
 
 		this.getLocalities = function(country, callback) {
-			Place.find({'address.country': country.replace(/-/g, ' ')}).distinct('address.locality').exec(callback);
+			Place.find({'address.country': { $regex: new RegExp("^" + country.replace(/-/g, ' ').toLowerCase(), "i") }}).distinct('address.locality').exec(callback);
 		};
 
 

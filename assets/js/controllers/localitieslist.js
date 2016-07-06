@@ -58,7 +58,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			};
 
 			$scope.getLink = function (locality) {
-				return $scope.country + '/' + locality.replace(/ /g, '-');
+				return $scope.country.toLowerCase() + '/' + locality.replace(/ /g, '-').toLowerCase();
 			}
 
 			var requestParams = $location.search();
