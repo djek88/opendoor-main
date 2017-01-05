@@ -1,6 +1,6 @@
 
 var config = require('./config.js');
-var http = require('http');
+var http = require('https');
 var fs = require('fs');
 var path = require('path');
 var querystring = require('querystring');
