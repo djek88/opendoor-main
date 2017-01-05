@@ -23,7 +23,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				return string;
 			}
 			
-			$scope.place = toUp(splittedUrl[splittedUrl.length - 2]);
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 2]);
 			$scope.country = toUp(splittedUrl[splittedUrl.length - 3]);
 
 			function setSearchParams() {
