@@ -7,7 +7,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 		function ($scope, $http, $rootScope, $location, $window) {
 
 			var splittedUrl = $location.path().split('/');
-			/*
+			
 			function toUp(string)
 			{
 				var firstChar = string.substring( 0, 1 ); // == "c"
@@ -16,9 +16,9 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				string = firstChar + tail;
 				return string;
 			}
-			*/
-			$scope.country = splittedUrl[splittedUrl.length - 3];
-			$scope.locality = splittedUrl[splittedUrl.length - 2];			
+			
+			$scope.country = toUp(splittedUrl[splittedUrl.length - 3]);
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 2]);			
 			$scope.places = null;
 			var $table = $('#search-table');
 			$scope.religionsList = $rootScope.religions;
