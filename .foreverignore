@@ -1,0 +1,7 @@
+assets/*
+bower_components/*
+node_modules/*
+templates/*
+photos/*
+static/*
+temp/*

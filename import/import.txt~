@@ -1,0 +1,27 @@
+db.places.drop()
+db.religiongroups.drop()
+
+
+mongoimport --db opendoor --collection religiongroups --type json --file religionGroups.json --jsonArray
+
+mongoimport --db opendoor --collection places --type json --file result.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_0.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_1.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_2.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_3.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_4.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_5.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_6.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_7.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_8.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_9.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_10.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_11.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_12.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_13.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_14.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_15.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_16.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_17.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_18.json --jsonArray
+mongoimport --db opendoor --collection places --type json --file out_19.json --jsonArray

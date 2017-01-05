@@ -1,0 +1,42 @@
+{
+  "name": "opendoor",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Vavooon"
+  ],
+  "license": "ISC",
+  "moduleType": [
+    "node"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.8",
+    "bootstrap": "~3.3.6",
+    "angular-route": "~1.4.8",
+    "angular-cookies": "~1.4.8",
+    "angular-jquery-timepicker": "~0.9.1",
+    "bootstrap-timepicker": "~0.5.1",
+    "select2": "~4.0.1",
+    "jquery-ui": "~1.11.4",
+    "tag-it": "*",
+    "Datejs": "datejs/Datejs",
+    "bootstrap-select": "~1.10.0",
+    "trumbowyg": "~1.1.7",
+    "trumbowyg-ng": "~0.0.3",
+    "eonasdan-bootstrap-datetimepicker": "~4.17.37",
+    "bootstrap-tagsinput": "~0.8.0",
+    "typeahead.js": "~0.11.1",
+    "bootstrap3-typeahead": "bassjobsen/Bootstrap-3-Typeahead#~4.0.0",
+    "requirejs": "~2.2.0",
+    "domReady": "requirejs-domready#~2.0.1"
+  }
+}

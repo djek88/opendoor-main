@@ -1,0 +1,20 @@
+#content.content
+	.container
+		.row
+			.col-lg-12.m-t-40
+				h4.search-placeholder.text-center(ng-show='message.length') {{message}}
+				.table-wrap.bg-white(ng-show='places.length')
+					table#search-table.table
+						thead
+							tr
+								th Name
+								th Religion
+								th Maintainer
+								th
+						tbody
+							tr.place-link(ng-repeat="place in places", ng-mousedown="$root.openPlace($event, place)")
+								td {{place.name}}
+								td {{place.religion}}
+								td {{place.maintainer ? place.maintainer.name : ''}}
+								td.text-right
+									i.fa.fa-chevron-right

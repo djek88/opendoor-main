@@ -1,0 +1,1 @@
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "opendoor.placenotifications", "name" : "_id_" }, { "v" : 1, "key" : { "location" : "2dsphere" }, "ns" : "opendoor.placenotifications", "name" : "location_2dsphere", "background" : true, "2dsphereIndexVersion" : 2 } ] }

@@ -1,0 +1,10 @@
+#content.content
+	.container
+		.row
+			.col-12
+				.panel(ng-class="'panel-' + alertType")
+					.panel-heading
+						h4.panel-title {{alertTitle}}
+					.panel-body
+						p {{ alertMessage }}
+						a.btn.btn-sm.btn-primary(ng-if="back", href="{{back}}") {{backTitle || 'Back'}}

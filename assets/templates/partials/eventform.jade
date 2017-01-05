@@ -1,0 +1,52 @@
+#content.content
+	.container.bg-white.p-t-10
+		div
+			h3.text-center.m-t-30(ng-if="mode == 'add'") Add a event
+			h3.text-center.m-t-30(ng-if="mode == 'edit'") Edit event
+			form.form-horizontal(method="POST", novalidate, name="form")
+				.form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
+					label.col-md-3.control-label Name
+					.col-md-9
+						input.form-control(name="name", ng-model="event.name", required)
+
+				.form-group(ng-class="{'has-error': (form.$submitted || form.startDate.$touched) && form.startDate.$error.required}")
+					label.col-md-3.control-label Start date
+					.col-md-9
+						#startDatePicker.input-group.date
+							input.form-control(name="startDate", ng-model="event.startDate", required)
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
+
+				.form-group(ng-class="{'has-error': (form.$submitted || form.endDate.$touched) && form.endDate.$error.required}")
+					label.col-md-3.control-label End date (optional)
+					.col-md-9
+						#endDatePicker.input-group.date
+							input.form-control(name="endDate", ng-model="event.endDate")
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
+
+				.form-group(ng-class="{'has-error': (form.$submitted || form.description.$touched) && form.description.$error.required}")
+					label.col-md-3.control-label Description
+					.col-md-9
+						textarea.form-control(rows="5", name="description", ng-model="event.description", required)
+				.form-group
+					.col-md-3
+					.col-md-9
+						h5 Add the address of where the event will be held. The default location is the address of this place of worship
+				.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.address.$error.required}")
+					label.col-md-3.control-label Address
+					.col-md-9
+						input.form-control(name="address", ng-model="event.address")
+				.form-group(ng-class="{'has-error': (form.$submitted || form.location.$touched) && form.location.$error.required}")
+					label.col-md-3.control-label Location
+					.col-md-9
+						//h5.m-r-10 Type place address to find it on map
+						.btn.btn-sm.btn-primary.m-b-10(ng-click="searchByAddress()") Find address on map
+						input.hidden(name="location", ng-model="event.location")
+						input.hidden(name="place", ng-model="event.place")
+						#results-map
+				.form-group
+					label.col-md-3.control-label
+					.col-md-9
+						input.btn.btn-sm.btn-primary(type="button", ng-if="mode == 'add'", ng-click="submitForm()", value="Add event")
+						input.btn.btn-sm.btn-primary(type="button", ng-if="mode == 'edit'", ng-click="submitForm()", value="Save event")
