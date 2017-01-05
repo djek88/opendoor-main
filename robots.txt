@@ -1,4 +1,13 @@
 User-Agent: *
-Disallow: 
+Disallow: /app
+Disallow: /assets
+Disallow: /error
+Disallow: /icon
+Disallow: /import
+Disallow: /photos
+Disallow: /static
+Disallow: /stats
+Disallow: /temp
+Disallow: /backup_db
 
-Sitemap: https://opendoor.ooo/sitemap.xml
+Sitemap: http://nestino.com/sitemap.xml
