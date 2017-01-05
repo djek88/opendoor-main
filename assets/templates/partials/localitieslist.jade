@@ -20,12 +20,13 @@
             h4.text-center(ng-show='message.length') {{message}}
             div(ng-show="localities")
                div(ng-show="localities.length")
+			     h1 {{country}}
                   .table-wrap.bg-white
                      table#search-table.table
                         thead
                            tr
                               th City
-                              th {{country}}
+                              th
                         tbody
                            tr.place-link(ng-repeat="locality in localities", ng-mousedown="openLocality($event, locality)")
                               td {{locality}}
