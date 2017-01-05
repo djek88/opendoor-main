@@ -87,7 +87,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 								places[i].updatedAt = (new Date(places[i].updatedAt)).browserToUTC().toString(siteconfig.l10n.dateTimeFormat);
 							}
 						}
-						$scope.message = '';
+						$scope.message = 'test';
 					}
 					else {
 						$scope.message = 'There are no places of worship';
