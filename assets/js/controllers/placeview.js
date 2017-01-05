@@ -5,6 +5,21 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
 	opendoorApp.registerController('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 		function ($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
+			
+			var splittedUrl = $location.path().split('/');
+			
+			function toUp(string)
+			{
+				var firstChar = string.substring( 0, 1 ); // == "c"
+				firstChar = firstChar.toUpperCase();
+				var tail = string.substring( 1 ); // == "heeseburger"
+				string = firstChar + tail;
+				return string;
+			}
+			
+			$scope.country = toUp(splittedUrl[splittedUrl.length - 7]);
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 5]);
+			
 			var placeId = $location.path().substr(8);
 			$scope.placeId = placeId;
 
