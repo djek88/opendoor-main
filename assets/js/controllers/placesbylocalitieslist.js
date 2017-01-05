@@ -18,7 +18,11 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			}
 			
 			$scope.country = toUp(splittedUrl[splittedUrl.length - 3]);
-			$scope.locality = toUp(splittedUrl[splittedUrl.length - 2]);			
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 2]);	
+
+			$scope.country = $scope.country.replace('-', ' ');
+			$scope.locality = $scope.locality.replace('-', ' ');
+					
 			$scope.places = null;
 			var $table = $('#search-table');
 			$scope.religionsList = $rootScope.religions;

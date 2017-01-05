@@ -21,7 +21,8 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			$scope.religionsList = $rootScope.religions;
 			$scope.religion = '';
 
-
+			$scope.country = $scope.country.replace('-', ' ');
+			
 			function setSearchParams() {
 
 				var requestParams = {

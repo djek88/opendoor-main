@@ -285,17 +285,23 @@ define([
 					var locality = toUp($route.current.params.locality);
 					if (country.length + locality.length >= 65 ) document.title = 'Places of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ');
 					else document.title = 'Places of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ') + titlePostfix;
+					$metaInfoEl.attr('name','description');
+					$metaInfoEl.attr('content', 'Find your Place of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ') + '. A complete list of all Places of Worship. Check to make sure your Place of Worship is listed and correct so others can find it.');
 				}
 				else if (typeof($route.current.params.country) != 'undefined')
 				{
 					var country = toUp($route.current.params.country);
 					if (country.length >= 65 ) document.title = 'Places of Worship in ' + country.replace('-', ' ');
 					else document.title = 'Places of Worship in ' + country.replace('-', ' ') + titlePostfix;
+					$metaInfoEl.attr('name','description');
+					$metaInfoEl.attr('content', 'Find your Place of Worship in '+ country.replace('-', ' ') +'. A complete list of all Places of Worship. Check to make sure your Place of Worship is listed and correct so others can find it.');
 				}
-				else 
+				else
+				{
 					document.title = $route.current.title + titlePostfix;
-				$metaInfoEl.attr('name','description');
-				$metaInfoEl.attr('content', $route.current.meta || '');
+					$metaInfoEl.attr('name','description');
+					$metaInfoEl.attr('content', $route.current.meta || '');
+				}
 			}
 		}
 

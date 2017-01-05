@@ -20,6 +20,9 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			$scope.country = toUp(splittedUrl[splittedUrl.length - 6]);
 			$scope.locality = toUp(splittedUrl[splittedUrl.length - 4]);
 			
+			$scope.country = $scope.country.replace('-', ' ');
+			$scope.locality = $scope.locality.replace('-', ' ');
+			
 			var placeId = $location.path().substr(8);
 			$scope.placeId = placeId;
 
