@@ -22,6 +22,7 @@ var countryList = require('country-list')();
 var sm = require('sitemap');
 
 http.get('*',function(req,res){  
+	console.log("!");
     res.redirect('https://opendoor.ahh.ooo'+req.url);
 });
 
