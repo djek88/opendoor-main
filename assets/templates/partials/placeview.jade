@@ -7,8 +7,8 @@
 						h3
 							.label.label-danger.pull-right(ng-if="!place.isConfirmed") UNVERIFIED
 						h1 {{place.name}}
-                        h2 {{locality}}, {{country}}
-						
+						h2 {{locality}}, {{country}}
+
 						a.rating-group.link(ng-click="scrollTo('reviews')")
 							span.fa(ng-class="place.averageRating >= 1 ? 'fa-star' : 'fa-star-o'")
 							span.fa(ng-class="place.averageRating >= 2 ? 'fa-star' : 'fa-star-o'")
