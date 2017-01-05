@@ -21,6 +21,10 @@ var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
 var countryList = require('country-list')();
 var sm = require('sitemap');
 
+http.get('*',function(req,res){  
+    res.redirect('https://opendoor.ahh.ooo'+req.url);
+});
+
 require('./assets/js/utils.js');
 require('./app/date.min.js');
 
