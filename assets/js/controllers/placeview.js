@@ -17,8 +17,8 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				return string;
 			}
 			
-			$scope.country = toUp(splittedUrl[splittedUrl.length - 7]);
-			$scope.locality = toUp(splittedUrl[splittedUrl.length - 5]);
+			$scope.country = toUp(splittedUrl[splittedUrl.length - 6]);
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 4]);
 			
 			var placeId = $location.path().substr(8);
 			$scope.placeId = placeId;
