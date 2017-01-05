@@ -11,7 +11,20 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 			var $table = $('#search-table');
 			$scope.religionsList = $rootScope.religions;
 			$scope.religion = '';
-
+			
+			var splittedUrl = $location.path().split('/');
+			
+			function toUp(string)
+			{
+				var firstChar = string.substring( 0, 1 ); // == "c"
+				firstChar = firstChar.toUpperCase();
+				var tail = string.substring( 1 ); // == "heeseburger"
+				string = firstChar + tail;
+				return string;
+			}
+			
+			$scope.place = toUp(splittedUrl[splittedUrl.length - 2]);
+			$scope.country = toUp(splittedUrl[splittedUrl.length - 3]);
 
 			function setSearchParams() {
 
