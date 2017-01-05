@@ -25,8 +25,8 @@
                         thead
                            tr
                               th Name
-                              th Religion
-                              th
+                              th Religion {{country}}
+                              th {{locality}}
                         tbody
                            tr.place-link(ng-repeat="place in places", ng-mousedown="$root.openPlace($event, place)", ng-mouseover="mouseOver($index)", ng-mouseout="mouseOut($index)")
                               td {{place.name}}
