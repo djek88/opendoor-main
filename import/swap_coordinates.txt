@@ -1,5 +1,0 @@
-@location.coordinates
-
-coordinates": \[(\s+)([\-\d\.]+),(\s+)([\-\d\.]+)
-coordinates": \[\1\4,\3\2
-
