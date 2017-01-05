@@ -278,6 +278,7 @@ define([
 			return string;
 		}
 		function onRouteChangeSuccess () {
+			console.log($route.current);
 			if ($route.current) {
 				if (typeof($route.current.params.locality) != 'undefined')
 				{
