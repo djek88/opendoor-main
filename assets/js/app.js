@@ -278,7 +278,6 @@ define([
 			return string;
 		}
 		function onRouteChangeSuccess () {
-			console.log($route.current);
 			if ($route.current) {
 				if (typeof($route.current.params.locality) != 'undefined')
 				{
@@ -295,7 +294,8 @@ define([
 				}
 				else 
 					document.title = $route.current.title + titlePostfix;
-				$metaInfoEl.attr('name', $route.current.meta || '');
+				$metaInfoEl.attr('name','description');
+				$metaInfoEl.attr('content', $route.current.meta || '');
 			}
 		}
 
