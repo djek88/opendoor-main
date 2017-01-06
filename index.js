@@ -324,8 +324,8 @@ app.get(placesFrontEndPages, function(req, res) {
 	});
 });
 
-http.createServer(app).listen(80);
-https.createServer(app).listen(443);
+https.createServer(app).listen(8443);
+http.createServer(app).listen(8099);
 
 
 // schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
