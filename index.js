@@ -1,6 +1,6 @@
 
 var config = require('./config.js');
-var http = require('https');
+var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var querystring = require('querystring');
@@ -145,6 +145,11 @@ if (config.prerenderServiceUrl) {
 		.set('host', config.hostname + ':' + config.port)
 		.set('protocol', 'http'));
 }
+
+app.get('*',function(req,res){  
+    res.redirect('https://opendoor.ahh.ooo'+req.url)
+})
+
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
