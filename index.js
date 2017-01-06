@@ -146,10 +146,6 @@ if (config.prerenderServiceUrl) {
 		.set('protocol', 'http'));
 }
 
-app.get('*',function(req,res){  
-    res.redirect('https://opendoor.ahh.ooo'+req.url)
-})
-
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
