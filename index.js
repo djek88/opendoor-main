@@ -1,6 +1,6 @@
 
 var config = require('./config.js');
-var http = require('http');
+var https = require('https');
 var fs = require('fs');
 var path = require('path');
 var querystring = require('querystring');
@@ -143,7 +143,7 @@ if (config.prerenderServiceUrl) {
 	app.use(require('prerender-node')
 		.set('prerenderServiceUrl', config.prerenderServiceUrl)
 		.set('host', config.hostname + ':' + config.port)
-		.set('protocol', 'http'));
+		.set('protocol', 'https'));
 }
 
 function requireHTTPS(req, res, next) {
