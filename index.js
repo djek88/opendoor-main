@@ -1,6 +1,7 @@
 
 var config = require('./config.js');
 var https = require('https');
+var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var querystring = require('querystring');
@@ -322,6 +323,9 @@ app.get(placesFrontEndPages, function(req, res) {
 		}
 	});
 });
+
+http.createServer(app).listen(80);
+https.createServer(app).listen(443);
 
 
 // schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
