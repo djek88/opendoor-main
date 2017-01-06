@@ -146,6 +146,14 @@ if (config.prerenderServiceUrl) {
 		.set('protocol', 'http'));
 }
 
+function requireHTTPS(req, res, next) {
+  if (!req.secure) {
+    return res.redirect('https://' + req.headers.host + req.url);
+  }
+  next();
+}
+
+app.use(requireHTTPS);
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
