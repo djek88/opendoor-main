@@ -1,6 +1,5 @@
 
 var config = require('./config.js');
-var https = require('https');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
@@ -146,15 +145,6 @@ if (config.prerenderServiceUrl) {
 		.set('host', config.hostname + ':' + config.port)
 		.set('protocol', 'http'));
 }
-
-function requireHTTPS(req, res, next) {
-  if (!req.secure) {
-    return res.redirect('http://' + req.headers.host + req.url);
-  }
-  next();
-}
-
-app.use(requireHTTPS);
 app.set('view options', { pretty: true });
 app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
@@ -170,7 +160,6 @@ app.use('/bower_components', express.static('bower_components'));
 app.use('/assets', express.static('assets'));
 app.use('/photos', express.static('photos'));
 app.use('/favicon.ico', express.static('assets/img/favicon.ico'));
-app.use('/robots.txt', express.static('robots.txt'));
 app.use('/generateSitemap', require('./app/routes/sitemap.js')(placeManager, sm, config, fs, path));
 app.use('/mailingList', require('./app/routes/mailinglist.js')(subscriptionManager, sm, config, fs, path));
 app.use(config.staticFiles, function(req, res){
@@ -323,9 +312,6 @@ app.get(placesFrontEndPages, function(req, res) {
 		}
 	});
 });
-
-//https.createServer(app).listen(8443);
-//http.createServer(app).listen(8099);
 
 
 // schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
