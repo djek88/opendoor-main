@@ -160,6 +160,7 @@ define(['libs/googlemaps'], function () {
 		}
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
+		console.log($inputEl.val());
 		if ($inputEl.val() == '') getAutoLocationFromBrowser();
 	};
 });
