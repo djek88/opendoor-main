@@ -121,7 +121,36 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 			
 			$scope.autoSearchPlaces = function () {
 				setSearchParams();
-				console.log(document.forms.form.location.value);
+				$scope.lat = requestParams.lat;
+				$scope.lng = requestParams.lng;
+				$scope.location = requestParams.lng + ', ' + requestParams.lat;
+				$scope.address = $rootScope.lastSearchAddress || $scope.location;
+				$scope.religion = requestParams.religion;
+				$scope.message = 'Searching…';
+				requestParams.maxDistance = 5000;
+				$http({
+					url: '/ajax/places/search'
+					, method: 'GET'
+					, params: requestParams
+				}).success(function (response) {
+					if (typeof response == 'object' && Array.isArray(response.results)) {
+						var places = response.results;
+						if (places.length) {
+							for (var i = 0; i < places.length; i++) {
+								places[i].distance = Math.round(places[i].distance);
+							}
+							$scope.message = '';
+						}
+						else {
+							$scope.message = 'There are no places of worship found near this location';
+						}
+						$scope.places = places;
+						createMap();
+					}
+					else {
+						onError();
+					}
+				}).error(onError);
 			};
 
 			function validateCoordinate(val) {
