@@ -168,6 +168,6 @@ define(['libs/googlemaps'], function () {
 		console.log($coordsEl.val());
 		if ($coordsEl.val() == '') getAutoLocationFromBrowser();
 		console.log($coordsEl.value);
-		console.log($coordsEl.());
+		console.log($coordsEl.val());
 	};
 });
