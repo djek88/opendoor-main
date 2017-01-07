@@ -8,7 +8,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 
 	opendoorApp.registerController('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
 		function ($scope, $http, $rootScope, $location) {
-			//$('.location-picker').locationpicker();
+			$('.location-picker').locationpicker();
 			var $locationInputEl = $('.location-picker-address');
 
 			$scope.places = null;
@@ -119,7 +119,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 				}
 			};
 			
-			/*$scope.autoSearchPlaces = function () {
+			$scope.autoSearchPlaces = function () {
 				if ($locationInputEl.attr('active') == '1') {
 					$locationInputEl.one('change', setSearchParams);
 				}
@@ -156,7 +156,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 						onError();
 					}
 				}).error(onError);
-			};*/
+			};
 
 			function validateCoordinate(val) {
 				val = parseFloat(val);
@@ -202,7 +202,9 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 				}).error(onError);
 			}
 			
-			//$scope.autoSearchPlaces();
+			setTimeout( function() {
+				if (requestParams.empty()) $scope.autoSearchPlaces();
+			}, 1000);
 		}
 	]);
 });
