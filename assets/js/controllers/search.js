@@ -118,6 +118,15 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					setSearchParams();
 				}
 			};
+			
+			$scope.autoSearchPlaces = function () {
+				if ($locationInputEl.attr('active') == '1') {
+					$locationInputEl.one('change', setSearchParams);
+				}
+				else {
+					setSearchParams();
+				}
+			};
 
 			function validateCoordinate(val) {
 				val = parseFloat(val);
@@ -162,7 +171,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					}
 				}).error(onError);
 			}
-			$scope.form.submit();
+			$scope.autoSearchPlaces();
 		}
 	]);
 });
