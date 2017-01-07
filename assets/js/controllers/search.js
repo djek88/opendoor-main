@@ -119,13 +119,9 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 				}
 			};
 			
-			$scope.autoSearchPlaces = function () { console.log($locationInputEl.val());
-				if ($locationInputEl.attr('active') == '1') { console.log("1");
-					$locationInputEl.one('change', setSearchParams);
-				}
-				else { console.log("2");
-					setSearchParams();
-				}
+			$scope.autoSearchPlaces = function () {
+				setSearchParams();
+				console.log(document.forms.form.location.value);
 			};
 
 			function validateCoordinate(val) {
