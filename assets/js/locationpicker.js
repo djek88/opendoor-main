@@ -136,7 +136,7 @@ define(['libs/googlemaps'], function () {
 		};
 
 
-		function getLocationFromBrowser(e) { console.log(e);
+		function getLocationFromBrowser(e) {
 			if (e.clientX) {
 				if (navigator.geolocation) {
 					$inputEl.val('Detecting Location…');
@@ -148,8 +148,18 @@ define(['libs/googlemaps'], function () {
 			}
 			return false;
 		}
+		
+		function getAutoLocationFromBrowser() {
+			if (navigator.geolocation) {
+				$inputEl.val('Detecting Location…');
+				navigator.geolocation.getCurrentPosition(onPositionReceive, showError);
+			}
+			else {
+				$scope.error = "Geolocation is not supported by this browser.";
+			}
+		}
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		
+		getAutoLocationFromBrowser();
 	};
 });
