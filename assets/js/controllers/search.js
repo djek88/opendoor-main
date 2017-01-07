@@ -119,7 +119,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 				}
 			};
 			
-			$scope.autoSearchPlaces = function () {
+			$scope.autoSearchPlaces = function () { console.log($locationInputEl);
 				if ($locationInputEl.attr('active') == '1') { console.log("1");
 					$locationInputEl.one('change', setSearchParams);
 				}
