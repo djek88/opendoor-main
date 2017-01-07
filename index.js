@@ -324,7 +324,7 @@ app.get(placesFrontEndPages, function(req, res) {
 	});
 });
 
-https.createServer(app).listen(8443);
+//https.createServer(app).listen(8443);
 //http.createServer(app).listen(8099);
 
 
