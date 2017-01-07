@@ -8,6 +8,9 @@ define(['libs/googlemaps'], function () {
 		var $rootEl = this;
 		var $inputEl = $('.location-picker-address', this);
 		var $coordsEl = $('.location-picker-location', this);
+		console.log($coordsEl);
+		console.log($coordsEl.val());
+		console.log($coordsEl.value);
 		var $autoDetectEl = $('.location-picker-detect-button', this);
 		var $resultsEl = $('<div class="location-picker-results"></div>');
 
@@ -161,6 +164,10 @@ define(['libs/googlemaps'], function () {
 		
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
+		console.log($coordsEl.value);
+		console.log($coordsEl.val());
 		if ($coordsEl.val() == '') getAutoLocationFromBrowser();
+		console.log($coordsEl.value);
+		console.log($coordsEl.());
 	};
 });
