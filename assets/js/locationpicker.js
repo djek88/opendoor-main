@@ -8,6 +8,7 @@ define(['libs/googlemaps'], function () {
 		var $rootEl = this;
 		var $inputEl = $('.location-picker-address', this);
 		var $coordsEl = $('.location-picker-location', this);
+		console.log($coordsEl);
 		var $autoDetectEl = $('.location-picker-detect-button', this);
 		var $resultsEl = $('<div class="location-picker-results"></div>');
 
@@ -158,8 +159,9 @@ define(['libs/googlemaps'], function () {
 				$scope.error = "Geolocation is not supported by this browser.";
 			}
 		}
+		
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		getAutoLocationFromBrowser();
+		//getAutoLocationFromBrowser();
 	};
 });
