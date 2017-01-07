@@ -161,6 +161,6 @@ define(['libs/googlemaps'], function () {
 		
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		if ($coordsEl.val == '') getAutoLocationFromBrowser();
+		if ($coordsEl.val() == '') getAutoLocationFromBrowser();
 	};
 });
