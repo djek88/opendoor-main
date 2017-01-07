@@ -162,6 +162,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					}
 				}).error(onError);
 			}
+			searchPlaces();
 		}
 	]);
 });
