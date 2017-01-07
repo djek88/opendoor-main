@@ -162,7 +162,10 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					}
 				}).error(onError);
 			}
-			getLocationFromBrowser();
+			console.log(locationpicker());
+			console.log(locationpicker);
+			console.log($location);
+			locationpicker.getLocationFromBrowser();
 		}
 	]);
 });
