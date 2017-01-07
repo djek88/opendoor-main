@@ -196,7 +196,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					}
 				}).error(onError);
 			}
-			setTimeout($scope.autoSearchPlaces,2000);
+			setTimeout($scope.autoSearchPlaces,500);
 		}
 	]);
 });
