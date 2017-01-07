@@ -136,7 +136,7 @@ define(['libs/googlemaps'], function () {
 		};
 
 
-		function getLocationFromBrowser(e) { console.log("!");
+		function getLocationFromBrowser(e) {
 			if (e.clientX) {
 				if (navigator.geolocation) {
 					$inputEl.val('Detecting Location…');
@@ -150,6 +150,6 @@ define(['libs/googlemaps'], function () {
 		}
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		getLocationFromBrowser;
+		getLocationFromBrowser($autoDetectEl);
 	};
 });
