@@ -8,7 +8,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 
 	opendoorApp.registerController('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
 		function ($scope, $http, $rootScope, $location) {
-			$('.location-picker').locationpicker();
+			console.log($('.location-picker').locationpicker());
 			var $locationInputEl = $('.location-picker-address');
 
 			$scope.places = null;
@@ -162,10 +162,6 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 					}
 				}).error(onError);
 			}
-			console.log(locationpicker());
-			console.log(locationpicker);
-			console.log($location);
-			locationpicker.getLocationFromBrowser();
 		}
 	]);
 });
