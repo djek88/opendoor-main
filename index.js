@@ -144,12 +144,12 @@ if (config.prerenderServiceUrl) {
 	app.use(require('prerender-node')
 		.set('prerenderServiceUrl', config.prerenderServiceUrl)
 		.set('host', config.hostname + ':' + config.port)
-		.set('protocol', 'https'));
+		.set('protocol', 'http'));
 }
 
 function requireHTTPS(req, res, next) {
   if (!req.secure) {
-    return res.redirect('https://' + req.headers.host + req.url);
+    return res.redirect('http://' + req.headers.host + req.url);
   }
   next();
 }
