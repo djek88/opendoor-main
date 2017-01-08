@@ -160,7 +160,7 @@ define(['libs/googlemaps'], function () {
 		
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		setTimeout( function() {
+		setTimeout( function() { console.log($coordsEl.val());
 			if ($coordsEl.val() == '') getAutoLocationFromBrowser();
 		}, 800);
 	};

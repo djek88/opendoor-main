@@ -202,9 +202,7 @@ define(['angular', 'app', 'locationpicker'], function (angular, opendoorApp) {
 				}).error(onError);
 			}
 			
-			setTimeout( function() {
-				if ($.isEmptyObject(requestParams)) $scope.autoSearchPlaces();
-			}, 1000);
+			$(".location-picker-location").change(function() { $scope.autoSearchPlaces(); } );
 		}
 	]);
 });
