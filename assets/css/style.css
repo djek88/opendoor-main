@@ -361,9 +361,3 @@ select.form-control,
 .job span {
 	margin-top: 3px;
 }
-
-/* search page */
-
-.placeAddLink {
-	color: red;
-}
