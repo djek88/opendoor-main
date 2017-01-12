@@ -2,7 +2,7 @@
  * Created by Vavooon on 22.12.2015.
  */
 define(['libs/googlemaps'], function () {
-	$.fn.locationpicker = function () {
+	$.fn.locationpicker = function (cb) {
 		var geocoder = new google.maps.Geocoder();
 
 		var $rootEl = this;
@@ -53,7 +53,6 @@ define(['libs/googlemaps'], function () {
 			$inputEl.trigger("change");
 			$coordsEl.trigger("change");
 		}
-
 
 		function blur(e) {
 			if (e.target != $inputEl[0]) {
@@ -106,7 +105,6 @@ define(['libs/googlemaps'], function () {
 			}
 		});
 
-
 		function onPositionReceive(location) {
 			var latlng = {lat: location.coords.latitude, lng: location.coords.longitude};
 			geocoder.geocode({'location': latlng}, function (results, status) {
@@ -117,6 +115,8 @@ define(['libs/googlemaps'], function () {
 		};
 
 		function showError(error) {
+			cb();
+
 			var errorMessage;
 			switch (error.code) {
 				case error.PERMISSION_DENIED:
@@ -134,7 +134,6 @@ define(['libs/googlemaps'], function () {
 			}
 		};
 
-
 		function getLocationFromBrowser(e) {
 			if (e.clientX) {
 				if (navigator.geolocation) {
@@ -147,7 +146,7 @@ define(['libs/googlemaps'], function () {
 			}
 			return false;
 		}
-		
+
 		function getAutoLocationFromBrowser() {
 			if (navigator.geolocation) {
 				$inputEl.val('Detecting Location…');
@@ -157,7 +156,7 @@ define(['libs/googlemaps'], function () {
 				$scope.error = "Geolocation is not supported by this browser.";
 			}
 		}
-		
+
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
 		setTimeout( function() {

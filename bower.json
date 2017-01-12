@@ -38,5 +38,9 @@
     "bootstrap3-typeahead": "bassjobsen/Bootstrap-3-Typeahead#~4.0.0",
     "requirejs": "~2.2.0",
     "domReady": "requirejs-domready#~2.0.1"
+  },
+  "resolutions": {
+    "angular": "~1.4.8",
+    "trumbowyg": "~1.1.7"
   }
 }

@@ -26,17 +26,14 @@ html
 		else
 			link(rel='stylesheet', href='/assets/css/tidy.css')
 
-
 		script(src="/siteconfig.js")
-
 		script(src="/assets/js/require.js", data-main="/assets/js/requirejs-config.js")
-
 		script(src="/bower_components/jquery/dist/jquery.min.js")
 		script(src="/bower_components/Datejs/build/date.js")
 		script(src="/assets/js/ui.js")
 		script(src="/assets/js/utils.js")
-
 		script(src="/assets/js/ga.js")
+
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
 			meta(name="description", content="#{place.name}")
@@ -45,8 +42,7 @@ html
 				meta(itemprop="description", content="#{place.about}")
 			if place.bannerPhoto
 				meta(itemprop="image", content="/photos/#{place.bannerPhoto}")
-		
-		
+
 			meta(name="twitter:card", content="Information about #{place.name}")
 			meta(name="twitter:site", content="#{siteconfig.twitterAccount}")
 			meta(name="twitter:title", content="#{place.name}")
@@ -55,7 +51,7 @@ html
 				meta(name="twitter:creator", content="#{siteconfig.twitterAccount}")
 			if place.bannerPhoto
 				meta(name="twitter:image:src", content="'+ #{siteconfig.imagesPath + place.bannerPhoto}")
-		
+
 			meta(property="og:title", content="#{place.name}")
 			meta(property="og:type", content="article")
 			meta(property="og:url", content="#{siteconfig.url + '/places/' + place.uri}")

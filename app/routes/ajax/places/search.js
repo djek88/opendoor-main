@@ -1,19 +1,15 @@
 module.exports = function(config, placeManager){
 	return function (req, res) {
 		var data = req.query;
-		if (req.query.lat && req.query.lng) {
-			data.coordinates = [
-				parseFloat(req.query.lng)
-				, parseFloat(req.query.lat)
-			]
+
+		if (data.lat && data.lng) {
+			data.coordinates = [parseFloat(data.lng), parseFloat(data.lat)];
 		}
+
 		placeManager.findNearby(data, function(err, results){
-			if (!err) {
-				res.send(JSON.stringify(results));
-			}
-			else {
-				res.send(JSON.stringify(err));
-			}
+			if (err) return res.send(JSON.stringify(err));
+
+			res.send(JSON.stringify(results));
 		});
 	};
 }

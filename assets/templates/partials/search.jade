@@ -1,19 +1,13 @@
 #content.content
 	.container
 		.row
-			.col-lg-12
+			.col-lg-12(ng-show='searchComplete')
 				form.form-inline(name="form", novalidate)
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.location.$error.required}")
 						.input-group.location-picker
 							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off", required)
 							input.location-picker-location.hidden(name="location", ng-model="location", required)
-							.input-group-btn
-								button.location-picker-detect-button.btn.btn-inverse Detect my location
 					span.inline-spacer
-					.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
-						select.form-control(name="religion", ng-model="religion")
-							option(value="", selected) All religions
-							option(value="{{name}}", ng-repeat="name in religionsList") {{name}}
 					input.hidden(name="maxDistance", ng-model="maxDistance", value="5000")
 					button.btn.btn-md.btn-primary(type='submit', ng-click="searchPlaces()") Search
 					.clearfix
@@ -26,7 +20,7 @@
 				div(ng-show="places")
 					h5.text-center(ng-show="!places.length")
 						| If you know of a place of worship please&nbsp;
-						a(href="/places/add") add it
+						a(href="/places/add" style="color: red;") add it
 						| &nbsp;or we can&nbsp;
 						a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
 					div(ng-show="places.length")
@@ -46,4 +40,4 @@
 										td.text-right
 											i.fa.fa-chevron-right
 						h4.m-t-40.text-center If the Place of Worship you are looking for isn't listed, please help us by&nbsp;
-							a(href="/places/add") adding it
+							a(href="/places/add" style="color: red;") adding it
