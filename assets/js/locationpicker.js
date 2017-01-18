@@ -2,7 +2,10 @@
  * Created by Vavooon on 22.12.2015.
  */
 define(['libs/googlemaps'], function () {
-	$.fn.locationpicker = function (cb) {
+	$.fn.locationpicker = function (options) {
+		var autoDetect = options.autoDetect;
+		var onLocationDetected = options.onLocationDetected || function() {};
+
 		var geocoder = new google.maps.Geocoder();
 
 		var $rootEl = this;
@@ -42,8 +45,7 @@ define(['libs/googlemaps'], function () {
 				if ($coordsEl) {
 					$coordsEl.val(locationArray.join(', '));
 				}
-			}
-			else {
+			} else {
 				location = null;
 				$inputEl.val('');
 				if ($coordsEl) {
@@ -52,6 +54,7 @@ define(['libs/googlemaps'], function () {
 			}
 			$inputEl.trigger("change");
 			$coordsEl.trigger("change");
+			onLocationDetected();
 		}
 
 		function blur(e) {
@@ -88,8 +91,7 @@ define(['libs/googlemaps'], function () {
 						$(document).on('click', blur);
 					}
 				});
-			}
-			else {
+			} else {
 				setLocation();
 				removeResults();
 			}
@@ -115,8 +117,6 @@ define(['libs/googlemaps'], function () {
 		};
 
 		function showError(error) {
-			cb();
-
 			var errorMessage;
 			switch (error.code) {
 				case error.PERMISSION_DENIED:
@@ -132,6 +132,9 @@ define(['libs/googlemaps'], function () {
 					errorMessage = "An unknown error occurred.";
 					break;
 			}
+
+			$inputEl.val('');
+			onLocationDetected(errorMessage);
 		};
 
 		function getLocationFromBrowser(e) {
@@ -139,8 +142,7 @@ define(['libs/googlemaps'], function () {
 				if (navigator.geolocation) {
 					$inputEl.val('Detecting Location…');
 					navigator.geolocation.getCurrentPosition(onPositionReceive, showError);
-				}
-				else {
+				} else {
 					$scope.error = "Geolocation is not supported by this browser.";
 				}
 			}
@@ -151,16 +153,18 @@ define(['libs/googlemaps'], function () {
 			if (navigator.geolocation) {
 				$inputEl.val('Detecting Location…');
 				navigator.geolocation.getCurrentPosition(onPositionReceive, showError);
-			}
-			else {
+			} else {
 				$scope.error = "Geolocation is not supported by this browser.";
 			}
 		}
 
 		$inputEl.focus(loadResults);
 		$autoDetectEl.click(getLocationFromBrowser);
-		setTimeout( function() {
-			if ($coordsEl.val() == '') getAutoLocationFromBrowser();
-		}, 800);
+
+		if (autoDetect) {
+			setTimeout(function() {
+				if ($coordsEl.val() == '') getAutoLocationFromBrowser();
+			}, 800);
+		}
 	};
 });

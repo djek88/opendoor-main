@@ -7,22 +7,21 @@
 						.input-group.location-picker
 							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off", required)
 							input.location-picker-location.hidden(name="location", ng-model="location", required)
+							.input-group-btn
+								button.location-picker-detect-button.btn.btn-inverse Detect my location
 					span.inline-spacer
 					input.hidden(name="maxDistance", ng-model="maxDistance", value="5000")
-					button.btn.btn-md.btn-primary(type='submit', ng-click="searchPlaces()") Search
+					//- button.btn.btn-md.btn-primary(type='submit', ng-click="searchPlaces()") Search
 					.clearfix
-		.row
-			.col-lg-12(ng-hide='message.length')
-				#results-map
-		.row
-			.col-lg-12.m-t-40
 				h4.text-center(ng-show='message.length') {{message}}
+				h5.text-center(ng-show="!places.length")
+					| If you know of a place of worship please&nbsp;
+					a.add-place(href="/places/add") add it
+					| &nbsp;or we can&nbsp;
+					a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
+		.row
+			.col-lg-6.m-t-20
 				div(ng-show="places")
-					h5.text-center(ng-show="!places.length")
-						| If you know of a place of worship please&nbsp;
-						a(href="/places/add" style="color: red;") add it
-						| &nbsp;or we can&nbsp;
-						a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
 					div(ng-show="places.length")
 						.table-wrap.bg-white
 							table#search-table.table
@@ -40,4 +39,6 @@
 										td.text-right
 											i.fa.fa-chevron-right
 						h4.m-t-40.text-center If the Place of Worship you are looking for isn't listed, please help us by&nbsp;
-							a(href="/places/add" style="color: red;") adding it
+							a.add-place(href="/places/add") adding it
+			.col-lg-6.m-t-20(ng-hide='message.length')
+				#results-map

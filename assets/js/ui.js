@@ -5,16 +5,15 @@
 $(function(){
 	$('html').on('click', function (e) {
 		var $el = $(e.target);
+
 		if ($el.hasClass('link')) {
 			if ($el.parent().hasClass('open')) {
 				$el.parent().removeClass('open');
-			}
-			else {
+			} else {
 				$('.nav.navbar-nav>li').removeClass('open');
 				$el.parent().addClass('open');
 			}
-		}
-		else {
+		} else {
 			$('.nav.navbar-nav>li').removeClass('open');
 		}
 	});

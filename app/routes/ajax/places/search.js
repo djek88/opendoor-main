@@ -1,15 +1,48 @@
-module.exports = function(config, placeManager){
-	return function (req, res) {
-		var data = req.query;
+const http = require('http');
 
-		if (data.lat && data.lng) {
-			data.coordinates = [parseFloat(data.lng), parseFloat(data.lat)];
+module.exports = function(config, placeManager) {
+	return function(req, res) {
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		var data = {};
+
+		if (lat && lng) {
+			data.coordinates = parseCoordinates(lat, lng);
+			placeManager.findNearby(data, sendPlacesList);
+		} else {
+			var userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+			getLocationByIp(userIp, function(err, lat, lng) {
+				if (err) return sendPlacesList(err);
+
+				data.coordinates = parseCoordinates(lat, lng);
+				placeManager.findNearby(data, sendPlacesList);
+			});
 		}
 
-		placeManager.findNearby(data, function(err, results){
-			if (err) return res.send(JSON.stringify(err));
+		function sendPlacesList(err, results) {
+			if (err) return res.status(404).json(err);
 
 			res.send(JSON.stringify(results));
-		});
+		}
 	};
+};
+
+function getLocationByIp(ip, cb) {
+	var url = `http://freegeoip.net/json/${ip}`;
+	//var url = `http://freegeoip.net/json/92.113.9.156`;
+
+	http.get(url, res => {
+		var body = '';
+
+		res.on('data', chunk => body += chunk);
+		res.on('end', () => {
+			body = JSON.parse(body);
+			cb(null, body.latitude, body.longitude);
+		});
+	}).on('error', cb);
+}
+
+function parseCoordinates(lat, lng) {
+	return [parseFloat(lng), parseFloat(lat)];
 }

@@ -8,14 +8,11 @@ define(['./app'], function (opendoorApp) {
 			$locationProvider.html5Mode(true);
 			//var $route = $routeProvider.$get[$routeProvider.$get.length-1]({$on:function(){}});
 			$routeProvider.when('/', {
-				title: 'Search for local Place of Worship'
-				,
-				meta: 'Find your Place of Worship anywhere in the World. Check to make sure your Place of Worship is listed and correct so others can find it.'
-				,
-				templateUrl: 'assets/templates/partials/search.html'
-				,
-				controller: 'SearchCtrl'
-				, resolve: opendoorApp.resolveController('/assets/js/controllers/search.js')
+				title: 'Search for local Place of Worship',
+				meta: 'Find your Place of Worship anywhere in the World. Check to make sure your Place of Worship is listed and correct so others can find it.',
+				templateUrl: 'assets/templates/partials/search.html',
+				controller: 'SearchCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/search.js')
 			}).when('/jobs/add', {
 				title: 'Add job'
 				, shouldLogin: true

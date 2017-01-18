@@ -361,3 +361,7 @@ select.form-control,
 .job span {
 	margin-top: 3px;
 }
+
+.add-place {
+	color: red;
+}

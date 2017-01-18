@@ -98,47 +98,48 @@ var siteconfig = {
 
 
 var frontendPages = [
-	'/'
-	,	'/login'
-	,	'/tools'
-	,	'/register'
-	,	'/feedback'
-	,	'/about'
-	,	'/error'
-	,	'/message'
-	,	'/notfound'
-	,	'/subscribefornotification'
-	,	'/places/add'
-	,	'/places/claims'
-	,	'/places/changes'
-	,	'/places/edit/:id'
-	,	'/places/list'
-	,	'/places/last'
-	,	'/users/list'
-	,	'/users/:id'
-	,	'/promotion/:id'
-	,	'/places/maintained'
-	,	'/places/'
-	,	'/places/:country/'
-	,	'/places/:country/:locality/'
-	,	'/places/review/:id'
-	,	'/places/donate/:id'
-	,	'/places/editorproposal/:id'
-	//, /\/places\/(.*)/
-	, '/events/add'
-	, '/events/search'
-	, '/events/:id/edit'
-	,	'/jobs/search'
-	, '/jobs/add'
-	,	'/jobs/:id'
-	, '/jobs/edit/:id'
-	, '/jobs/fund/:id'
+	'/',
+	'/login',
+	'/tools',
+	'/register',
+	'/feedback',
+	'/about',
+	'/error',
+	'/message',
+	'/notfound',
+	'/subscribefornotification',
+	'/places/add',
+	'/places/claims',
+	'/places/changes',
+	'/places/edit/:id',
+	'/places/list',
+	'/places/last',
+	'/users/list',
+	'/users/:id',
+	'/promotion/:id',
+	'/places/maintained',
+	'/places/',
+	'/places/:country/',
+	'/places/:country/:locality/',
+	'/places/review/:id',
+	'/places/donate/:id',
+	'/places/editorproposal/:id',
+	///\/places\/(.*)/,
+	'/events/add',
+	'/events/search',
+	'/events/:id/edit',
+	'/jobs/search',
+	'/jobs/add',
+	'/jobs/:id',
+	'/jobs/edit/:id',
+	'/jobs/fund/:id'
 ];
 
 var placesFrontEndPages = [
-		'/places/:id'
-	, '/places/:country/:region/:locality/:religion/:groupName/:name'
+	'/places/:id',
+	'/places/:country/:region/:locality/:religion/:groupName/:name'
 ];
+
 if (config.prerenderServiceUrl) {
 	app.use(require('prerender-node')
 		.set('prerenderServiceUrl', config.prerenderServiceUrl)
@@ -150,7 +151,6 @@ app.use(cookieParser(config.cookieKeys));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(busboy({ immediate: true}));
 app.use(session({secret: config.sessionSecret}));
-
 
 
 mongoose.connect(config.mongoURI);
@@ -199,6 +199,7 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 		if (err) {
 			console.log(err);
 		}
+
 		res.send(html);
 	});
 
@@ -211,11 +212,12 @@ app.post('/login', require('./app/routes/login.js')(userManager, sha1));
 app.get('/logout', require('./app/routes/logout.js')());
 app.post('/register', require('./app/routes/register.js')(userManager, sha1));
 
-
 app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
 app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));
 app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
 app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/searchbyip', require('./app/routes/ajax/places/search.js')(config, placeManager));
+
 app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
 app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
 app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
@@ -265,16 +267,17 @@ app.get('/version', function(req, res) {
 
 app.get(frontendPages, function(req, res) {
 	var options = {
-		apiKeys: config.apiKeys
-		, pretty: true
-		, currentYear: currentYear
-		, originalCss: req.query.originalCss
+		apiKeys: config.apiKeys,
+		pretty: true,
+		currentYear: currentYear,
+		originalCss: req.query.originalCss,
+		userIp: req.headers['x-forwarded-for'] || req.connection.remoteAddress
 	};
+
 	jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 		if (!err) {
 			res.send(content);
-		}
-		else {
+		} else {
 			console.log(err);
 		}
 	});
@@ -282,33 +285,33 @@ app.get(frontendPages, function(req, res) {
 
 app.get(placesFrontEndPages, function(req, res) {
 	var query = {};
+
 	if (req.params.country) {
 		query.uri = req.path.substr(8);
-	}
-	else {
+	} else {
 		query._id = req.params.id;
 	}
+
 	placeManager.findOne(query, function(err, place) {
 		var options = {
-			apiKeys: config.apiKeys
-			, isPlace: true
-			, place: place
-			, siteconfig: siteconfig
-			, pretty: true
-			, currentYear: currentYear
-			, originalCss: req.query.originalCss
+			apiKeys: config.apiKeys,
+			isPlace: true,
+			place: place,
+			siteconfig: siteconfig,
+			pretty: true,
+			currentYear: currentYear,
+			originalCss: req.query.originalCss
 		};
+
 		if (!err && place) {
 			jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
 				if (!err) {
 					res.send(content);
-				}
-				else {
+				} else {
 					console.log(err);
 				}
 			});
-		}
-		else {
+		} else {
 			res.sendStatus(404);
 		}
 	});

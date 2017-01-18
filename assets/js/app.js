@@ -94,22 +94,22 @@ define([
 
 	opendoorApp.run(['$rootScope', '$location', '$window', '$q', function($rootScope, $location, $window, $q) {
 		$rootScope.religions = [
-			'Christianity'
-			,	'Islam'
-			,	'Hinduism'
-			,	'Chinese'
-			,	'Buddism'
-			,	'Taoism'
-			,	'Shinto'
-			,	'Sikhism'
-			,	'Judaism'
-			,	'Korean Shamanism'
-			,	'Caodaism'
-			,	'Bahá\'í Faith'
-			,	'Jainism'
-			,	'Cheondoism'
-			,	'Hoahaoism'
-			,	'Tenriism'
+			'Christianity',
+			'Islam',
+			'Hinduism',
+			'Chinese',
+			'Buddism',
+			'Taoism',
+			'Shinto',
+			'Sikhism',
+			'Judaism',
+			'Korean Shamanism',
+			'Caodaism',
+			'Bahá\'í Faith',
+			'Jainism',
+			'Cheondoism',
+			'Hoahaoism',
+			'Tenriism'
 		];
 
 		$rootScope.leaveFeedback = function ($event) {
@@ -259,45 +259,37 @@ define([
 		$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 	}]);
 
-	opendoorApp.config( [
-		'$compileProvider',
-		function( $compileProvider )
-		{
+	opendoorApp.config( ['$compileProvider', function($compileProvider) {
 			$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
-		}
-	]);
+	}]);
 
 	opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {
 		var $metaInfoEl = $('#metaInfo');
-		function toUp(string)
-		{
-			var firstChar = string.substring( 0, 1 ); // == "c"
+
+		function toUp(string) {
+			var firstChar = string.substring(0, 1); // == "c"
 			firstChar = firstChar.toUpperCase();
 			var tail = string.substring( 1 ); // == "heeseburger"
 			string = firstChar + tail;
 			return string;
 		}
-		function onRouteChangeSuccess () {
+
+		function onRouteChangeSuccess() {
 			if ($route.current) {
-				if (typeof($route.current.params.locality) != 'undefined')
-				{
+				if (typeof($route.current.params.locality) != 'undefined') {
 					var country = toUp($route.current.params.country);
 					var locality = toUp($route.current.params.locality);
 					if (country.length + locality.length >= 65 ) document.title = 'Places of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ');
 					else document.title = 'Places of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ') + titlePostfix;
 					$metaInfoEl.attr('name','description');
 					$metaInfoEl.attr('content', 'Find your Place of Worship in ' + locality.replace('-', ' ') + ', ' + country.replace('-', ' ') + '. A complete list of all Places of Worship. Check to make sure your Place of Worship is listed and correct so others can find it.');
-				}
-				else if (typeof($route.current.params.country) != 'undefined')
-				{
+				} else if (typeof($route.current.params.country) != 'undefined') {
 					var country = toUp($route.current.params.country);
 					if (country.length >= 65 ) document.title = 'Places of Worship in ' + country.replace('-', ' ');
 					else document.title = 'Places of Worship in ' + country.replace('-', ' ') + titlePostfix;
 					$metaInfoEl.attr('name','description');
 					$metaInfoEl.attr('content', 'Find your Place of Worship in '+ country.replace('-', ' ') +'. A complete list of all Places of Worship. Check to make sure your Place of Worship is listed and correct so others can find it.');
-				}
-				else
-				{
+				} else {
 					document.title = $route.current.title + titlePostfix;
 					$metaInfoEl.attr('name','description');
 					$metaInfoEl.attr('content', $route.current.meta || '');
@@ -327,5 +319,4 @@ define([
 	}]);
 
 	return opendoorApp;
-
 });
