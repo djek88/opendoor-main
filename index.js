@@ -271,7 +271,7 @@ app.get(frontendPages, function(req, res) {
 		pretty: true,
 		currentYear: currentYear,
 		originalCss: req.query.originalCss,
-		userIp: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+		userIp: 111//req.headers['x-forwarded-for'] || req.connection.remoteAddress
 	};
 
 	jade.renderFile(__dirname + '/assets/templates/index.jade', options, function (err, content) {
