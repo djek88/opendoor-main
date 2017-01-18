@@ -16,7 +16,13 @@ module.exports = function(config, placeManager) {
 				if (err) return sendPlacesList(err);
 
 				data.coordinates = parseCoordinates(lat, lng);
-				placeManager.findNearby(data, sendPlacesList);
+				placeManager.findNearby(data, function(err, results) {
+					if (err) return sendPlacesList(err);
+
+					results.lat = lat;
+					results.lng = lng;
+					sendPlacesList(null, results);
+				});
 			});
 		}
 

@@ -87,6 +87,24 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 				prom.then(displayResults, onError);
 			}
 
+			function setSearchParams() {
+				console.log('setSearchParams');
+				var location = document.forms.form.location.value.split(', ');
+
+				if (location.length == 2) {
+					var reqParams = {
+						lat: location[1],
+						lng: location[0],
+						religion: $scope.religion
+					};
+
+					$location.search('lat', reqParams.lat || null);
+					$location.search('lng', reqParams.lng || null);
+					$location.search('religion', reqParams.religion || null);
+					$rootScope.lastSearchAddress = $scope.address;
+				}
+			}
+
 			/*function autoSearchPlaces() {
 				console.log('autoSearchPlaces');
 
@@ -120,6 +138,10 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 				var places = response.results;
 
+				if (response.lat && response.lng) {
+					$scope.location = response.lng + ', ' + response.lat;
+				}
+
 				if (!places.length) {
 					$scope.message = 'There are no places of worship found near this location';
 				} else {
@@ -131,49 +153,6 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 				$scope.places = places;
 				createMap();
-			}
-
-			function setSearchParams() {
-				console.log('setSearchParams');
-				var location = document.forms.form.location.value.split(', ');
-
-				if (location.length == 2) {
-					var reqParams = {
-						lat: location[1],
-						lng: location[0],
-						religion: $scope.religion
-					};
-
-					$location.search('lat', reqParams.lat || null);
-					$location.search('lng', reqParams.lng || null);
-					$location.search('religion', reqParams.religion || null);
-					$rootScope.lastSearchAddress = $scope.address;
-				}
-			}
-
-			function onLocationDetectComplete() {
-				console.log('onLocationDetectComplete');
-				$scope.message = 'Press "Search" to find nearest place of worship to you';
-				$scope.searchComplete = true;
-			}
-
-			function mouseOut(i) {
-				console.log('mouseOut');
-				map.markers[i + 1].setIcon(map.icons.brightPoi);
-			}
-
-			function mouseOver(i) {
-				console.log('mouseOver');
-				map.markers[i + 1].setIcon(map.icons.defaultPoi);
-			}
-
-			function mirrorPoint(p, o) {
-				console.log('mirrorPoint');
-				var px = p[0];
-				var py = p[1];
-				var ox = o[0];
-				var oy = o[1];
-				return [ox * 2 - px, oy * 2 - py];
 			}
 
 			function createMap() {
@@ -234,6 +213,31 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 						$('tr:nth-child(' + (i + 1) + ')', $table).removeClass('hover');
 					});
 				}
+			}
+
+			function onLocationDetectComplete() {
+				console.log('onLocationDetectComplete');
+				$scope.message = 'Press "Search" to find nearest place of worship to you';
+				$scope.searchComplete = true;////////////////////////////////////////////////////////////////////////
+			}
+
+			function mouseOut(i) {
+				console.log('mouseOut');
+				map.markers[i + 1].setIcon(map.icons.brightPoi);
+			}
+
+			function mouseOver(i) {
+				console.log('mouseOver');
+				map.markers[i + 1].setIcon(map.icons.defaultPoi);
+			}
+
+			function mirrorPoint(p, o) {
+				console.log('mirrorPoint');
+				var px = p[0];
+				var py = p[1];
+				var ox = o[0];
+				var oy = o[1];
+				return [ox * 2 - px, oy * 2 - py];
 			}
 
 			function isValidLatitude(lat) {
