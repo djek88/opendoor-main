@@ -35,8 +35,8 @@ module.exports = function(config, placeManager) {
 };
 
 function getLocationByIp(ip, cb) {
-	//var url = 'http://freegeoip.net/json/' + ip;
-	var url = `http://freegeoip.net/json/92.113.9.156`;
+	var url = 'http://freegeoip.net/json/' + ip;
+	//var url = 'http://freegeoip.net/json/92.113.9.156';
 
 	http.get(url, function(res) {
 		var body = '';
