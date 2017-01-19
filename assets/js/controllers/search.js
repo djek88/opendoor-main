@@ -129,11 +129,11 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 				$rootScope.getMapInstance($('#results-map')).then(function(m) {
 					map = m;
 
-					/*google.maps.event.addListenerOnce(map, 'idle', function() {
+					google.maps.event.addListenerOnce(map, 'idle', function() {
 						addMarkers($scope.places);
 					});
 
-					addMarkers($scope.places);*/
+					addMarkers($scope.places);
 				});
 			}
 
