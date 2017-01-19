@@ -183,72 +183,72 @@ define([
 			return $q(function(resolve, reject) {
 				require(['libs/googlemaps'], function (google) {
 					window.google = google;
-					if (!$rootScope.map) {
-						var div = $('<div id="map"></div>');
-						$(targetEl).append(div);
-						var map = $rootScope.map = new google.maps.Map(div[0], {
-							scrollwheel: false
-							, streetViewControl: false
-							, draggable: !('ontouchend' in document)
-						});
-						map.markers = [];
-						map.infoWindows = [];
 
-						map.icons = {
-							brightPoi: '/assets/img/spotlight-poi-bright.png'
-							, defaultPoi: '/assets/img/spotlight-poi.png'
-							, location: '/assets/img/mylocation.png'
-						};
-
-						var setPosition = google.maps.InfoWindow.prototype.setPosition;
-						google.maps.InfoWindow.prototype.setPosition = function () {
-							map.infoWindows.push(this);
-							setPosition.apply(this, arguments);
-						};
-
-
-						map.removeMarkers = function () {
-							var marker;
-							while (marker = map.markers.pop()) {
-								marker.setMap(null);
-							}
-						};
-
-						map.removeInfoWindows = function () {
-							var infoWindow;
-							while (infoWindow = map.infoWindows.pop()) {
-								infoWindow.setMap(null);
-							}
-						};
-
-						map.addMarker = function (opts) {
-							opts.map = map;
-							var marker = new google.maps.Marker(opts);
-							map.markers.push(marker);
-							return marker;
-						};
-
-						map.setMarker = function (location, bounds) {
-							if (bounds) {
-								map.fitBounds(bounds);
-							}
-							else {
-								map.setZoom(16);
-							}
-							var pos = new google.maps.LatLng(location[1], location[0]);
-							map.addMarker({
-								position: pos
-								, map: map
-								, icon: map.icons.defaultPoi
-							});
-							map.setCenter(pos);
-						}
-					}
-					else {
+					if ($rootScope.map) {
 						$(targetEl).append($rootScope.map.getDiv());
 						$rootScope.map.removeMarkers();
 						$rootScope.map.removeInfoWindows();
+						return resolve($rootScope.map);
 					}
+
+					var div = $('<div id="map"></div>');
+					$(targetEl).append(div);
+					var map = $rootScope.map = new google.maps.Map(div[0], {
+						scrollwheel: false,
+						streetViewControl: false,
+						draggable: !('ontouchend' in document)
+					});
+					map.markers = [];
+					map.infoWindows = [];
+					map.icons = {
+						brightPoi: '/assets/img/spotlight-poi-bright.png',
+						defaultPoi: '/assets/img/spotlight-poi.png',
+						location: '/assets/img/mylocation.png'
+					};
+
+					var setPosition = google.maps.InfoWindow.prototype.setPosition;
+					google.maps.InfoWindow.prototype.setPosition = function() {
+						map.infoWindows.push(this);
+						setPosition.apply(this, arguments);
+					};
+
+					map.removeMarkers = function () {
+						var marker;
+						while (marker = map.markers.pop()) {
+							marker.setMap(null);
+						}
+					};
+
+					map.removeInfoWindows = function () {
+						var infoWindow;
+						while (infoWindow = map.infoWindows.pop()) {
+							infoWindow.setMap(null);
+						}
+					};
+
+					map.addMarker = function (opts) {
+						opts.map = map;
+						var marker = new google.maps.Marker(opts);
+						map.markers.push(marker);
+						return marker;
+					};
+
+					map.setMarker = function (location, bounds) {
+						if (bounds) {
+							map.fitBounds(bounds);
+						} else {
+							map.setZoom(16);
+						}
+
+						var pos = new google.maps.LatLng(location[1], location[0]);
+						map.addMarker({
+							position: pos,
+							map: map,
+							icon: map.icons.defaultPoi
+						});
+						map.setCenter(pos);
+					}
+
 					resolve($rootScope.map);
 				});
 			});

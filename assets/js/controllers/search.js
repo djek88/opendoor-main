@@ -5,24 +5,24 @@
 define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 	'use strict';
 
-	opendoorApp.registerController('SearchCtrl', ['$scope', '$http', '$rootScope', '$location',
-		function($scope, $http, $rootScope, $location) {
+	opendoorApp.registerController('SearchCtrl', ['$scope', '$http', '$rootScope', '$location', '$cookies',
+		function($scope, $http, $rootScope, $location, $cookies) {
 			console.log('tic', $scope.userIp);
 
 			var map;
-			var $locationInputEl = $('.location-picker-address');
 			var reqParams = $location.search();
 			var $table = $('#search-table');
+			var prevLocation = {
+				lat: Number($cookies.get('latitude')),
+				lng: Number($cookies.get('longitude'))
+			};
 
-			//$scope.ft = 1;
 			$scope.places = null;
 			$scope.message = 'Getting Your Current Location';
-			//$scope.religionsList = $rootScope.religions;
 			$scope.religion = '';
 
 			$scope.mouseOver = mouseOver;
 			$scope.mouseOut = mouseOut;
-			$scope.searchPlaces = searchPlaces;
 
 			$('.location-picker').locationpicker({
 				autoDetect: false,
@@ -38,35 +38,21 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 			if (isValidLatitude(reqParams.lat) && isValidLongitude(reqParams.lng)) {
 				searchPlaces();
 				onLocationDetectComplete();
+			} else if (isValidLatitude(prevLocation.lat) &&
+					isValidLongitude(prevLocation.lng)) {
+				document.forms.form.location.value = prevLocation.lng + ', ' + prevLocation.lat;
+				setSearchParams();
 			} else {
 				searchPlacesByIp(onLocationDetectComplete);
 			}
 
-			/*$(".location-picker-location").change(function() {
-				console.log('location-picker-location CHANGE', $scope.ft);
-
-				if ($scope.ft == 1 && $.isEmptyObject(reqParams)) {
-					autoSearchPlaces();
-					$scope.address = '';
-				}
-
-				$scope.ft = 2;
-			});*/
-
 			function searchPlaces() {
 				console.log('searchPlaces');
-				/*$scope.form.$submitted = true;
-
-				if ($locationInputEl.attr('active') == '1') {
-					$locationInputEl.one('change', setSearchParams);
-				} else {
-					setSearchParams();
-				}*/
 
 				$scope.lat = reqParams.lat;
 				$scope.lng = reqParams.lng;
-				$scope.location = reqParams.lng + ', ' + reqParams.lat;
-				$scope.address = $rootScope.lastSearchAddress || $scope.location;
+				document.forms.form.location.value = reqParams.lng + ', ' + reqParams.lat;
+				$scope.address = $rootScope.lastSearchAddress || document.forms.form.location.value;
 				$scope.religion = reqParams.religion;
 				$scope.message = 'Searching…';
 				reqParams.maxDistance = 15000;
@@ -81,7 +67,8 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 			function searchPlacesByIp(cb) {
 				var prom = $http({
 					url: '/ajax/places/search',
-					method: 'GET'
+					method: 'GET',
+					params: {maxDistance: 20000}
 				});
 				prom.then(cb);
 				prom.then(displayResults, onError);
@@ -91,12 +78,14 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 				console.log('setSearchParams');
 				var location = document.forms.form.location.value.split(', ');
 
-				if (location.length == 2) {
+				if (location.length === 2) {
 					var reqParams = {
 						lat: location[1],
 						lng: location[0],
 						religion: $scope.religion
 					};
+
+					saveCoordinatesInCookies(reqParams.lat, reqParams.lng);
 
 					$location.search('lat', reqParams.lat || null);
 					$location.search('lng', reqParams.lng || null);
@@ -104,30 +93,6 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 					$rootScope.lastSearchAddress = $scope.address;
 				}
 			}
-
-			/*function autoSearchPlaces() {
-				console.log('autoSearchPlaces');
-
-				if ($locationInputEl.attr('active') == '1') {
-					$locationInputEl.one('change', setSearchParams);
-				} else {
-					setSearchParams();
-				}
-
-				$scope.lat = reqParams.lat;
-				$scope.lng = reqParams.lng;
-				$scope.location = reqParams.lng + ', ' + reqParams.lat;
-				$scope.address = $rootScope.lastSearchAddress || $scope.location;
-				$scope.religion = reqParams.religion;
-				$scope.message = 'Searching…';
-				reqParams.maxDistance = 15000;
-
-				$http({
-					url: '/ajax/places/search',
-					method: 'GET',
-					params: reqParams,
-				}).success(displayResults).error(onError);
-			}*/
 
 			function displayResults(response) {
 				response = response.data;
@@ -138,8 +103,10 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 				var places = response.results;
 
-				if (response.lat && response.lng) {
-					$scope.location = response.lng + ', ' + response.lat;
+				if (isValidLatitude(response.lat) &&
+						isValidLongitude(response.lng)) {
+					document.forms.form.location.value = response.lng + ', ' + response.lat;
+					saveCoordinatesInCookies(response.lat, response.lng);
 				}
 
 				if (!places.length) {
@@ -173,7 +140,7 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 			function addMarkers(data) {
 				console.log('addMarkers');
 				var bounds = new google.maps.LatLngBounds();
-				var location = $scope.location.split(', ');
+				var location = document.forms.form.location.value.split(', ');
 				map.removeMarkers();
 				map.markers.push(new google.maps.Marker({
 					position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])},
@@ -218,7 +185,12 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 			function onLocationDetectComplete() {
 				console.log('onLocationDetectComplete');
 				$scope.message = 'Press "Search" to find nearest place of worship to you';
-				$scope.searchComplete = true;////////////////////////////////////////////////////////////////////////
+				$scope.searchComplete = true;
+			}
+
+			function saveCoordinatesInCookies(lat, lng) {
+				$cookies.put('latitude', lat);
+				$cookies.put('longitude', lng);
 			}
 
 			function mouseOut(i) {
@@ -242,18 +214,17 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 			function isValidLatitude(lat) {
 				console.log('isValidLatitude');
-				return isFinite(lat) && Math.abs(lat) <= 90;
+				return lat !== null && isFinite(lat) && Math.abs(lat) <= 90;
 			}
 
 			function isValidLongitude(lng) {
 				console.log('isValidLongitude');
-				return isFinite(lng) && Math.abs(lng) <= 180;
+				return lng !== null && isFinite(lng) && Math.abs(lng) <= 180;
 			}
 
 			function onError(msg) {
 				console.log('onError');
 				$scope.message = msg || 'Occur error during request!';
-				//$scope.address = '';
 				$scope.places = null;
 			}
 		}

@@ -2,12 +2,10 @@ const http = require('http');
 
 module.exports = function(config, placeManager) {
 	return function(req, res) {
-		var lat = req.query.lat;
-		var lng = req.query.lng;
-		var data = {};
+		var data = req.query;
 
-		if (lat && lng) {
-			data.coordinates = parseCoordinates(lat, lng);
+		if (data.lat && data.lng) {
+			data.coordinates = parseCoordinates(data.lat, data.lng);
 			placeManager.findNearby(data, sendPlacesList);
 		} else {
 			var userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

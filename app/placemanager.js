@@ -395,28 +395,30 @@ module.exports = function(mongoose, email, config) {
 		this.findNearby = function(data, callback) {
 			var skipPosition;
 			var limitPosition;
-			var geoNearOption = {
-				"near": {
-					"type": "Point"
-					,	"coordinates": data.coordinates
-				}
-				,	"distanceField": "distance"
-				//,	"maxDistance": 2000
-				,	"spherical": true
-				,	"query": { "location.type": "Point" }
-			};
 			var matchOption = {};
-
-
+			var geoNearOption = {
+				"distanceField": "distance",
+				"spherical": true,
+				//"maxDistance": 2000,
+				"near": {
+					"type": "Point",
+					"coordinates": data.coordinates
+				},
+				"query": {
+					"location.type": "Point"
+				}
+			};
 			var options = [
 				{
 					"$match": matchOption
 				}
 			];
+
 			if (data.coordinates) {
-				options.unshift({"$geoNear": geoNearOption}, {
-					"$sort": {"distance": 1} // Show the nearest first
-				});
+				options.unshift(
+					{"$geoNear": geoNearOption},
+					{"$sort": {"distance": 1}} // Show the nearest first
+				);
 			}
 
 			if (data.hasOwnProperty('isConfirmed')) {
@@ -438,6 +440,7 @@ module.exports = function(mongoose, email, config) {
 			if (data.country) {
 				matchOption['address.country'] = new RegExp(decodeURI(data.country).replace(/-/g, ' '), 'i');
 			}
+
 			if (data.locality) {
 				matchOption['address.locality'] = new RegExp(decodeURI(data.locality).replace(/-/g, ' '), 'i');
 			}
@@ -445,17 +448,19 @@ module.exports = function(mongoose, email, config) {
 			if (data.maxDistance) {
 				geoNearOption.maxDistance = parseInt(data.maxDistance);
 			}
+
 			if (data.skip) {
 				skipPosition = options.push({"$skip": parseInt(data.skip)});
 			}
+
 			if (data.limit) {
 				var limit = parseInt(data.limit);
 				limit = limit > config.frontend.maxItemsPerPage ? config.frontend.maxItemsPerPage : limit;
 				limitPosition = options.push({"$limit": limit});
-			}
-			else {
+			} else {
 				limitPosition = options.push({"$limit": config.frontend.itemsPerPage});
 			}
+
 			if (data.exclude) {
 				geoNearOption['query']['_id'] = {'$ne': mongoose.Types.ObjectId(data.exclude)};
 			}
@@ -464,23 +469,24 @@ module.exports = function(mongoose, email, config) {
 				matchOption['maintainer'] = {$ne: null};
 			}
 
-			console.log(matchOption);
 			Place.aggregate(options, function(err, places){
 				options.push({ $group: { _id: null, count: { $sum: 1 } } });
-
 
 				if (limitPosition) {
 					options.splice(limitPosition - 1, 1);
 				}
+
 				if (skipPosition) {
 					options.splice(skipPosition - 1, 1);
 				}
+
 				Place.aggregate(options, function(err, stats){
 					Place.populate(places, {path: "maintainer"}, function(err, places){
 						var response = {
-							results: places
-							, count: stats[0] ? stats[0].count : 0
+							results: places,
+							count: stats[0] ? stats[0].count : 0
 						};
+
 						if (typeof callback == 'function') {
 							callback(err, response);
 						}
