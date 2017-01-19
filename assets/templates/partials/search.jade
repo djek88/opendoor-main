@@ -6,7 +6,7 @@
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.location.$error.required}")
 						.input-group.location-picker
 							input.location-picker-address.form-control(name="address", ng-model="address", placeholder="Address", autocomplete="off", required)
-							input.location-picker-location.hidden(name="location", ng-model="location", required)
+							input.location-picker-location.hidden(name="location" required)
 							.input-group-btn
 								button.location-picker-detect-button.btn.btn-inverse Detect my location
 					span.inline-spacer
