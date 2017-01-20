@@ -140,92 +140,93 @@ module.exports = function(mongoose, email, config) {
 		expireDate: Date
 	});
 
-	var placeSchema = new mongoose.Schema({
+	var placeSchema = new mongoose.Schema(
+		{
 			name: {
-				type: String
-				,	required: true
-			}
-			, uri: {
-				type: String
-				,	required: true
-			}
-			, religion: {
-				type: String
-				,	required: true
-			}
-			, groupName: {
-				type: String
-				,	required: true
-			}
-			, address: {
-					line1: String
-				,	line2: String
-				, locality: {
-					type: String
-					,	required: true
+				type: String,
+				required: true
+			},
+			uri: {
+				type: String,
+				required: true
+			},
+			religion: {
+				type: String,
+				required: true
+			},
+			groupName: {
+				type: String,
+				required: true
+			},
+			address: {
+				line1: String,
+				line2: String,
+				region: String,
+				postalCode: String,
+				locality: {
+					type: String,
+					required: true
+				},
+				country: {
+					type: String,
+					required: true
 				}
-				,	region: String
-				,	country: {
-					type: String
-					,	required: true
-				}
-				,	postalCode: String
-			}
-			, concatenatedAddress: String
-			, location : {
+			},
+			concatenatedAddress: String,
+			location : {
 				type: {
-					type: String
-					,	default: 'Point'
-				}
-				,	coordinates: [Number]
-			}
-			, denominations: [String]
-			, leaderName: String
-			, leaderRole: String
-			, phone: String
-			, homepage: String
-			, email: String
-			, mainMeetingDay: String
-			, mainMeetingTime: Date
-			, bannerPhoto: String
-			, leaderPhoto: String
-			, about: String
-			, travelInformation: String
-			, addedByEmail: String
-			, maintainer: {
-				type: mongoose.Schema.Types.ObjectId
-				, ref: 'user'
-			}
-			, isConfirmed: Boolean
-			, reviews: {
-				type: [reviewSchema]
-				,	default: []
-			}
-			, events: {
-				type: [eventSchema]
-				, default: []
-			}
-			, promotions: {
-				type: [promotionSchema]
-				, default: []
-			}
-			, jobs: {
-				type: [jobSchema]
-				, default: []
-			}
-			,	averageRating: {
-				type: Number
-				,	default: 0
-			}
-			,	ratingsCount: {
-				type: Number
-				,	default: 0
-			}
-			,	jsonLd: mongoose.Schema.Types.Mixed
+					type: String,
+					default: 'Point'
+				},
+				coordinates: [Number]
+			},
+			denominations: [String],
+			leaderName: String,
+			leaderRole: String,
+			phone: String,
+			homepage: String,
+			email: String,
+			mainMeetingDay: String,
+			mainMeetingTime: Date,
+			bannerPhoto: String,
+			leaderPhoto: String,
+			about: String,
+			travelInformation: String,
+			addedByEmail: String,
+			maintainer: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'user'
+			},
+			isConfirmed: Boolean,
+			reviews: {
+				type: [reviewSchema],
+				default: []
+			},
+			events: {
+				type: [eventSchema],
+				default: []
+			},
+			promotions: {
+				type: [promotionSchema],
+				default: []
+			},
+			jobs: {
+				type: [jobSchema],
+				default: []
+			},
+			averageRating: {
+				type: Number,
+				default: 0
+			},
+			ratingsCount: {
+				type: Number,
+				default: 0
+			},
+			jsonLd: mongoose.Schema.Types.Mixed
+		}, {
+			timestamps: true
 		}
-		, {
-		timestamps: true
-	});
+	);
 	placeSchema.index({location: '2dsphere'});
 	placeSchema.set('autoIndex', true);
 
@@ -340,7 +341,6 @@ module.exports = function(mongoose, email, config) {
 					}
 				}
 			});
-
 		};
 
 		this.update = function(id, data, callback) {
@@ -360,8 +360,6 @@ module.exports = function(mongoose, email, config) {
 					}
 				});
 			})
-
-
 		};
 
 		this.setMaintainer = function(id, maintainerId, callback) {
@@ -499,7 +497,6 @@ module.exports = function(mongoose, email, config) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}).populate('maintainer', 'name').exec(callback);
 		};
 
-
 		this.markAsConfirmed = function(id, callback) {
 			Place.findOneAndUpdate({'_id': id, isConfirmed: false}, {isConfirmed: true}, function(err, place){
 				if (place) {
@@ -544,7 +541,6 @@ module.exports = function(mongoose, email, config) {
 			});
 		};
 
-
 		this.addEvent = function(id, data, callback) {
 			Place.findOne({'_id': mongoose.Types.ObjectId(id)}, function(err, place) {
 				if (!err && place) {
@@ -576,7 +572,6 @@ module.exports = function(mongoose, email, config) {
 				}
 				place.save(callback);
 			});
-
 		}
 
 		this.addPromotion = function(id, data, callback) {
