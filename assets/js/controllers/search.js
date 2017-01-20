@@ -190,6 +190,14 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 								var location = [lng, lat];
 								map.removeMarkers();
 
+								// add marker for user location
+								map.addMarker({
+									position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])},
+									map: map,
+									icon: map.icons.location,
+									title: 'My location'
+								});
+
 								var data = $scope.places;
 
 								// add markers for churches
