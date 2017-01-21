@@ -164,7 +164,7 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 							searchPlaces({
 								lat: mapCenterLat,
 								lng: mapCenterLng,
-								maxDistance: 5000
+								maxDistance: 10000
 							}, function(places) {
 								saveLatLng(mapCenterLat, mapCenterLng);
 
