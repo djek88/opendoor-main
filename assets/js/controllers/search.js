@@ -54,7 +54,7 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 				searchPlacesByIp(function(places, lat, lng) {
 					saveLatLng(lat, lng);
-					updateScopeProperties();
+					updateScopeProperties(places);
 
 					$scope.searchComplete = true;
 
