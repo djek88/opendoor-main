@@ -10,7 +10,8 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 			console.log('tic', $scope.userIp);
 
 			var map;
-			var reqParams = $location.search();
+			var USERMARKERTITLE = 'My location';
+			var urlParams = $location.search();
 			var $table = $('#search-table');
 			var prevLocation = {
 				lat: Number($cookies.get('latitude')),
@@ -19,7 +20,6 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 
 			$scope.places = null;
 			$scope.message = 'Getting Your Current Location';
-			$scope.religion = '';
 
 			$scope.mouseOver = mouseOver;
 			$scope.mouseOut = mouseOut;
@@ -30,117 +30,121 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 					$scope.$apply(function() {
 						if (errMsg) return onError(errMsg);
 
-						setSearchParams();
+						setUrlParams();
 					});
 				}
 			});
 
-			if (isValidLatitude(reqParams.lat) && isValidLongitude(reqParams.lng)) {
-				searchPlaces();
-				onLocationDetectComplete();
-			} else if (isValidLatitude(prevLocation.lat) &&
-					isValidLongitude(prevLocation.lng)) {
+			if (isValidLatitude(urlParams.lat) && isValidLongitude(urlParams.lng)) {
+				$scope.message = 'Searching…';
+
+				searchPlaces(urlParams, function(places) {
+					saveLatLng(urlParams.lat, urlParams.lng);
+					updateScopeProperties(places);
+
+					$scope.searchComplete = true;
+
+					createMap();
+				});
+			} else if (isValidLatitude(prevLocation.lat) && isValidLongitude(prevLocation.lng)) {
 				document.forms.form.location.value = prevLocation.lng + ', ' + prevLocation.lat;
-				setSearchParams();
+				setUrlParams();
 			} else {
-				searchPlacesByIp(onLocationDetectComplete);
+				$scope.message = 'Searching…';
+
+				searchPlacesByIp(function(places, lat, lng) {
+					saveLatLng(lat, lng);
+					updateScopeProperties();
+
+					$scope.searchComplete = true;
+
+					createMap();
+				});
 			}
 
-			function searchPlaces() {
-				console.log('searchPlaces');
+			function saveLatLng(lat, lng) {
+				$scope.lat = lat;
+				$scope.lng = lng;
+				document.forms.form.location.value = lng + ', ' + lat;
+				saveLatLngInCookies(lat, lng);
+			}
 
-				$scope.lat = reqParams.lat;
-				$scope.lng = reqParams.lng;
-				document.forms.form.location.value = reqParams.lng + ', ' + reqParams.lat;
-				$scope.address = $rootScope.lastSearchAddress || document.forms.form.location.value;
-				$scope.religion = reqParams.religion;
-				$scope.message = 'Searching…';
-				reqParams.maxDistance = reqParams.maxDistance || 5000;
-
+			function searchPlaces(params, cb) {
 				$http({
 					url: '/ajax/places/search',
 					method: 'GET',
-					params: reqParams
-				}).then(displayResults, onError);
+					params: params
+				}).then(function(response) {
+					/////////////////////
+					/*response = {data: {"results":[
+							{"_id":"56c635948a8e8be0c0c0bced","address":{"line1":"Leicester Place","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"WC2H 7BP"},"averageRating":0,"concatenatedAddress":"Leicester Place, London, Greater London, United Kingdom, WC2H 7BP","denominations":[],"events":[],"groupName":"Catholic","hash":"ef0e9b8b6b06ac183a1408bcd1d997d0062d16e5","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Notre Dame de France","geo":{"@type":"GeoCoordinates","latitude":51.5109632,"longitude":-0.1302443},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"WC2H 7BP","streetAddress":"Leicester Place"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/notre-dame-de-france"},"location":{"type":"Point","coordinates":[-0.1302443,51.5109632]},"name":"Notre Dame de France","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/notre-dame-de-france","distance":437.4522716903821},
+							{"_id":"56c635948a8e8be0c0c0bcdf","address":{"line1":"Maiden Lane","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"WC2E 7NA"},"averageRating":0,"concatenatedAddress":"Maiden Lane, London, Greater London, United Kingdom, WC2E 7NA","denominations":[],"events":[],"groupName":"Catholic","hash":"691d7398e0c7667a15494c0406066014b6b666d6","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Corpus Christi","geo":{"@type":"GeoCoordinates","latitude":51.5106625,"longitude":-0.1232665},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"WC2E 7NA","streetAddress":"Maiden Lane"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/corpus-christi"},"location":{"type":"Point","coordinates":[-0.1232665,51.5106625]},"name":"Corpus Christi","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/corpus-christi","distance":482.4410491157676},
+							{"_id":"56c635958a8e8be0c0c0e4bc","address":{"line1":"13 Poland Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W1F 8QB"},"averageRating":0,"concatenatedAddress":"13 Poland Street, London, Greater London, United Kingdom, W1F 8QB","denominations":[],"events":[],"groupName":"Catholic","hash":"2a7917bc777e2e8cd146a370494d5a3e6f530b8a","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Holy Brother Albert","geo":{"@type":"GeoCoordinates","latitude":51.51461399999999,"longitude":-0.1368965},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W1F 8QB","streetAddress":"13 Poland Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/holy-brother-albert"},"location":{"type":"Point","coordinates":[-0.1368965,51.51461399999999]},"name":"Holy Brother Albert","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/holy-brother-albert","distance":1026.8999961078707},
+							{"_id":"56c635948a8e8be0c0c0bd1c","address":{"line1":"70 Lincoln's Inn Fields","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"WC2A 3JA"},"averageRating":0,"concatenatedAddress":"70 Lincoln's Inn Fields, London, Greater London, United Kingdom, WC2A 3JA","denominations":[],"events":[],"groupName":"Catholic","hash":"c3e4f9a02f7eb0600ba293cb16e0efa1f8f7455b","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Anselm and St Cecilia","geo":{"@type":"GeoCoordinates","latitude":51.5167207,"longitude":-0.1189408},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"WC2A 3JA","streetAddress":"70 Lincoln's Inn Fields"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-anselm-and-st-cecilia"},"location":{"type":"Point","coordinates":[-0.1189408,51.5167207]},"name":"St. Anselm and St Cecilia","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-anselm-and-st-cecilia","distance":1208.753566687858},
+							{"_id":"56c635918a8e8be0c0bfcc02","address":{"line1":"Westminster Community Church, 2 Greycoat Place","line2":"","locality":"London","region":"London","country":"England","postalCode":"SW1P 1SB"},"averageRating":0,"concatenatedAddress":"Westminster Community Church, 2 Greycoat Place, London, London, England, SW1P 1SB","denominations":[],"events":[],"groupName":"RCCG","hash":"38e79324ef90761517f3dbd4595a1dda2921f642","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Shekhinah Glory Of The Living God","geo":{"@type":"GeoCoordinates","latitude":51.4966083,"longitude":-0.1339058},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"London","addressRegion":"London","postalCode":"SW1P 1SB","streetAddress":"Westminster Community Church, 2 Greycoat Place"},"mainentityofpage":"https://opendoor.ooo/places/england/london/london/christianity/rccg/shekhinah-glory-of-the-living-god"},"location":{"type":"Point","coordinates":[-0.1339058,51.4966083]},"name":"Shekhinah Glory Of The Living God","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/london/christianity/rccg/shekhinah-glory-of-the-living-god","distance":1269.461545619689},
+							{"_id":"56c635918a8e8be0c0bfcc84","address":{"line1":"106 Doreen Ramsey Court, The Cut","line2":"","locality":"London","region":"Greater London","country":"England","postalCode":"SE1 8LN"},"averageRating":0,"concatenatedAddress":"106 Doreen Ramsey Court, The Cut, London, Greater London, England, SE1 8LN","denominations":[],"events":[],"groupName":"RCCG","hash":"a861674e75441e7d9f3f3a9c08c5271e97c78231","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Zion Assembly Elephant & Castle","geo":{"@type":"GeoCoordinates","latitude":51.5022931,"longitude":-0.1096526},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"London","addressRegion":"Greater London","postalCode":"SE1 8LN","streetAddress":"106 Doreen Ramsey Court, The Cut"},"mainentityofpage":"https://opendoor.ooo/places/england/greater-london/london/christianity/rccg/zion-assembly-elephant-castle"},"location":{"type":"Point","coordinates":[-0.1096526,51.5022931]},"name":"Zion Assembly Elephant & Castle","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/greater-london/london/christianity/rccg/zion-assembly-elephant-castle","distance":1375.097885471472},
+							{"_id":"56c635948a8e8be0c0c0bd65","address":{"line1":"114 Mount Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W1K 3AH"},"averageRating":0,"concatenatedAddress":"114 Mount Street, London, Greater London, United Kingdom, W1K 3AH","denominations":[],"events":[],"groupName":"Catholic","hash":"8d9a857866e4aa95a3d575a1f54d9108dd8a5792","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"The Immaculate Conception","geo":{"@type":"GeoCoordinates","latitude":51.50986,"longitude":-0.1489946},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W1K 3AH","streetAddress":"114 Mount Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/the-immaculate-conception"},"location":{"type":"Point","coordinates":[-0.1489946,51.50986]},"name":"The Immaculate Conception","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/the-immaculate-conception","distance":1497.6234460374535},
+							{"_id":"56c635948a8e8be0c0c0bce5","address":{"line1":"114 Mount Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W1K 3AH"},"averageRating":0,"concatenatedAddress":"114 Mount Street, London, Greater London, United Kingdom, W1K 3AH","denominations":[],"events":[],"groupName":"Catholic","hash":"7062b6814d76c135f29bf37b3753659877079ccc","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Immaculate Conception","geo":{"@type":"GeoCoordinates","latitude":51.50986,"longitude":-0.1489946},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W1K 3AH","streetAddress":"114 Mount Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/immaculate-conception"},"location":{"type":"Point","coordinates":[-0.1489946,51.50986]},"name":"Immaculate Conception","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/immaculate-conception","distance":1497.6234460374535},
+							{"_id":"56c635948a8e8be0c0c0bcd6","address":{"line1":"Ambrosden Avenue","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"SW1P"},"averageRating":0,"concatenatedAddress":"Ambrosden Avenue, London, Greater London, United Kingdom, SW1P","denominations":[],"events":[],"groupName":"Catholic","hash":"8279cc5a61157dd97d6ad0c154d50f498c643d28","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Archdiocese of Westminster","geo":{"@type":"GeoCoordinates","latitude":51.4957943,"longitude":-0.1388978},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"SW1P","streetAddress":"Ambrosden Avenue"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/archdiocese-of-westminster"},"location":{"type":"Point","coordinates":[-0.1388978,51.4957943]},"name":"Archdiocese of Westminster","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/archdiocese-of-westminster","distance":1500.2831850472398},
+							{"_id":"56c635918a8e8be0c0bfcb4c","address":{"line1":"Doggett’S House, Blackfrairs Bridge","line2":"","locality":"Greater London","region":"Greater London","country":"England","postalCode":"SE1 9UD"},"averageRating":0,"concatenatedAddress":"Doggett’S House, Blackfrairs Bridge, Greater London, Greater London, England, SE1 9UD","denominations":[],"events":[],"groupName":"RCCG","hash":"d6bbe23f8605707cadda07af48444fc6f119407b","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"King’S Centre Blackfriars","geo":{"@type":"GeoCoordinates","latitude":51.5084515,"longitude":-0.1048548},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Greater London","addressRegion":"Greater London","postalCode":"SE1 9UD","streetAddress":"Doggett’S House, Blackfrairs Bridge"},"mainentityofpage":"https://opendoor.ooo/places/england/greater-london/greater-london/christianity/rccg/kings-centre-blackfriars"},"location":{"type":"Point","coordinates":[-0.1048548,51.5084515]},"name":"King’S Centre Blackfriars","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/greater-london/greater-london/christianity/rccg/kings-centre-blackfriars","distance":1591.6051793595184},
+							{"_id":"56c635918a8e8be0c0bfcbb4","address":{"line1":"Doggett Coats And Badge, 1 Blackfriars Road","line2":"","locality":"Waterloo","region":"London","country":"England","postalCode":"SE1 9UD"},"averageRating":0,"concatenatedAddress":"Doggett Coats And Badge, 1 Blackfriars Road, Waterloo, London, England, SE1 9UD","denominations":[],"events":[],"groupName":"RCCG","hash":"5ae9d87dfee9e1a2d15b71373ae2d9d16f62ccc1","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Our God Reigns Waterloo","geo":{"@type":"GeoCoordinates","latitude":51.5084515,"longitude":-0.1048548},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Waterloo","addressRegion":"London","postalCode":"SE1 9UD","streetAddress":"Doggett Coats And Badge, 1 Blackfriars Road"},"mainentityofpage":"https://opendoor.ooo/places/england/london/waterloo/christianity/rccg/our-god-reigns-waterloo"},"location":{"type":"Point","coordinates":[-0.1048548,51.5084515]},"name":"Our God Reigns Waterloo","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/waterloo/christianity/rccg/our-god-reigns-waterloo","distance":1591.6051793595184},
+							{"_id":"56c635948a8e8be0c0c0bd22","address":{"line1":"8 Ogle Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W1W 6HS"},"averageRating":0,"concatenatedAddress":"8 Ogle Street, London, Greater London, United Kingdom, W1W 6HS","denominations":[],"events":[],"groupName":"Catholic","hash":"a0d6a629146eefd4ad791c20e73f5783102d0932","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Charles Borromeo","geo":{"@type":"GeoCoordinates","latitude":51.52012879999999,"longitude":-0.1400982},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W1W 6HS","streetAddress":"8 Ogle Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-charles-borromeo"},"location":{"type":"Point","coordinates":[-0.1400982,51.52012879999999]},"name":"St. Charles Borromeo","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-charles-borromeo","distance":1659.5422749367965},
+							{"_id":"56c635948a8e8be0c0c0bc93","address":{"line1":"150 Saint George's Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"SE1 6HX"},"averageRating":0,"concatenatedAddress":"150 Saint George's Road, London, Greater London, United Kingdom, SE1 6HX","denominations":[],"events":[],"groupName":"Catholic","hash":"9fd54eedebe979f24c510a7d122ae9f2e9104ca8","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Archdiocese of Southwark","geo":{"@type":"GeoCoordinates","latitude":51.498146,"longitude":-0.1087254},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"SE1 6HX","streetAddress":"150 Saint George's Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/archdiocese-of-southwark"},"location":{"type":"Point","coordinates":[-0.1087254,51.498146]},"name":"Archdiocese of Southwark","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/archdiocese-of-southwark","distance":1670.1332456773725},
+							{"_id":"56c635948a8e8be0c0c0adb2","address":{"line1":"22 Binney Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W1K 5BH"},"averageRating":0,"concatenatedAddress":"22 Binney Street, London, Greater London, United Kingdom, W1K 5BH","denominations":[],"events":[],"groupName":"Catholic","hash":"ecb5ba4662341e9bd8593dfbdc861e45ba2d3be7","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Great Britain, Faithful of Eastern Rite","geo":{"@type":"GeoCoordinates","latitude":51.5136901,"longitude":-0.1506435},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W1K 5BH","streetAddress":"22 Binney Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/great-britain-faithful-of-eastern-rite"},"location":{"type":"Point","coordinates":[-0.1506435,51.5136901]},"name":"Great Britain, Faithful of Eastern Rite","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/great-britain-faithful-of-eastern-rite","distance":1735.4706841764803},
+							{"_id":"56c635948a8e8be0c0c0bd27","address":{"line1":"14 Ely Place","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"EC1N 6RY"},"averageRating":0,"concatenatedAddress":"14 Ely Place, London, Greater London, United Kingdom, EC1N 6RY","denominations":[],"events":[],"groupName":"Catholic","hash":"8f953ba6bf1900ba66ac01d3cc7cb456b73421ec","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Etheldreda","geo":{"@type":"GeoCoordinates","latitude":51.5183761,"longitude":-0.1070299},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"EC1N 6RY","streetAddress":"14 Ely Place"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-etheldreda"},"location":{"type":"Point","coordinates":[-0.1070299,51.5183761]},"name":"St. Etheldreda","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-etheldreda","distance":1889.036368077691}
+						],
+						"count":15}
+					};*/
+					//////////////////////
+					if (typeof response.data !== 'object' &&
+							!Array.isArray(response.data.results)) {
+						return onError();
+					}
+
+					var places = roundPlacesDistance(response.data.results);
+					var lat = response.data.lat;
+					var lng = response.data.lng;
+
+					cb(places, lat, lng);
+				}, onError);
 			}
 
 			function searchPlacesByIp(cb) {
-				var prom = $http({
-					url: '/ajax/places/search',
-					method: 'GET',
-					params: {maxDistance: 10000}
-				});
-				prom.then(cb);
-				prom.then(displayResults, onError);
+				searchPlaces({maxDistance: 10000}, cb);
 			}
 
-			function setSearchParams() {
-				console.log('setSearchParams');
+			function updateScopeProperties(places) {
+				$scope.places = places;
+				$scope.message = places.length ? '' : 'There are no places of worship found near this location.';
+				$scope.address = $rootScope.lastSearchAddress || document.forms.form.location.value;
+			}
+
+			function setUrlParams() {
 				var location = document.forms.form.location.value.split(', ');
 
-				if (location.length === 2) {
-					var reqParams = {
-						lat: location[1],
-						lng: location[0],
-						religion: $scope.religion
-					};
+				if (location.length < 2) return;
 
-					saveCoordinatesInCookies(reqParams.lat, reqParams.lng);
+				var lat = location[1];
+				var lng = location[0];
 
-					$location.search('lat', reqParams.lat || null);
-					$location.search('lng', reqParams.lng || null);
-					$location.search('religion', reqParams.religion || null);
-					$rootScope.lastSearchAddress = $scope.address;
-				}
-			}
+				$location.search('lat', lat || null);
+				$location.search('lng', lng || null);
 
-			function displayResults(response) {
-				response = response.data;
-
-				////////////////////////////////
-				//response = JSON.parse('{"results":[{"_id":"56c635918a8e8be0c0bfcc49","address":{"line1":"The Vale Community Centre, 1 Pentland Road","line2":"","locality":"Kilburn","region":"London","country":"England","postalCode":"NW6 5RT"},"averageRating":0,"concatenatedAddress":"The Vale Community Centre, 1 Pentland Road, Kilburn, London, England, NW6 5RT","denominations":[],"events":[],"groupName":"RCCG","hash":"f127ea9c58e4d163f2ecd8da04f46310a860a396","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"The Sowers Kilburn","geo":{"@type":"GeoCoordinates","latitude":51.53178219999999,"longitude":-0.1963767},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Kilburn","addressRegion":"London","postalCode":"NW6 5RT","streetAddress":"The Vale Community Centre, 1 Pentland Road"},"mainentityofpage":"https://opendoor.ooo/places/england/london/kilburn/christianity/rccg/the-sowers-kilburn"},"location":{"type":"Point","coordinates":[-0.1963767,51.53178219999999]},"name":"The Sowers Kilburn","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/kilburn/christianity/rccg/the-sowers-kilburn","distance":704.9159058160787},{"_id":"56c635948a8e8be0c0c0bce2","address":{"line1":"1 Stafford Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"NW6 5RS"},"averageRating":0,"concatenatedAddress":"1 Stafford Road, London, Greater London, United Kingdom, NW6 5RS","denominations":[],"events":[],"groupName":"Catholic","hash":"fa3706ea134ca239c034b8ece5ef8a2c921f2002","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Immaculate Heart of Mary","geo":{"@type":"GeoCoordinates","latitude":51.5309313,"longitude":-0.1956552},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"NW6 5RS","streetAddress":"1 Stafford Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/immaculate-heart-of-mary"},"location":{"type":"Point","coordinates":[-0.1956552,51.5309313]},"name":"Immaculate Heart of Mary","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/immaculate-heart-of-mary","distance":744.4199376604439},{"_id":"56c635948a8e8be0c0c0bcfc","address":{"line1":"337 Harrow Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W9 3RB"},"averageRating":0,"concatenatedAddress":"337 Harrow Road, London, Greater London, United Kingdom, W9 3RB","denominations":[],"events":[],"groupName":"Catholic","hash":"ddfaa9b609a7ddd0d1b100f13fe75c84226bc893","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Our Lady of Lourdes & St Vincent de Paul","geo":{"@type":"GeoCoordinates","latitude":51.5236202,"longitude":-0.1998787},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W9 3RB","streetAddress":"337 Harrow Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/our-lady-of-lourdes-st-vincent-de-paul"},"location":{"type":"Point","coordinates":[-0.1998787,51.5236202]},"name":"Our Lady of Lourdes & St Vincent de Paul","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/our-lady-of-lourdes-st-vincent-de-paul","distance":904.8469028760774},{"_id":"56c635918a8e8be0c0bfcc47","address":{"line1":"25 Alpha House, Kilburn","line2":"","locality":"Kilburn","region":"London","country":"England","postalCode":"NW6 5TE"},"averageRating":0,"concatenatedAddress":"25 Alpha House, Kilburn, Kilburn, London, England, NW6 5TE","denominations":[],"events":[],"groupName":"RCCG","hash":"43756f3762b2a9babb2c78221ecb2a6a2b7e31bb","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"The Shepherd’S House Hammersmith","geo":{"@type":"GeoCoordinates","latitude":51.5358463,"longitude":-0.19401},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Kilburn","addressRegion":"London","postalCode":"NW6 5TE","streetAddress":"25 Alpha House, Kilburn"},"mainentityofpage":"https://opendoor.ooo/places/england/london/kilburn/christianity/rccg/the-shepherds-house-hammersmith"},"location":{"type":"Point","coordinates":[-0.19401,51.5358463]},"name":"The Shepherd’S House Hammersmith","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/kilburn/christianity/rccg/the-shepherds-house-hammersmith","distance":1033.6078262461106},{"_id":"56c635948a8e8be0c0c0bd69","address":{"line1":"Chamberlayne Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"NW10 3NS"},"averageRating":0,"concatenatedAddress":"Chamberlayne Road, London, Greater London, United Kingdom, NW10 3NS","denominations":[],"events":[],"groupName":"Catholic","hash":"5815e92aefcefaaf3441b8972bd1f7cc6e3ec3f7","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Transfiguration","geo":{"@type":"GeoCoordinates","latitude":51.534964,"longitude":-0.2197274},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"NW10 3NS","streetAddress":"Chamberlayne Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/transfiguration"},"location":{"type":"Point","coordinates":[-0.2197274,51.534964]},"name":"Transfiguration","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/transfiguration","distance":1039.818133784575},{"_id":"56c635918a8e8be0c0bfcbad","address":{"line1":"Hazel Road Community Hall, Hazel Road, Kensal Green(Off Harrow Road)","line2":"","locality":"Kensal Green","region":"London","country":"England","postalCode":"NW10 5PP"},"averageRating":0,"concatenatedAddress":"Hazel Road Community Hall, Hazel Road, Kensal Green(Off Harrow Road), Kensal Green, London, England, NW10 5PP","denominations":[],"events":[],"groupName":"RCCG","hash":"fd7ba9641265bd0a685bb057dc5184cbc1e179aa","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Open Heavens New Horizons Kensal Green","geo":{"@type":"GeoCoordinates","latitude":51.530112,"longitude":-0.2253},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Kensal Green","addressRegion":"London","postalCode":"NW10 5PP","streetAddress":"Hazel Road Community Hall, Hazel Road, Kensal Green(Off Harrow Road)"},"mainentityofpage":"https://opendoor.ooo/places/england/london/kensal-green/christianity/rccg/open-heavens-new-horizons-kensal-green"},"location":{"type":"Point","coordinates":[-0.2253,51.530112]},"name":"Open Heavens New Horizons Kensal Green","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/kensal-green/christianity/rccg/open-heavens-new-horizons-kensal-green","distance":1310.5541619604783},{"_id":"56c635948a8e8be0c0c0bd10","address":{"line1":"Quex Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"NW6 4PL"},"averageRating":0,"concatenatedAddress":"Quex Road, London, Greater London, United Kingdom, NW6 4PL","denominations":[],"events":[],"groupName":"Catholic","hash":"0812ff4b186307836d70a0110e2cff1258b9c9d8","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Sacred Heart of Jesus","geo":{"@type":"GeoCoordinates","latitude":51.5400747,"longitude":-0.194291},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"NW6 4PL","streetAddress":"Quex Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/sacred-heart-of-jesus"},"location":{"type":"Point","coordinates":[-0.194291,51.5400747]},"name":"Sacred Heart of Jesus","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/sacred-heart-of-jesus","distance":1341.572194926078},{"_id":"56c635948a8e8be0c0c0bd01","address":{"line1":"17 Cirencester Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W2 5SR"},"averageRating":0,"concatenatedAddress":"17 Cirencester Street, London, Greater London, United Kingdom, W2 5SR","denominations":[],"events":[],"groupName":"Catholic","hash":"38ad49d8947af0518210008b7af41065e333d0e6","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Our Lady of Sorrows","geo":{"@type":"GeoCoordinates","latitude":51.5215068,"longitude":-0.1913219},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W2 5SR","streetAddress":"17 Cirencester Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/our-lady-of-sorrows"},"location":{"type":"Point","coordinates":[-0.1913219,51.5215068]},"name":"Our Lady of Sorrows","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/our-lady-of-sorrows","distance":1459.2195307712136},{"_id":"56c635948a8e8be0c0c0bd58","address":{"line1":"Moorhouse Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W2 5DJ"},"averageRating":0,"concatenatedAddress":"Moorhouse Road, London, Greater London, United Kingdom, W2 5DJ","denominations":[],"events":[],"groupName":"Catholic","hash":"36254ee69ea426e3011ed4d7e4461f39befe6cef","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Mary of the Angels","geo":{"@type":"GeoCoordinates","latitude":51.5163074,"longitude":-0.1979792},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W2 5DJ","streetAddress":"Moorhouse Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-mary-of-the-angels"},"location":{"type":"Point","coordinates":[-0.1979792,51.5163074]},"name":"St. Mary of the Angels","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-mary-of-the-angels","distance":1701.2766646131456},{"_id":"56c635948a8e8be0c0c0bcf3","address":{"line1":"","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"NW6 1QE"},"averageRating":0,"concatenatedAddress":"London, Greater London, United Kingdom, NW6 1QE","denominations":[],"events":[],"groupName":"Catholic","hash":"603a5bccebf009af0d3d4ed4705dc80b128c4f2c","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Our Lady of Lebanon Lebanese Church","geo":{"@type":"GeoCoordinates","latitude":51.5516195,"longitude":-0.2010339},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"NW6 1QE","streetAddress":""},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/our-lady-of-lebanon-lebanese-church"},"location":{"type":"Point","coordinates":[-0.2010339,51.5516195]},"name":"Our Lady of Lebanon Lebanese Church","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/our-lady-of-lebanon-lebanese-church","distance":2361.991650782233},{"_id":"56c635948a8e8be0c0c0bd28","address":{"line1":"Pottery Lane","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W11 4NQ"},"averageRating":0,"concatenatedAddress":"Pottery Lane, London, Greater London, United Kingdom, W11 4NQ","denominations":[],"events":[],"groupName":"Catholic","hash":"64c7f791a0d89a99cce79bcca8d450b00cf36a99","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Francis of Assisi","geo":{"@type":"GeoCoordinates","latitude":51.5088571,"longitude":-0.2099252},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W11 4NQ","streetAddress":"Pottery Lane"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-francis-of-assisi"},"location":{"type":"Point","coordinates":[-0.2099252,51.5088571]},"name":"St. Francis of Assisi","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-francis-of-assisi","distance":2439.90546072507},{"_id":"56c635948a8e8be0c0c0bd02","address":{"line1":"4A Inverness Place","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"W2 3JF"},"averageRating":0,"concatenatedAddress":"4A Inverness Place, London, Greater London, United Kingdom, W2 3JF","denominations":[],"events":[],"groupName":"Catholic","hash":"e137d2760ff46a824c248d407058bc8dc13afa48","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Our Lady Queen of Heaven","geo":{"@type":"GeoCoordinates","latitude":51.5123044,"longitude":-0.1870292},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"W2 3JF","streetAddress":"4A Inverness Place"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/our-lady-queen-of-heaven"},"location":{"type":"Point","coordinates":[-0.1870292,51.5123044]},"name":"Our Lady Queen of Heaven","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/our-lady-queen-of-heaven","distance":2444.783449563585},{"_id":"56c635918a8e8be0c0bfcb82","address":{"line1":"187 Freston Road, London, Notting Hill Gate","line2":"","locality":"London","region":"Greater London","country":"England","postalCode":"W10 6TH"},"averageRating":0,"concatenatedAddress":"187 Freston Road, London, Notting Hill Gate, London, Greater London, England, W10 6TH","denominations":[],"events":[],"groupName":"RCCG","hash":"f5b81384e6aef725914b0abb4fcc7a7fb048207d","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Love Assembly Notting Hill Gate","geo":{"@type":"GeoCoordinates","latitude":51.5090387,"longitude":-0.196776},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"London","addressRegion":"Greater London","postalCode":"W10 6TH","streetAddress":"187 Freston Road, London, Notting Hill Gate"},"mainentityofpage":"https://opendoor.ooo/places/england/greater-london/london/christianity/rccg/love-assembly-notting-hill-gate"},"location":{"type":"Point","coordinates":[-0.196776,51.5090387]},"name":"Love Assembly Notting Hill Gate","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/greater-london/london/christianity/rccg/love-assembly-notting-hill-gate","distance":2497.938982675136},{"_id":"56c635918a8e8be0c0bfcbf6","address":{"line1":"The Community Venue O2 Centre, 225 Finchley Road","line2":"","locality":"Finchley","region":"London","country":"England","postalCode":"NW3 6LP"},"averageRating":0,"concatenatedAddress":"The Community Venue O2 Centre, 225 Finchley Road, Finchley, London, England, NW3 6LP","denominations":[],"events":[],"groupName":"RCCG","hash":"3ad14863b4b292840ae4c850e832fff41e07a7b4","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Rivers Of Joy Finchley Road","geo":{"@type":"GeoCoordinates","latitude":51.5470959,"longitude":-0.1800505},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"Finchley","addressRegion":"London","postalCode":"NW3 6LP","streetAddress":"The Community Venue O2 Centre, 225 Finchley Road"},"mainentityofpage":"https://opendoor.ooo/places/england/london/finchley/christianity/rccg/rivers-of-joy-finchley-road"},"location":{"type":"Point","coordinates":[-0.1800505,51.5470959]},"name":"Rivers Of Joy Finchley Road","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/finchley/christianity/rccg/rivers-of-joy-finchley-road","distance":2583.2131918190644},{"_id":"56c635948a8e8be0c0c0bd5f","address":{"line1":"3 Adamson Road","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":"NW3 3HX"},"averageRating":0,"concatenatedAddress":"3 Adamson Road, London, Greater London, United Kingdom, NW3 3HX","denominations":[],"events":[],"groupName":"Catholic","hash":"bffd92b05a53df40a30e562b7ea9951423b0fc45","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Thomas More","geo":{"@type":"GeoCoordinates","latitude":51.5443411,"longitude":-0.1733537},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"NW3 3HX","streetAddress":"3 Adamson Road"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-thomas-more"},"location":{"type":"Point","coordinates":[-0.1733537,51.5443411]},"name":"St. Thomas More","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-thomas-more","distance":2748.119116881381},{"_id":"56c635918a8e8be0c0bfcc50","address":{"line1":"White City Community Centre, India Way","line2":"","locality":"White City Estate","region":"London","country":"England","postalCode":"W12 7QT"},"averageRating":0,"concatenatedAddress":"White City Community Centre, India Way, White City Estate, London, England, W12 7QT","denominations":[],"events":[],"groupName":"RCCG","hash":"f200a350f0dd5d73ce6eebd17e7b5dbc842f0f17","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"Throne Of Grace White City","geo":{"@type":"GeoCoordinates","latitude":51.5114965,"longitude":-0.233682},"address":{"@type":"PostalAddress","addressCountry":"England","addressLocality":"White City Estate","addressRegion":"London","postalCode":"W12 7QT","streetAddress":"White City Community Centre, India Way"},"mainentityofpage":"https://opendoor.ooo/places/england/london/white-city-estate/christianity/rccg/throne-of-grace-white-city"},"location":{"type":"Point","coordinates":[-0.233682,51.5114965]},"name":"Throne Of Grace White City","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"england/london/white-city-estate/christianity/rccg/throne-of-grace-white-city","distance":2850.458335765749},{"_id":"56c635948a8e8be0c0c0bd18","address":{"line1":"High Street","line2":"","locality":"London","region":"Greater London","country":"United Kingdom","postalCode":""},"averageRating":0,"concatenatedAddress":"High Street, London, Greater London, United Kingdom","denominations":[],"events":[],"groupName":"Catholic","hash":"dfea151b570c9ff876a65b357b2109b079f092ba","isConfirmed":true,"jobs":[],"jsonLd":{"@type":"Place","name":"St. Augustine of Canterbury","geo":{"@type":"GeoCoordinates","latitude":51.5355996,"longitude":-0.2476982},"address":{"@type":"PostalAddress","addressCountry":"United Kingdom","addressLocality":"London","addressRegion":"Greater London","postalCode":"","streetAddress":"High Street"},"mainentityofpage":"https://opendoor.ooo/places/united-kingdom/greater-london/london/christianity/catholic/st-augustine-of-canterbury"},"location":{"type":"Point","coordinates":[-0.2476982,51.5355996]},"name":"St. Augustine of Canterbury","promotions":[],"ratingsCount":0,"religion":"Christianity","reviews":[],"uri":"united-kingdom/greater-london/london/christianity/catholic/st-augustine-of-canterbury","distance":2912.3160185860497}],"count":17}');
-				////////////////////////////////
-
-				if (typeof response != 'object' && !Array.isArray(response.results)) {
-					return onError();
-				}
-
-				var places = response.results;
-
-				if (isValidLatitude(response.lat) && isValidLongitude(response.lng)) {
-					document.forms.form.location.value = response.lng + ', ' + response.lat;
-					saveCoordinatesInCookies(response.lat, response.lng);
-				}
-
-				$scope.message = places.length ? '' : 'There are no places of worship found near this location';
-
-				for (var i = 0; i < places.length; i++) {
-					places[i].distance = Math.round(places[i].distance);
-				}
-
-				$scope.places = places;
-				createMap();
+				$rootScope.lastSearchAddress = $scope.address;
 			}
 
 			function createMap() {
-				console.log('createMap');
-				if ($scope.message.length) return;
+				$rootScope.getMapInstance($('#results-map')).then(function(mapInstance) {
+					map = mapInstance;
 
-				$rootScope.getMapInstance($('#results-map')).then(function(m) {
-					map = m;
-
-					configureAutoUploadMap(map);
-
-					/*google.maps.event.addListenerOnce(map, 'idle', function() {
-						console.log('map idle event');
-						addMarkers($scope.places);
-					});*/
-
-					addMarkers($scope.places);
+					addUserLocationMarker();
+					addPlacesMarkers();
+					setMapBounds();
+					configureAutoUploadMap();
 				});
 			}
 
-			function configureAutoUploadMap(map) {
+			function configureAutoUploadMap() {
 				var timerId;
 
 				google.maps.event.addListener(map, 'dragstart', function() {
@@ -151,150 +155,98 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 						console.log('dragend');
 
 						timerId = setTimeout(function() {
-							console.log('timeout', map.getCenter().lat(), map.getCenter().lng());
+							console.log('timeout');
 
-							var lat = map.getCenter().lat();
-							var lng = map.getCenter().lng();
+							var mapCenterLatLng = map.getCenter();
+							var mapCenterLat = mapCenterLatLng.lat();
+							var mapCenterLng = mapCenterLatLng.lng();
 
-							$http({
-								url: '/ajax/places/search',
-								method: 'GET',
-								params: {
-									lat: lat,
-									lng: lng,
-									maxDistance: 5000
-								}
-							}).then(function(response) {
-								response = response.data;
+							searchPlaces({
+								lat: mapCenterLat,
+								lng: mapCenterLng,
+								maxDistance: 5000
+							}, function(places) {
+								saveLatLng(mapCenterLat, mapCenterLng);
 
-								if (typeof response != 'object' && !Array.isArray(response.results)) {
-									return onError();
-								}
+								updateScopeProperties(places);
 
-								var places = response.results;
-
-								$scope.message = places.length ? '' : 'There are no places of worship found near this location';
-
-								for (var i = 0; i < places.length; i++) {
-									places[i].distance = Math.round(places[i].distance);
-								}
-
-								$scope.places = places;
-
-								if ($scope.message.length) return;
-
-
-
-
-								var bounds = new google.maps.LatLngBounds();
-								var location = [lng, lat];
 								map.removeMarkers();
+								map.removeInfoWindows();
 
-								// add marker for user location
-								map.addMarker({
-									position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])},
-									map: map,
-									icon: map.icons.location,
-									title: 'My location'
-								});
-
-								var data = $scope.places;
-
-								// add markers for churches
-								for(var i = 0; i < data.length; i++) {
-									var pos = new google.maps.LatLng(data[i].location.coordinates[1], data[i].location.coordinates[0]);
-
-									// I mirror all markers against search position in order to keep it in center of map
-									var mirroredPoint = mirrorPoint(data[i].location.coordinates, location);
-									var mirroredPos = new google.maps.LatLng(mirroredPoint[1], mirroredPoint[0]);
-									var marker = map.addMarker({
-										position: pos,
-										map: map,
-										icon: map.icons.brightPoi,
-										title: data[i].name,
-									});
-									bounds.extend(pos);
-									bounds.extend(mirroredPos);
-
-									setMarkerMouseEventsHandlers(marker, i);
-								}
-
-								google.maps.event.trigger(map, 'resize');
-								map.fitBounds(bounds);
-
-								function setMarkerMouseEventsHandlers(marker, i) {
-									google.maps.event.addListener(marker, 'mouseover', function () {
-										marker.setIcon(map.icons.defaultPoi);
-										$('tr:nth-child(' + (i + 1) + ')', $table).addClass('hover');
-									});
-									google.maps.event.addListener(marker, 'mouseout', function () {
-										marker.setIcon(map.icons.brightPoi);
-										$('tr:nth-child(' + (i + 1) + ')', $table).removeClass('hover');
-									});
-								}
-								// display churches without recreating map
-								// need to do refactoring work on displayResults
-								// and other nested functions
-							}, onError);
-						}, 1000);
+								addUserLocationMarker();
+								addPlacesMarkers();
+								setMapBounds();
+							});
+						}, 700);
 					});
 				});
 			}
 
-			function addMarkers(data) {
-				console.log('addMarkers');
-				var bounds = new google.maps.LatLngBounds();
+			function addUserLocationMarker() {
 				var location = document.forms.form.location.value.split(', ');
-				map.removeMarkers();
-				// add marker for user location
+
 				map.addMarker({
-					position: {lat: parseFloat(location[1]), lng: parseFloat(location[0])},
 					map: map,
+					title: USERMARKERTITLE,
 					icon: map.icons.location,
-					title: 'My location'
+					position: new google.maps.LatLng(location[1], location[0])
 				});
+			}
 
-				// add markers for churches
-				for(var i = 0; i < data.length; i++) {
-					var pos = new google.maps.LatLng(data[i].location.coordinates[1], data[i].location.coordinates[0]);
+			function addPlacesMarkers() {
+				$scope.places.forEach(function(place, i) {
+					var markerPosition = new google.maps.LatLng(
+						place.location.coordinates[1],
+						place.location.coordinates[0]
+					);
 
-					// I mirror all markers against search position in order to keep it in center of map
-					var mirroredPoint = mirrorPoint(data[i].location.coordinates, location);
-					var mirroredPos = new google.maps.LatLng(mirroredPoint[1], mirroredPoint[0]);
 					var marker = map.addMarker({
-						position: pos,
 						map: map,
-						icon: map.icons.brightPoi,
-						title: data[i].name,
+						title: place.name,
+						position: markerPosition,
+						icon: map.icons.brightPoi
 					});
-					bounds.extend(pos);
-					bounds.extend(mirroredPos);
 
 					setMarkerMouseEventsHandlers(marker, i);
-				}
-
-				google.maps.event.trigger(map, 'resize');
-				map.fitBounds(bounds);
+				});
 
 				function setMarkerMouseEventsHandlers(marker, i) {
-					google.maps.event.addListener(marker, 'mouseover', function () {
+					google.maps.event.addListener(marker, 'mouseover', function() {
 						marker.setIcon(map.icons.defaultPoi);
 						$('tr:nth-child(' + (i + 1) + ')', $table).addClass('hover');
 					});
-					google.maps.event.addListener(marker, 'mouseout', function () {
+					google.maps.event.addListener(marker, 'mouseout', function() {
 						marker.setIcon(map.icons.brightPoi);
 						$('tr:nth-child(' + (i + 1) + ')', $table).removeClass('hover');
 					});
 				}
 			}
 
-			function onLocationDetectComplete() {
-				console.log('onLocationDetectComplete');
-				$scope.message = 'Press "Search" to find nearest place of worship to you';
-				$scope.searchComplete = true;
+			function setMapBounds() {
+				if (map.markers.length === 1) {
+					map.setCenter(map.markers[0].position);
+					map.setZoom(12);
+				} else {
+					var bounds = new google.maps.LatLngBounds();
+					var userMarkerLatLng = map.markers.filter(function(m) {
+							return m.title === USERMARKERTITLE;
+						})[0].getPosition();
+
+					map.markers.forEach(function(marker) {
+						if (marker.title === USERMARKERTITLE) return;
+
+						var markerLatLng = marker.getPosition();
+						var mirroredPos = getMirroredPosition(markerLatLng, userMarkerLatLng);
+
+						bounds.extend(markerLatLng);
+						bounds.extend(mirroredPos);
+					});
+
+					map.fitBounds(bounds);
+				}
 			}
 
-			function saveCoordinatesInCookies(lat, lng) {
+			function saveLatLngInCookies(lat, lng) {
 				$cookies.put('latitude', lat);
 				$cookies.put('longitude', lng);
 			}
@@ -307,26 +259,37 @@ define(['angular', 'app', 'locationpicker'], function(angular, opendoorApp) {
 				map.markers[i + 1].setIcon(map.icons.defaultPoi);
 			}
 
-			function mirrorPoint(p, o) {
+			function roundPlacesDistance(places) {
+				for (var i = places.length - 1; i >= 0; i--) {
+					places[i].distance = Math.round(places[i].distance);
+				}
+
+				return places;
+			}
+
+			function getMirroredPosition(p, o) {
+				p = [p.lng(), p.lat()];
+				o = [o.lng(), o.lat()];
+
 				var px = p[0];
 				var py = p[1];
 				var ox = o[0];
 				var oy = o[1];
-				return [ox * 2 - px, oy * 2 - py];
+
+				return new google.maps.LatLng((oy * 2 - py), (ox * 2 - px));
 			}
 
 			function isValidLatitude(lat) {
-				console.log('isValidLatitude');
 				return lat !== null && isFinite(lat) && Math.abs(lat) <= 90;
 			}
 
 			function isValidLongitude(lng) {
-				console.log('isValidLongitude');
 				return lng !== null && isFinite(lng) && Math.abs(lng) <= 180;
 			}
 
 			function onError(msg) {
 				console.log('onError');
+				$scope.searchComplete = true;
 				$scope.message = msg || 'Occur error during request!';
 				$scope.places = null;
 			}

@@ -397,7 +397,7 @@ module.exports = function(mongoose, email, config) {
 			var geoNearOption = {
 				"distanceField": "distance",
 				"spherical": true,
-				//"maxDistance": 2000,
+				"maxDistance": 10000,
 				"near": {
 					"type": "Point",
 					"coordinates": data.coordinates
