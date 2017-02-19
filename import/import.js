@@ -9,23 +9,17 @@ var geocoder = require('geocoder');
 var config = require('../config.js');
 var sha1 = require('sha1');
 require('../assets/js/utils.js');
+
 var placeQueue = [];
-
 var codesStats = {};
-
 var delayIncrement = 200;
-
 var outFileName = 'result.json';
 var outContent = [];
 var existingPlaceHashes = [];
 var skippedPlaces = 0;
-
-
 var startTime = Date.now();
-
 var finishedRequests = 0;
 var allRequests;
-
 
 function createJsonLd(place) {
 	var data = {
@@ -81,13 +75,10 @@ function createJsonLd(place) {
 	return data;
 }
 
-
-
 function sendGeocodeRequest(address, cb, delay) {
-
 	delay = delay || 0;
 	setTimeout(function(){
-		geocoder.geocode(address, function ( err, res ) {
+		geocoder.geocode(address, function(err, res ) {
 			if (res.status == 'OVER_QUERY_LIMIT') {
 				sendGeocodeRequest(address, cb, delay + delayIncrement);
 			}
@@ -104,21 +95,18 @@ function sendGeocodeRequest(address, cb, delay) {
 			}
 
 		//}, {key: 'AIzaSyDANhr6hDNSuCe4451dQBdXHhO_bojAgZU'});
-		}, {key: config.apiKeys.googleMapsServer});
-
-
+		}, {
+			key: config.apiKeys.googleMapsServer
+		});
 	}, delay);
-
 }
 
 function showResusts() {
-
 	console.log(codesStats);
 	var executionTime = (Date.now() - startTime)/1000;
 	var timePerRequest = Math.round((executionTime / allRequests) * 1000) / 1000;
 	console.log('Execution time: ' + executionTime + 's, time per request: ' + timePerRequest + 's');
 }
-
 
 function sendNewRequestFromQueue() {
 	var place = placeQueue.shift();
@@ -152,7 +140,6 @@ function sendNewRequestFromQueue() {
 		console.log('All elements have been processed');
 		showResusts();
 	}
-
 }
 
 fs.readFile(outFileName, 'utf8', function (err, data) {
@@ -165,70 +152,68 @@ fs.readFile(outFileName, 'utf8', function (err, data) {
 		catch(e) {
 
 		}
+
 		for (var i = 0; i < outContent.length; i++) {
 			if (outContent[i].hash) {
 				existingPlaceHashes.push(outContent[i].hash);
 			}
 		}
 	}
-	if (!args.length) {
-		console.err("Please provide at least CSV filename");
-	}
-	else {
-		var fileName = args[0];
-		fs.readFile(fileName, 'utf8', function(err, content){
-			if (err) {
-				console.log(err);
-			}
-			else {
-				csv.parse(content, function(err, data) {
-					for (var i=1; i<data.length; i++) {
-						var placeAsArray = data[i];
-						for (var j=0; j < placeAsArray.length; j++) {
-							placeAsArray[j] = placeAsArray[j].trim();
-						}
-						var place = {
-								name: placeAsArray[0]
-							, address: {
-									line1: [placeAsArray[1], placeAsArray[2], placeAsArray[3], placeAsArray[4]].cleanArray().join(', ')
-								, line2: ''
-								, locality: placeAsArray[5]
-								, region: placeAsArray[6]
-								, country: placeAsArray[8]
-								, postalCode: placeAsArray[7]
-							}
-							,	religion: 'Christianity'
-							, groupName: 'RCCG'
-							,	isConfirmed: true
-							, denominations: []
-							, reviews: []
-							, events: []
-							, promotions: []
-							, jobs: []
-							, ratingsCount: 0
-							, averageRating: 1
-						};
 
-						place.uri = [
-							place.address.country.replace(/\//g, '-')
-							, place.address.region.replace(/\//g, '-')
-							, place.address.locality.replace(/\//g, '-')
-							, place.religion.replace(/\//g, '-')
-							, place.groupName.replace(/\//g, '-')
-							, place.name.replace(/\//g, '-')
-						].join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
-						place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
-						placeQueue.push(place);
-						//if (i>4) {
-						//	break;
-						//}
-					}
-					allRequests = placeQueue.length;
-					sendNewRequestFromQueue();
-				});
+	if (!args.length) return console.log("Please provide at least CSV filename");
+
+	var fileName = args[0];
+	fs.readFile(fileName, 'utf8', function(err, content){
+		if (err) return console.log(err);
+
+		csv.parse(content, function(err, data) {
+			for (var i=1; i<data.length; i++) {
+				var placeAsArray = data[i];
+				for (var j=0; j < placeAsArray.length; j++) {
+					placeAsArray[j] = placeAsArray[j].trim();
+				}
+
+				var place = {
+					name: placeAsArray[0],
+					address: {
+						line1: [placeAsArray[1], placeAsArray[2], placeAsArray[3], placeAsArray[4]].cleanArray().join(', '),
+						line2: '',
+						locality: placeAsArray[5],
+						region: placeAsArray[6],
+						country: placeAsArray[8],
+						postalCode: placeAsArray[7]
+					},
+					religion: 'Christianity',
+					groupName: 'RCCG',
+					isConfirmed: true,
+					denominations: [],
+					reviews: [],
+					events: [],
+					promotions: [],
+					jobs: [],
+					ratingsCount: 0,
+					averageRating: 1
+				};
+
+				place.uri = [
+					place.address.country.replace(/\//g, '-'),
+					place.address.region.replace(/\//g, '-'),
+					place.address.locality.replace(/\//g, '-'),
+					place.religion.replace(/\//g, '-'),
+					place.groupName.replace(/\//g, '-'),
+					place.name.replace(/\//g, '-')
+				].join('/').replace(/_/g, '').replace(/[^\-a-zA-Z0-9/\s]/g, '').replace(/\s+/g, '-');
+				place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
+				placeQueue.push(place);
+				//if (i>4) {
+				//	break;
+				//}
 			}
-		})
-	}
+
+			allRequests = placeQueue.length;
+			sendNewRequestFromQueue();
+		});
+	});
 });
 
 process.on('SIGINT', process.exit);

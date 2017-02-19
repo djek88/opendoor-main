@@ -2,13 +2,8 @@ module.exports = function(placeManager, sm, config, fs, path) {
 	return function (req, res) {
 		if (req.session.user && req.session.user.isAdmin) {
 			var js2xmlparser = require("js2xmlparser");
-
-
 			var sitemapItemsCount = 50000;
-
-
 			var currentDate = (new Date).toString('yyyy-MM-dd');
-
 			var staticSitemap = sm.createSitemap ({
 				hostname: config.url
 				, cacheTime: 600000
@@ -21,7 +16,6 @@ module.exports = function(placeManager, sm, config, fs, path) {
 			});
 			fs.writeFile(path.join(__dirname, '../../static', 'sitemap_static.xml'), staticSitemap.toString(), function(){});
 
-
 			var sitemapIndex = {
 				'@': {
 					xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9'
@@ -31,7 +25,6 @@ module.exports = function(placeManager, sm, config, fs, path) {
 					, lastmod: currentDate
 				}]
 			};
-
 
 			var placesPath = '/places/';
 			var startItem = 0;
@@ -49,8 +42,6 @@ module.exports = function(placeManager, sm, config, fs, path) {
 						, cacheTime: 600000
 						// , urls: predefinedUrls
 					});
-
-
 
 					for (var j = startItem; j < endItem; j++) {
 						sitemap.add({url: placesPath + places[j].uri});
@@ -70,14 +61,10 @@ module.exports = function(placeManager, sm, config, fs, path) {
 					fs.writeFile(path.join(__dirname, '../../static', 'sitemap_' + i + '.xml'), sitemap.toString(), function(){});
 				}
 				fs.writeFile(path.join(__dirname, '../../static', 'sitemap.xml'), js2xmlparser('sitemapindex', sitemapIndex), function(){});
-
 				res.redirect('/message?message=sitemapgenerated');
-
 			});
-		}
-		else {
+		} else {
 			res.redirect('/error');
 		}
-
 	};
 };

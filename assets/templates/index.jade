@@ -145,7 +145,7 @@ html
 								a(href='/register') REGISTER
 			#wrap(ng-view ng-init="userIp = '#{userIp}'")
 			footer#footer.my-footer
-				| © #{currentYear} |#{userIp}| OpenDoor -
+				| © #{currentYear} | OpenDoor -
 				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage")  Suggest an improvement
 				| &nbsp;-&nbsp;
 				a.link(href="/about") About

@@ -8,7 +8,7 @@ require.config({
 		'angular-route': '/bower_components/angular-route/angular-route.min',
 		'angular-cookies': '/bower_components/angular-cookies/angular-cookies.min',
 		'trumbowyg-ng': '/bower_components/trumbowyg-ng/dist/trumbowyg-ng.min',
-		'libs/googlemaps': 'https://maps.googleapis.com/maps/api/js?key=' + siteconfig.apiKeys.googleMaps,
+		'libs/googlemaps': 'https://maps.googleapis.com/maps/api/js?v=3&key=' + siteconfig.apiKeys.googleMaps,
 		'libs/stripe': 'https://checkout.stripe.com/checkout',
 		'libs/datetimepicker': '/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min',
 		'libs/tagsinput': '/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min',

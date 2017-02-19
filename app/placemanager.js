@@ -99,22 +99,21 @@ module.exports = function(mongoose, email, config) {
 		return str;
 	}
 
-
 	var sanitizeHtml = require('sanitize-html');
 
 	var promotionSchema = new mongoose.Schema({
-			name: String
-		,	expireDate: Date
-		, url: String
+		name: String,
+		expireDate: Date,
+		url: String
 	});
 
 	var reviewSchema = new mongoose.Schema({
-			name: String
-		,	rating: {
-				type: Number
-			,	required: true
-			}
-		,	text: String
+		name: String,
+		rating: {
+			type: Number,
+			required: true
+		},
+		text: String
 	});
 
 	var eventSchema = new mongoose.Schema({
@@ -234,19 +233,19 @@ module.exports = function(mongoose, email, config) {
 
 	function preprocessFields(place, callback) {
 		var religionGroup = {name: place.groupName, religion: place.religion};
-		religionGroupManager.find(religionGroup, function(err, religionGroups){
+		religionGroupManager.find(religionGroup, function(err, religionGroups) {
 			if (!err && !religionGroups.length) {
 				global.religionGroupManager.add(religionGroup);
 			}
 		});
 
 		var uriFields = [
-			place.address.country
-			, place.address.region
-			, place.address.locality
-			, place.religion
-			, place.groupName
-			, place.name
+			place.address.country,
+			place.address.region,
+			place.address.locality,
+			place.religion,
+			place.groupName,
+			place.name
 		];
 
 		for (var i=0; i < uriFields.length; i++) {
@@ -628,8 +627,7 @@ module.exports = function(mongoose, email, config) {
 		this.findById = Place.findById.bind(Place);
 		this.findOneAndUpdate = Place.findOneAndUpdate.bind(Place);
 		this.aggregate = Place.aggregate.bind(Place);
-
-
 	}
+
 	return PlaceManager;
 };

@@ -145,8 +145,8 @@ select.form-control,
 
 /* place page */
 
-#place-main
-, #place-sidebar>*{
+#place-main,
+#place-sidebar>* {
 	background-color: white;
 	margin-bottom: 20px;
 }
