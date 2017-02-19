@@ -1,4 +1,3 @@
-
 var config = require('./config.js');
 var http = require('http');
 var fs = require('fs');
@@ -25,16 +24,42 @@ require('./app/date.min.js');
 mongoose.connect(config.mongoURI);
 
 var app = express();
-var db = mongoose.connection;
 var transporter;
 
 mongoose.connection
 	.once('open', function () {
-		var server = app.listen(config.port, config.hostname, function () {
-			var host = server.address().address;
-			var port = server.address().port;
+		var server = http.createServer(app);
 
-			console.log('App listening at http://%s:%s', host, port);
+		server.listen(config.port, config.hostname);
+		server.on('error', function(error) {
+			if (error.syscall !== 'listen') {
+				throw error;
+			}
+
+			var bind = typeof port === 'string'
+				? 'Pipe ' + port
+				: 'Port ' + port;
+
+			// handle specific listen errors with friendly messages
+			switch (error.code) {
+				case 'EACCES':
+					console.error(bind + ' requires elevated privileges');
+					process.exit(1);
+					break;
+				case 'EADDRINUSE':
+					console.error(bind + ' is already in use');
+					process.exit(1);
+					break;
+				default:
+					throw error;
+			}
+		});
+		server.on('listening', function() {
+			var addr = server.address();
+			var bind = typeof addr === 'string'
+				? 'pipe ' + addr
+				: 'port ' + addr.port;
+			console.log('Listening on ' + bind);
 		});
 	})
 	.on('error', console.error);
@@ -95,7 +120,7 @@ var siteconfig = {
 	apiKeys: {
 		stripePublic: config.apiKeys.stripePublic,
 		googleMaps: config.apiKeys.googleMaps
-	},
+	}
 };
 
 var frontendPages = [
@@ -141,11 +166,9 @@ var placesFrontEndPages = [
 	'/places/:country/:region/:locality/:religion/:groupName/:name'
 ];
 
-if (config.prerenderServiceUrl) {
-	var prerender = require('prerender-node')
-		.set('prerenderServiceUrl', config.prerenderServiceUrl)
-		.set('host', config.hostname + ':' + config.port)
-		.set('protocol', 'http');
+if (config.prerenderService.enable) {
+	var prerender = require('./app/prerenderservice');
+	prerender.runServer();
 
 	app.use(prerender);
 }
