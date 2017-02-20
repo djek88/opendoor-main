@@ -7,11 +7,12 @@ module.exports = function(config, placeManager) {
 		if (data.lat && data.lng) {
 			data.coordinates = parseCoordinates(data.lat, data.lng);
 			placeManager.findNearby(data, sendPlacesList);
-		} else {
+		} else if (data.byIp) {
 			var userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
 			getLocationByIp(userIp, function(err, lat, lng) {
 				if (err) return sendPlacesList(err);
+				if (!lat || !lng) return sendPlacesList(new Error('Location didn\'t detected'));
 
 				data.coordinates = parseCoordinates(lat, lng);
 				placeManager.findNearby(data, function(err, results) {
@@ -22,6 +23,8 @@ module.exports = function(config, placeManager) {
 					sendPlacesList(null, results);
 				});
 			});
+		} else {
+			placeManager.findNearby(data, sendPlacesList);
 		}
 
 		function sendPlacesList(err, results) {
@@ -34,7 +37,7 @@ module.exports = function(config, placeManager) {
 
 function getLocationByIp(ip, cb) {
 	var url = 'http://freegeoip.net/json/' + ip;
-	//var url = 'http://freegeoip.net/json/92.113.9.156';
+	//var url = 'http://freegeoip.net/json/92.113.9.166';
 
 	http.get(url, function(res) {
 		var body = '';
@@ -50,3 +53,20 @@ function getLocationByIp(ip, cb) {
 function parseCoordinates(lat, lng) {
 	return [parseFloat(lng), parseFloat(lat)];
 }
+
+/*
+module.exports = function(config, placeManager){
+	return function (req, res) {
+		var data = req.query;
+
+		if (data.lat && data.lng) {
+			data.coordinates = [parseFloat(data.lng), parseFloat(data.lat)];
+		}
+
+		placeManager.findNearby(data, function(err, results){
+			if (err) return res.send(JSON.stringify(err));
+
+			res.send(JSON.stringify(results));
+		});
+	};
+}*/

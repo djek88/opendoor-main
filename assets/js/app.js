@@ -3,7 +3,6 @@
  * Created by Vavooon on 17.12.2015.
  */
 
-
 define([
 	'angular',
 	// './controllers/search',
@@ -14,9 +13,7 @@ define([
 ], function (angular) {
 	'use strict';
 
-
 	var titlePostfix = ' | OpenDoor.ooo';
-
 
 	var opendoorApp = angular.module('opendoorApp', [
 		'ngRoute',
@@ -66,9 +63,7 @@ define([
 	opendoorApp.config(['$routeProvider', '$controllerProvider',
 		function($routeProvider, $controllerProvider) {
 
-
 			opendoorApp.registerController = $controllerProvider.register;
-
 
 			function resolveDependencies ($q, $rootScope, dependencies) {
 				var defer = $q.defer();
@@ -89,8 +84,6 @@ define([
 			}
 		}
 	]);
-
-
 
 	opendoorApp.run(['$rootScope', '$location', '$window', '$q', function($rootScope, $location, $window, $q) {
 		$rootScope.religions = [
@@ -139,13 +132,11 @@ define([
 			}
 		};
 
-
 		$rootScope.submitForm = function() {
 			this.form.$submitted = true;
 			if (this.form.$valid) {
 				document.forms.form.submit();
-			}
-			else {
+			} else {
 				console.log(this.form);
 			}
 		};
@@ -177,7 +168,6 @@ define([
 			$scope.pagesAsArray = pagesList;
 			$scope.page++;
 		};
-
 
 		$rootScope.getMapInstance = function(targetEl) {
 			return $q(function(resolve, reject) {
@@ -260,7 +250,7 @@ define([
 	}]);
 
 	opendoorApp.config( ['$compileProvider', function($compileProvider) {
-			$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
+		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
 	}]);
 
 	opendoorApp.run(['$rootScope', '$route', '$cookies', '$location', function($rootScope, $route, $cookies, $location) {

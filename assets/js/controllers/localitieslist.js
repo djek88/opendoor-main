@@ -1,105 +1,39 @@
-/**
- * Created by vavooon on 29.03.16.
- */
 define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
-	opendoorApp.registerController('LocalitiesListCtrl', ['$scope', '$http', '$rootScope', '$location', '$window',
-		function ($scope, $http, $rootScope, $location, $window) {
 
-			var splittedUrl = $location.path().split('/');
-			
-			function toUp(string)
-			{
-				var firstChar = string.substring( 0, 1 ); // == "c"
-				firstChar = firstChar.toUpperCase();
-				var tail = string.substring( 1 ); // == "heeseburger"
-				string = firstChar + tail;
-				return string;
-			}
-			
-			$scope.country = toUp(splittedUrl[splittedUrl.length - 2]);
-			$scope.religionsList = $rootScope.religions;
-			$scope.religion = '';
-
-			$scope.country = $scope.country.replace('-', ' ');
-			
-			function setSearchParams() {
-
-				var requestParams = {
-					name: $scope.name
-					//, skip: $scope.skip
-					//, limit: $scope.limit
-					, religion: $scope.religion
-					, maintained: $scope.maintained
-				};
-
-				$location.search('name', requestParams.name || null);
-				//$location.search('skip', requestParams.skip || null);
-				//$location.search('limit', requestParams.limit || null);
-				$location.search('religion', requestParams.religion || null);
-				$location.search('maintained', requestParams.maintained || null);
-			}
-
-			$scope.searchPlaces = function () {
-				console.log($scope.skip);
-				$scope.form.$submitted = true;
-				setSearchParams();
-			};
-			//
-			//$scope.setPage = function(n) {
-			//	$scope.skip = (n-1) * $scope.itemsPerPage;
-			//	$scope.form.$submitted = true;
-			//	setSearchParams();
-			//};
-
-
-			function onError() {
-				$scope.message = 'An error happened during request';
-				$scope.places = null;
-			}
-
-			$scope.openLocality = function ($event, country) {
-				//$rootScope.selectedPlace = place;
-				if ($event.which == 2) {
-					$window.open('/places/' + $scope.getLink(country), '_blank');
-				}
-				else {
-					$location.url('/places/' + $scope.getLink(country));
-				}
-			};
-
-			$scope.getLink = function (locality) {
-				return $scope.country.toLowerCase() + '/' + locality.replace(/ /g, '-').toLowerCase();
-			}
-
-			var requestParams = $location.search();
-			$scope.name = requestParams.name;
-			//$scope.skip = requestParams.skip;
-			//$scope.limit = requestParams.limit;
-			$scope.religion = requestParams.religion;
-			$scope.maintained = requestParams.maintained;
+	opendoorApp.registerController('LocalitiesListCtrl', ['$scope', '$http', '$location', '$window', '$routeParams',
+		function($scope, $http, $location, $window, $routeParams) {
+			$scope.selectedCountry = paramToText($routeParams.country);
 			$scope.message = 'Searching…';
-			$http({
-				url: '/ajax/localities?country=' + $scope.country
-				, method: 'GET'
-				, params: requestParams
-			}).success(function (response) {
-				if (typeof response == 'object' && Array.isArray(response)) {
-					var localities = response;
-					if (localities.length) {
-						$scope.message = '';
-					}
-					else {
-						$scope.message = 'There are no places';
-					}
-					$scope.localities = localities;
-					$scope.count = response.count;
-				}
-				else {
-					onError();
-				}
-			}).error(onError);
-		}
 
+			$scope.openLocality = openLocality;
+			$scope.getLink = getLink;
+
+			$http({
+				url: '/ajax/localities',
+				method: 'GET',
+				params: {country: $scope.selectedCountry}
+			}).success(function(results) {
+				$scope.localities = results;
+				$scope.message = results.length ? '' : 'There are no localities';
+			}).error(function() {
+				$scope.message = 'An error happened during request';
+			});
+
+			function getLink(locality) {
+				return $routeParams.country + '/' + locality.replace(/ /g, '-').toLowerCase();
+			}
+
+			function openLocality($event, locality) {
+				var url = '/places/' + getLink(locality);
+
+				$event.which == 2 ? $window.open(url) : $location.url(url);
+			}
+
+			function paramToText(param) {
+				param = param.charAt(0).toUpperCase() + param.slice(1);
+				return param.replace(/-/g, ' ');
+			}
+		}
 	]);
 });

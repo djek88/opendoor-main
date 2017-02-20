@@ -17,7 +17,6 @@ var sha1 = require('sha1');
 var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
 var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
-var countryList = require('country-list')();
 var sm = require('sitemap');
 
 require('./assets/js/utils.js');
@@ -125,49 +124,6 @@ var siteconfig = {
 	}
 };
 
-var frontendPages = [
-	'/',
-	'/login',
-	'/tools',
-	'/register',
-	'/feedback',
-	'/about',
-	'/error',
-	'/message',
-	'/notfound',
-	'/subscribefornotification',
-	'/places/add',
-	'/places/claims',
-	'/places/changes',
-	'/places/edit/:id',
-	'/places/list',
-	'/places/last',
-	'/users/list',
-	'/users/:id',
-	'/promotion/:id',
-	'/places/maintained',
-	'/places/',
-	'/places/:country/',
-	'/places/:country/:locality/',
-	'/places/review/:id',
-	'/places/donate/:id',
-	'/places/editorproposal/:id',
-	///\/places\/(.*)/,
-	'/events/add',
-	'/events/search',
-	'/events/:id/edit',
-	'/jobs/search',
-	'/jobs/add',
-	'/jobs/:id',
-	'/jobs/edit/:id',
-	'/jobs/fund/:id'
-];
-
-var placesFrontEndPages = [
-	'/places/:id',
-	'/places/:country/:region/:locality/:religion/:groupName/:name'
-];
-
 if (config.prerenderService.enable) {
 	var prerender = require('./app/prerenderservice');
 	prerender.runServer();
@@ -215,8 +171,92 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 	});
 });
 
+app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(siteconfig));
+app.post('/login', require('./app/routes/login.js')(userManager, sha1));
+app.get('/logout', require('./app/routes/logout.js')());
+app.post('/register', require('./app/routes/register.js')(userManager, sha1));
+
+app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
+app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));
+app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/searchbyip', require('./app/routes/ajax/places/search.js')(config, placeManager));
+app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
+app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
+app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
+app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
+app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
+app.get(['/ajax/events/:id', '/ajax/events/search'], require('./app/routes/ajax/events.js')(mongoose, placeManager, config));
+app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));
+app.get('/ajax/countries', require('./app/routes/ajax/countries.js')(placeManager));
+app.get('/ajax/localities', require('./app/routes/ajax/localities.js')(placeManager));
+app.get('/ajax/religionGroups', require('./app/routes/ajax/religionGroups.js')(religionGroupManager));
+app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(denominationManager));
+app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
+
+app.get('/subscriptions/confirm/:id', require('./app/routes/subscriptions/confirm.js')(subscriptionManager));
+app.post(['/jobs/add', '/jobs/edit/:id'], require('./app/routes/jobs/edit.js')(mongoose, placeManager, placeManager));
+app.post('/jobs/fund/:id', require('./app/routes/jobs/fund.js')(placeManager, stripe));
+app.post('/jobs/:id', require('./app/routes/jobs/contact.js')(mongoose, placeManager, email));
+
+app.get('/places/confirm/:id', require('./app/routes/places/confirm.js')(placeManager));
+app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
+app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
+app.post('/places/review/:id', require('./app/routes/places/addreview.js')(placeManager));
+app.post('/places/donate/:id', require('./app/routes/promotion.js')(placeManager, stripe));
+app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
+app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
+app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));
+
+app.post(['/events/add', '/events/:id/edit'], require('./app/routes/places/upsertevent.js')(placeManager, mongoose));
+app.post('/feedback', require('./app/routes/feedback.js')(userManager, config, email));
+app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager, placeManager));
+app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimManager));
+app.get('/claims/:id/deny', require('./app/routes/claims/deny.js')(claimManager));
+app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(placeChangeManager, email));
+app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(placeChangeManager, email));
+app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));
+app.get('/version', function(req, res) { res.send('1.0.1'); });
+
+var frontendPages = [
+	'/',
+	'/login',
+	'/tools',
+	'/register',
+	'/feedback',
+	'/about',
+	'/error',
+	'/message',
+	'/notfound',
+	'/subscribefornotification',
+	'/places/',
+	'/places/list',
+	'/places/last',
+	'/places/add',
+	'/places/claims',
+	'/places/changes',
+	'/places/edit/:id',
+	'/users/list',
+	'/users/:id',
+	'/promotion/:id',
+	'/places/maintained',
+	'/places/:country/',
+	'/places/:country/:locality/',
+	'/places/review/:id',
+	'/places/donate/:id',
+	'/places/editorproposal/:id',
+	///\/places\/(.*)/,
+	'/events/add',
+	'/events/search',
+	'/events/:id/edit',
+	'/jobs/search',
+	'/jobs/add',
+	'/jobs/:id',
+	'/jobs/edit/:id',
+	'/jobs/fund/:id'
+];
+
 app.get(frontendPages, function(req, res) {
-	console.log(req.path);
 	var options = {
 		apiKeys: config.apiKeys,
 		pretty: true,
@@ -231,6 +271,11 @@ app.get(frontendPages, function(req, res) {
 		res.send(content);
 	});
 });
+
+var placesFrontEndPages = [
+	'/places/:id',
+	'/places/:country/:region/:locality/:religion/:groupName/:name'
+];
 
 app.get(placesFrontEndPages, function(req, res) {
 	var query = {};
@@ -261,49 +306,6 @@ app.get(placesFrontEndPages, function(req, res) {
 		});
 	});
 });
-
-app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(siteconfig));
-app.post('/login', require('./app/routes/login.js')(userManager, sha1));
-app.get('/logout', require('./app/routes/logout.js')());
-app.post('/register', require('./app/routes/register.js')(userManager, sha1));
-app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
-app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));
-app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
-app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
-app.get('/ajax/places/searchbyip', require('./app/routes/ajax/places/search.js')(config, placeManager));
-app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
-app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
-app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
-app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(mongoose, placeManager)); //keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
-app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
-app.get(['/ajax/events/:id', '/ajax/events/search'], require('./app/routes/ajax/events.js')(mongoose, placeManager, config));
-app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));
-app.get('/ajax/countries', require('./app/routes/ajax/countries.js')(placeManager, countryList));
-app.get('/ajax/localities', require('./app/routes/ajax/localities.js')(placeManager));
-app.get('/ajax/religionGroups', require('./app/routes/ajax/religionGroups.js')(religionGroupManager));
-app.get('/ajax/denominations', require('./app/routes/ajax/denominations.js')(denominationManager));
-app.get('/ajax/claims', require('./app/routes/ajax/claims.js')(claimManager));
-app.get('/places/confirm/:id', require('./app/routes/places/confirm.js')(placeManager));
-app.get('/subscriptions/confirm/:id', require('./app/routes/subscriptions/confirm.js')(subscriptionManager));
-app.post(['/jobs/add', '/jobs/edit/:id'], require('./app/routes/jobs/edit.js')(mongoose, placeManager, placeManager));
-app.post('/jobs/fund/:id', require('./app/routes/jobs/fund.js')(placeManager, stripe));
-app.post('/jobs/:id', require('./app/routes/jobs/contact.js')(mongoose, placeManager, email));
-app.post(['/places/add', '/places/edit/:id'], require('./app/routes/places/edit.js')(mongoose, userManager, placeChangeManager, placeNotificationManager, email));
-app.post('/places/editorproposal/:id', require('./app/routes/places/editorproposal.js')(email));
-app.post('/places/review/:id', require('./app/routes/places/addreview.js')(placeManager));
-app.post('/places/donate/:id', require('./app/routes/promotion.js')(placeManager, stripe));
-app.post(['/events/add', '/events/:id/edit'], require('./app/routes/places/upsertevent.js')(placeManager, mongoose));
-app.get('/places/uptodate/:id', require('./app/routes/places/uptodate.js')(placeManager));
-app.post('/places/message', require('./app/routes/places/message.js')(placeManager, email));
-app.post('/places/subscribe', require('./app/routes/subscriptions/subscribe.js')(subscriptionManager, placeManager, email));
-app.post('/feedback', require('./app/routes/feedback.js')(userManager, config, email));
-app.get('/claims/:id/add', require('./app/routes/claims/add.js')(mongoose, claimManager, placeManager));
-app.get('/claims/:id/accept', require('./app/routes/claims/accept.js')(claimManager));
-app.get('/claims/:id/deny', require('./app/routes/claims/deny.js')(claimManager));
-app.get('/placechanges/:id/accept', require('./app/routes/placechanges/accept.js')(placeChangeManager, email));
-app.get('/placechanges/:id/deny', require('./app/routes/placechanges/deny.js')(placeChangeManager, email));
-app.post('/subscribefornotification', require('./app/routes/subscribefornotification.js')(placeNotificationManager));
-app.get('/version', function(req, res) { res.send('1.0.1'); });
 
 // schedule.scheduleJob('* * 0 * * *', sendPlaceReminder(placeManager, email));
 // schedule.scheduleJob('* * 0 * * *', setYear);

@@ -1,18 +1,14 @@
-module.exports = function(placeManager, countryList){
+var countryList = require('country-list')();
 
-
-	
+module.exports = function(placeManager){
 	return function (req, res) {
 		if (req.query.withPlaces) {
-			placeManager.getCountries(
-				function(err, countries) {
-					countries.sort();
-					res.send(countries);
-				}
-			);
+			return placeManager.getCountries(function(err, countries) {
+				countries.sort();
+				res.send(countries);
+			});
 		}
-		else {
-			res.send(JSON.stringify(countryList.getNames()));
-		}
+
+		res.send(JSON.stringify(countryList.getNames()));
 	};
 };

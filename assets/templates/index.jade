@@ -143,7 +143,9 @@ html
 								a(href='/login') LOG IN
 							li(ng-hide="$root.isLoggedIn")
 								a(href='/register') REGISTER
+
 			#wrap(ng-view ng-init="userIp = '#{userIp}'")
+
 			footer#footer.my-footer
 				| © #{currentYear} | OpenDoor -
 				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage")  Suggest an improvement

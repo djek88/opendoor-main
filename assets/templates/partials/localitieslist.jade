@@ -1,35 +1,20 @@
 #content.content
-   .container
-      //.row
-      //   .col-lg-12
-      //      form.form-inline(name="form", novalidate)
-      //         .form-group(ng-class="{'has-error': (form.$submitted || form.name.$touched) && form.name.$error.required}")
-      //            input.form-control(name="name", ng-model="name", placeholder="Name")
-      //         .form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
-      //            select.form-control(name="religion", ng-model="religion")
-      //               option(value="", selected) All religions
-      //               option(value="{{name}}", ng-repeat="name in religionsList") {{name}}
-      //         .checkbox
-      //            label(for="maintained") Only maintained
-      //            input.form-control(type="checkbox", id="maintained", name="maintained", ng-model="maintained")
-      //            | &nbsp;
-      //         button.btn.btn-md.btn-primary(type='submit', ng-click="searchPlaces()") Filter
-      //         .clearfix
-      .row
-         .col-lg-12.m-t-40
-            h4.text-center(ng-show='message.length') {{message}}
-            h1.localsheadings Places of Worship in {{country}}
-            div(ng-show="localities")
-               div(ng-show="localities.length")
-                  .table-wrap.bg-white
-                     table#search-table.table
-                        thead
-                           tr
-                              th City
-                              th
-                        tbody
-                           tr.place-link(ng-repeat="locality in localities", ng-mousedown="openLocality($event, locality)")
-                              td {{locality}}
-                              td.text-right
-                                 a(href="/places/{{getLink(locality)}}")
-                                    i.fa.fa-chevron-right
+	.container
+		.row
+			.col-lg-12.m-t-40
+				h4.text-center(ng-show='message') {{message}}
+				h1.localsheadings Places of Worship in {{selectedCountry}}
+				div(ng-show="localities")
+					div(ng-show="localities.length")
+						.table-wrap.bg-white
+							table#search-table.table
+								thead
+									tr
+										th City
+										th
+								tbody
+									tr.place-link(ng-repeat="locality in localities", ng-mousedown="openLocality($event, locality)")
+										td {{locality}}
+										td.text-right
+											a(ng-href="/places/{{getLink(locality)}}")
+												i.fa.fa-chevron-right
