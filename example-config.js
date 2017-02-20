@@ -1,9 +1,12 @@
 module.exports = {
 	port: 8000,
-	hostname: '0.0.0.0',
+	hostname: 'localhost',
 	sitename: 'OpenDoor.ooo',
-	url: 'http://192.168.100.2:8000',
-	// prerenderServiceUrl: 'http://localhost:3000/',
+	url: 'http://prodServerHostname[:port]', // eg http://176.9.152.11:8000
+	prerenderService: {
+		enable: true,
+		port: 3000
+	},
 	cookieKeys: '1223',
 	sessionSecret: '1234567890QWERTY1223',
 	mongoURI: 'mongodb://localhost:27017/opendoor',

@@ -20,7 +20,7 @@ prerenderService.runServer = function() {
 
 	serverProcess = spawn(process.argv[0], ['./app/prerenderservice/server.js'], {
 		env: { PORT: config.prerenderService.port, NODE_HOSTNAME: 'localhost' },
-		stdio: 'inherit'
+		//stdio: 'inherit' // uncomment for see prerender service's logs
 	});
 
 	serverProcess.unref();
