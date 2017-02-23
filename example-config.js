@@ -5,7 +5,8 @@ module.exports = {
 	url: 'http://prodServerHostname[:port]', // eg http://176.9.152.11:8000
 	prerenderService: {
 		enable: true,
-		port: 3000
+		port: 3000,
+		instances: 1 // how many servers will be running, 0 = numCpuCores
 	},
 	cookieKeys: '1223',
 	sessionSecret: '1234567890QWERTY1223',
