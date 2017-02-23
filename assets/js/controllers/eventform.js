@@ -1,19 +1,11 @@
-/**
- * Created by vavooon on 29.03.16.
- */
-
-'use strict';
-define(['angular'
-	, 'app'
-	, 'libs/googlemaps'
-	, 'libs/datetimepicker'], function (angular, opendoorApp) {
+define(['angular', 'app', 'libs/googlemaps', 'libs/datetimepicker'], function (angular, opendoorApp) {
+	'use strict';
 
 	opendoorApp.registerController('EventFormCtrl', ['$scope', '$rootScope', '$location', '$http', '$routeParams',
 		function ($scope, $rootScope, $location, $http, $routeParams) {
 			var isAdding = $location.path() == '/events/add';
 			var eventId = $scope.eventId = $routeParams.id;
 			var placeId = $location.search().place;
-
 
 			var geocoder = new google.maps.Geocoder();
 			var map;
@@ -36,18 +28,17 @@ define(['angular'
 				$scope.event.endDate = $('input', $endDatePicker).val();
 			});
 
-			$rootScope.getMapInstance($('#results-map'))
-				.then(function(m) {
-					map = m;
-					google.maps.event.addListenerOnce(map, 'idle', function () {
-						google.maps.event.trigger(map, 'resize');
-					});
-
-
-					var pos = new google.maps.LatLng(0, 0);
-					map.setCenter(pos);
-					map.setZoom(2);
+			$rootScope.getMapInstance($('#results-map')).then(function(m) {
+				map = m;
+				google.maps.event.addListenerOnce(map, 'idle', function () {
+					google.maps.event.trigger(map, 'resize');
 				});
+
+
+				var pos = new google.maps.LatLng(0, 0);
+				map.setCenter(pos);
+				map.setZoom(2);
+			});
 
 			$scope.searchByAddress = function () {
 				geocoder.geocode({'address': $scope.event.address}, function (results, status) {
@@ -62,7 +53,6 @@ define(['angular'
 					}
 				});
 			};
-
 
 			function setData(event) {
 				if (event.startDate) {
@@ -80,7 +70,6 @@ define(['angular'
 			}
 
 			function setDataFromPlace(place) {
-
 				if (eventId) {
 					for (var i=0; i < place.events.length; i++) {
 						if (place.events[i]._id == eventId) {
@@ -90,12 +79,11 @@ define(['angular'
 						}
 					}
 					// $location.url('/notfound');
-				}
-				else {
+				} else {
 					setData({
-						address: place.concatenatedAddress
-						, location: place.location
-						, place: place._id
+						address: place.concatenatedAddress,
+						location: place.location,
+						place: place._id
 					});
 				}
 			}
@@ -104,28 +92,24 @@ define(['angular'
 				$scope.edit = true;
 				$scope.mode = 'edit';
 				path = '/ajax/places/search?event=' + eventId;
-			}
-			else {
+			} else {
 				$scope.mode = 'add';
 				path = '/ajax/places/' + placeId;
 
 			}
 
 			$http({
-				url: path
-				, method: 'GET'
+				url: path,
+				method: 'GET'
 			}).success(function (data) {
 				if (typeof data == 'object') {
 					setDataFromPlace(eventId ? data.results[0] : data);
-				}
-				else {
+				} else {
 					// $location.url('/notfound');
 				}
 			}).error(function () {
 				// $location.url('/notfound');
 			});
-
-
 		}
 	]);
 });

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "supervisor -i node_modules,bower_components index.js",
+    "debugger": "supervisor -i node_modules,bower_components -- --inspect index.js",
     "prod": "ls"
   },
   "author": "Vavooon",

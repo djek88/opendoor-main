@@ -1,10 +1,3 @@
-/**
- *
- *
- * Created by Vavooon on 17.12.2015.
- */
-
-
 module.exports = function(mongoose, config) {
 
 	var userSchema = new mongoose.Schema({

@@ -1,28 +1,26 @@
-module.exports = function(placeManager){
-	return function (req, res) {
-		console.log('req.session');
-		console.log(req.session);
-		console.log(req.session.user);
-		if (req.session.user) {
-			var id = req.params.id;
-			var data = {
-				rating: req.body.rating
-				,	text: req.body.text
-				,	name: req.session.user.name
-			};
+const googleAnalytics = require('../googleAnalytics');
 
-			placeManager.addReview(id, data, function(err, place){
-				if (!err && place) {
-					console.log('Review for place ' + id + ' was added');
-					res.redirect('/message?message=reviewsaved&back=' + encodeURIComponent('/places/' + place.uri));
-				}
-				else {
-					res.redirect('/error');
-				}
+module.exports = function(placeManager){
+	return function(req, res) {
+		if (!req.session.user) return res.redirect('/message?message=pleaselogin');
+
+		var id = req.params.id;
+		var data = {
+			rating: req.body.rating,
+			text: req.body.text,
+			name: req.session.user.name
+		};
+
+		placeManager.addReview(id, data, function(err, place) {
+			if (err || !place) return res.redirect('/error');
+
+			res.redirect('/message?message=reviewsaved&back=' + encodeURIComponent('/places/' + place.uri));
+
+			googleAnalytics.sendEvent({
+				_ga: req.cookies._ga,
+				eventCategory: 'place review',
+				eventAction: 'create'
 			});
-		}
-		else {
-			res.redirect('/message?message=pleaselogin');
-		}
+		});
 	};
 };

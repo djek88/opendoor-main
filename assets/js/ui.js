@@ -1,7 +1,3 @@
-/**
- * Created by vavooon on 09.04.16.
- */
-
 $(function(){
 	$('html').on('click', function (e) {
 		var $el = $(e.target);

@@ -1,9 +1,7 @@
-/**
- * Created by Vavooon on 22.12.2015.
- */
 define(['libs/googlemaps'], function () {
-	$.fn.locationpicker = function (options) {
-		var autoDetect = options.autoDetect;
+	$.fn.locationpicker = function(options) {
+		options = options || {};
+		var autoDetect = options.autoDetect || true;
 		var onLocationDetected = options.onLocationDetected || function() {};
 
 		var geocoder = new google.maps.Geocoder();

@@ -10,7 +10,6 @@ html
 		meta(content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport")
 		base(href="/")
 
-
 		//- if originalCss
 			link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
 			link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap/css/bootstrap.min.css')
@@ -31,7 +30,6 @@ html
 		link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/font-awesome/css/font-awesome.min.css')
-
 		link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/css/animate.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/css/style.min.css')
@@ -42,17 +40,32 @@ html
 		link(rel='stylesheet', href='/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
 		link(rel='stylesheet', href='/assets/css/style.css')
 
-
-
-
-
 		script(src="/siteconfig.js")
 		script(src="/assets/js/require.js", data-main="/assets/js/requirejs-config.js")
 		script(src="/bower_components/jquery/dist/jquery.min.js")
 		script(src="/bower_components/Datejs/build/date.js")
 		script(src="/assets/js/ui.js")
 		script(src="/assets/js/utils.js")
-		script(src="/assets/js/ga.js")
+
+		<!-- Google Analytics -->
+		script.
+			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+			ga('create', window.siteconfig.googleAnalytics.trackingId, 'auto');
+			ga('require', 'urlChangeTracker');
+			ga('send', 'pageview');
+		script(async src="https://www.google-analytics.com/analytics.js")
+		script(async src="/assets/js/autotrack.js")
+		<!-- End Google Analytics -->
+
+		<!-- Begin Inspectlet Embed Code -->
+		script(type="text/javascript" id="inspectletjs").
+			window.__insp = window.__insp || [];
+			__insp.push(['wid', 298518304]);
+			(function() {
+			function ldinsp(){if(typeof window.__inspld != "undefined") return; window.__inspld = 1; var insp = document.createElement('script'); insp.type = 'text/javascript'; insp.async = true; insp.id = "inspsync"; insp.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://cdn.inspectlet.com/inspectlet.js'; var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(insp, x); };
+			setTimeout(ldinsp, 500); document.readyState != "complete" ? (window.attachEvent ? window.attachEvent('onload', ldinsp) : window.addEventListener('load', ldinsp, false)) : ldinsp();
+			})();
+		<!-- End Inspectlet Embed Code -->
 
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
@@ -148,7 +161,6 @@ html
 
 			footer#footer.my-footer
 				| © #{currentYear} | OpenDoor -
-				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage")  Suggest an improvement
+				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage") Suggest an improvement
 				| &nbsp;-&nbsp;
 				a.link(href="/about") About
-			script(src="/assets/js/mouseflow.js")

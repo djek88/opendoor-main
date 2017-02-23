@@ -1,8 +1,3 @@
-/**
- *
- * Created by Vavooon on 17.12.2015.
- */
-
 define([
 	'angular',
 	// './controllers/search',
@@ -62,10 +57,9 @@ define([
 
 	opendoorApp.config(['$routeProvider', '$controllerProvider',
 		function($routeProvider, $controllerProvider) {
-
 			opendoorApp.registerController = $controllerProvider.register;
 
-			function resolveDependencies ($q, $rootScope, dependencies) {
+			function resolveDependencies($q, $rootScope, dependencies) {
 				var defer = $q.defer();
 				require(dependencies, function () {
 					defer.resolve();
@@ -80,7 +74,7 @@ define([
 					load: ['$q', '$rootScope', function ($q, $rootScope) {
 						return resolveDependencies($q, $rootScope, [path]);
 					}]
-				}
+				};
 			}
 		}
 	]);
@@ -300,7 +294,9 @@ define([
 
 		var id = $cookies.get('_id');
 		if (typeof id == 'string'){
-			$rootScope._id = id.substring(3,id.length-1);
+			$rootScope._id = id.substring(3, id.length-1);
+			// set google analytics 'userId' for unite sessions
+			ga('set', 'userId', $rootScope._id);
 		}
 		$rootScope.email = $cookies.get('email');
 		$rootScope.isAdmin = $cookies.get('isAdmin') == 'true';

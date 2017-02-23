@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('./config.js');
+var config = require('./config');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
@@ -13,7 +13,6 @@ var bodyParser = require('body-parser');
 var session = require('cookie-session');
 var busboy = require('connect-busboy');
 var jade = require('jade');
-var sha1 = require('sha1');
 var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
 var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
@@ -118,9 +117,12 @@ var siteconfig = {
 	twitterAccount: config.social.twitterAccount,
 	frontend: config.frontend,
 	l10n: config.l10n,
+	googleAnalytics: {
+		trackingId: config.googleAnalytics.trackingId
+	},
 	apiKeys: {
 		stripePublic: config.apiKeys.stripePublic,
-		googleMaps: config.apiKeys.googleMaps
+		googleMaps: config.apiKeys.googleMaps,
 	}
 };
 
@@ -172,9 +174,9 @@ app.get('/assets/templates/partials/:filename.html', function (req, res) {
 });
 
 app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(siteconfig));
-app.post('/login', require('./app/routes/login.js')(userManager, sha1));
+app.post('/register', require('./app/routes/register.js')(userManager));
+app.post('/login', require('./app/routes/login.js')(userManager));
 app.get('/logout', require('./app/routes/logout.js')());
-app.post('/register', require('./app/routes/register.js')(userManager, sha1));
 
 app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
 app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));

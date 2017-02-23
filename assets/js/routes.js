@@ -43,32 +43,6 @@ define(['./app'], function (opendoorApp) {
 				resolve: opendoorApp.resolveController('/assets/js/controllers/userview.js')
 			})
 
-			.when('/places/', {
-				title: 'Places of Worship listed by Country',
-				meta: 'Find your Place of Worship anywhere in the World. A list of all Places of Worship by Country. Check to make sure your Place of Worship is listed and correct so others can find it.',
-				templateUrl: 'assets/templates/partials/countrieslist.html',
-				controller: 'CountriesListCtrl',
-				resolve: opendoorApp.resolveController('/assets/js/controllers/countrieslist.js')
-			})
-			.when('/places/:country/', {
-				title: 'Localities list',
-				templateUrl: 'assets/templates/partials/localitieslist.html',
-				controller: 'LocalitiesListCtrl',
-				resolve: opendoorApp.resolveController('/assets/js/controllers/localitieslist.js')
-			})
-			.when('/places/:country/:locality/', {
-				title: 'Places list',
-				templateUrl: 'assets/templates/partials/placesbylocalitieslist.html',
-				controller: 'PlacesByLocalitiesListCtrl',
-				resolve: opendoorApp.resolveController('/assets/js/controllers/placesbylocalitieslist.js')
-			})
-			.when('/places/list', {
-				title: 'Places list',
-				shouldLogin: true,
-				templateUrl: 'assets/templates/partials/placeslist.html',
-				controller: 'PlacesListCtrl',
-				resolve: opendoorApp.resolveController('/assets/js/controllers/placeslist.js')
-			})
 			.when('/places/add', {
 				title: 'Add a Place of Worship',
 				meta: 'Add your Place of Worship for free, list events, get reviews and allow others to find it.',
@@ -97,6 +71,20 @@ define(['./app'], function (opendoorApp) {
 				templateUrl: 'assets/templates/partials/placechanges.html',
 				controller: 'PlaceChangesCtrl',
 				resolve: opendoorApp.resolveController('/assets/js/controllers/placechanges.js')
+			})
+			.when('/places/list', {
+				title: 'Places list',
+				shouldLogin: true,
+				templateUrl: 'assets/templates/partials/placeslist.html',
+				controller: 'PlacesListCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/placeslist.js')
+			})
+			.when('/places/', {
+				title: 'Places of Worship listed by Country',
+				meta: 'Find your Place of Worship anywhere in the World. A list of all Places of Worship by Country. Check to make sure your Place of Worship is listed and correct so others can find it.',
+				templateUrl: 'assets/templates/partials/countrieslist.html',
+				controller: 'CountriesListCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/countrieslist.js')
 			})
 			.when('/places/last', {
 				title: 'Last places',
@@ -129,6 +117,18 @@ define(['./app'], function (opendoorApp) {
 				controller: 'EditorProposalCtrl',
 				resolve: opendoorApp.resolveController('/assets/js/controllers/editorproposal.js')
 			})
+			.when('/places/:country/', {
+				title: 'Localities list',
+				templateUrl: 'assets/templates/partials/localitieslist.html',
+				controller: 'LocalitiesListCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/localitieslist.js')
+			})
+			.when('/places/:country/:locality/', {
+				title: 'Places list',
+				templateUrl: 'assets/templates/partials/placesbylocalitieslist.html',
+				controller: 'PlacesByLocalitiesListCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/placesbylocalitieslist.js')
+			})
 			.when('/places/:country/:region/:locality/:religion/:groupName/:name', {
 				title: 'View place',
 				templateUrl: 'assets/templates/partials/placeview.html',
@@ -142,12 +142,6 @@ define(['./app'], function (opendoorApp) {
 				resolve: opendoorApp.resolveController('/assets/js/controllers/placeview.js')
 			})
 
-			.when('/jobs/:id', {
-				title: 'View job',
-				templateUrl: 'assets/templates/partials/jobview.html',
-				controller: 'JobViewCtrl',
-				resolve: opendoorApp.resolveController('/assets/js/controllers/jobview.js')
-			})
 			.when('/jobs/add', {
 				title: 'Add job',
 				shouldLogin: true,
@@ -168,6 +162,12 @@ define(['./app'], function (opendoorApp) {
 				templateUrl: 'assets/templates/partials/jobfund.html',
 				controller: 'JobFundCtrl',
 				resolve: opendoorApp.resolveController('/assets/js/controllers/jobfund.js')
+			})
+			.when('/jobs/:id', {
+				title: 'View job',
+				templateUrl: 'assets/templates/partials/jobview.html',
+				controller: 'JobViewCtrl',
+				resolve: opendoorApp.resolveController('/assets/js/controllers/jobview.js')
 			})
 			
 			.when('/events/search', {

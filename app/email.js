@@ -1,6 +1,3 @@
-
-
-
 function Email (config, transporter) {
 	var self = this;
 	function getAdminEmails(callback) {

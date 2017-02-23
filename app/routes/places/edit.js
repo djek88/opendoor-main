@@ -1,7 +1,8 @@
-module.exports = function(mongoose, userManager, placeChangeManager, placeNotificationManager, email) {
-	var fs = require('fs');
-	var extend = require('util')._extend;
+const fs = require('fs');
+const extend = require('util')._extend;
+const googleAnalytics = require('../googleAnalytics');
 
+module.exports = function(mongoose, userManager, placeChangeManager, placeNotificationManager, email) {
 	function equals(a, b) {
 		var atype = typeof a;
 		var btype = typeof b;
@@ -40,36 +41,61 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 		}
 	}
 
-	return function (req, res) {
-		
-		if (!req.session.user) {
-			return res.end();
-		}
-		var isAdding = !req.params.id;
-		if (isAdding) {
-			var id = mongoose.Types.ObjectId();
-		}
-		else {
-			var id = mongoose.Types.ObjectId(req.params.id);
-		}
-		
-		var fields = {};
+	return function(req, res) {
+		if (!req.session.user || !req.busboy) return res.end();
 
-		var files = {};
+		let isAdding = !req.params.id;
+		let fields = {};
+		let files = {};
+		let allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
+		let allowedFileExtensions = ['jpg', 'png'];
+		let id = mongoose.Types.ObjectId();
 
-		var allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
-		var allowedFileExtensions = ['jpg', 'png'];
+		if (!isAdding) {
+			id = mongoose.Types.ObjectId(req.params.id);
+		}
+
+		req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+			if (filename.length) {
+				var extension = filename.toLowerCase().split('.').pop();
+
+				if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
+					var imgFileName = files[fieldname] = id + '_' + fieldname + '_' + global.getUniqueFilename() + '.' + extension;
+					var fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
+					file.pipe(fstream);
+				} else {
+					console.warn('wrong extendion or field name:', fieldname, extension);
+				}
+			}
+			file.resume();
+		});
+
+		req.busboy.on('field', function(key, value) {
+			fields[key] = value;
+		});
+
+		req.busboy.on('finish', storePlace);
 
 		function finishRequest(err, place) {
 			if (isAdding) {
 				email.sendNotificationAboutNewPlaceToAdmin(id);
 				email.sendConfirmationLink(id, req.session.user.email);
 				res.redirect('/message?message=placeadded');
-			}
-			else if (place.maintainer == req.session.user._id) {
+
+				googleAnalytics.sendEvent({
+					_ga: req.cookies._ga,
+					eventCategory: 'place',
+					eventAction: 'create'
+				});
+			} else if (place.maintainer == req.session.user._id) {
 				res.redirect('/message?message=placesaved&back=' + encodeURIComponent('/places/' + place.uri));
-			}
-			else {
+
+				googleAnalytics.sendEvent({
+					_ga: req.cookies._ga,
+					eventCategory: 'place',
+					eventAction: 'update'
+				});
+			} else {
 				email.sendPlaceChanges({id: place._id, recipientEmail: place.maintainer.email});
 				res.redirect('/message?message=changesadded&back=' + encodeURIComponent('/places/' + place.uri));
 			}
@@ -92,8 +118,7 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			}
 			if (place.denominations && place.denominations.length) {
 				place.denominations = place.denominations.split(',');
-			}
-			else {
+			} else {
 				place.denominations = [];
 			}
 
@@ -102,12 +127,12 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 			}
 
 			place.address = {
-				line1: place.addressLine1
-				, line2: place.addressLine2
-				, locality: place.locality
-				, region: place.region
-				, country: place.country
-				, postalCode: place.postalCode
+				line1: place.addressLine1,
+				line2: place.addressLine2,
+				locality: place.locality,
+				region: place.region,
+				country: place.country,
+				postalCode: place.postalCode
 			};
 
 			delete place.addressLine1;
@@ -123,16 +148,14 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				place.maintainer = mongoose.Types.ObjectId(req.session.user._id);
 
 				placeManager.add(place, finishRequest);
-			}
-			else {
+			} else {
 				placeManager.findById(req.params.id).populate('maintainer').lean().exec(function (err, currentPlace) {
 					console.log('cuur');
 					console.log(currentPlace);
 					if (currentPlace) {
 						if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
 							placeManager.update(req.params.id, place, finishRequest);
-						}
-						else {
+						} else {
 							for (var i in place) {
 								if (place.hasOwnProperty(i)) {
 									if (place[i] && !equals(currentPlace[i], place[i]) && (currentPlace[i] || place[i])) {
@@ -148,38 +171,11 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 							}
 							finishRequest(err, currentPlace);
 						}
-					}
-					else {
+					} else {
 						res.send("Object wasn't found");
 					}
 				});
 			}
-
 		}
-
-
-		if (req.busboy) {
-			req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-				if (filename.length) {
-					var extension = filename.toLowerCase().split('.').pop();
-					if (allowedFileFields.indexOf(fieldname) != -1 && allowedFileExtensions.indexOf(extension) != -1) {
-						var imgFileName = files[fieldname] = id + '_' + fieldname + '_' + global.getUniqueFilename() + '.' + extension;
-						var fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
-						file.pipe(fstream);
-					}
-					else {
-						console.warn('wrong extendion or field name:', fieldname, extension);
-					}
-				}
-				file.resume();
-			});
-			req.busboy.on('field', function (key, value) {
-				fields[key] = value;
-			});
-			req.busboy.on('finish', storePlace);
-		}
-		else {
-			res.end();
-		}
-	}
+	};
 };
