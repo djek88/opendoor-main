@@ -24,7 +24,7 @@ module.exports = function(userManager) {
 				}
 
 				googleAnalytics.sendEvent({
-					clientId: req.cookies._ga,
+					_ga: req.cookies._ga,
 					eventCategory: 'authorization',
 					eventAction: 'sign up'
 				});
