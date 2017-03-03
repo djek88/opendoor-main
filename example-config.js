@@ -1,52 +1,60 @@
+// After adding new configurations, should add validation rules in appropriate file
+
+// Any DEFAULT and NOT REQUIRED options can be absent
+// NOT REQUIRED - config block will be created with default values for child options, if default values are specified
+
 module.exports = {
-	port: 8000,
-	hostname: 'localhost',
-	sitename: 'OpenDoor.ooo',
-	url: 'http://prodServerHostname[:port]', // eg http://176.9.152.11:8000
-	prerenderService: {
-		enable: true,
-		port: 3000,
-		instances: 1 // how many servers will be running, 0 = numCpuCores
+	// port: undefined,				/*DEFAULT: 8000*/
+	// hostname: '',				/*DEFAULT: 'localhost'*/
+	siteName: '',					/*REQUIRED, eg: 'OpenDoor.ooo'*/
+	url: '',						/*REQUIRED, 'http://prodServerHostname[:port]', eg: 'test.com'*/
+	// cookieKeys: '',				/*DEFAULT: '1223'*/
+	// sessionSecret: '',			/*DEFAULT: '1234567890QWERTY1223'*/
+	// mongoURI: '',				/*DEFAULT: 'mongodb://localhost:27017/opendoor'*/
+	// staticFiles: [],				/*DEFAULT: [], eg: ['/path/to/static/file']*/
+
+	apiKeys: {						/*REQUIRED*/
+		googleMaps: '',					/*REQUIRED*/
+		// googleMapsServer: '',		/*NOT REQUIRED*/
+		stripePublic: '',				/*REQUIRED*/
+		stripeSecret: ''				/*REQUIRED*/
 	},
-	cookieKeys: '1223',
-	sessionSecret: '1234567890QWERTY1223',
-	mongoURI: 'mongodb://localhost:27017/opendoor',
-	mailConfig: {
-		//	transport: 'gmail',
-		//	service: 'Gmail',
-		//	auth: {
-		//	 	user: 'user@gmail.com',
-		//		pass: 'userpass'
-		//}
-		//	senderAddress: 'user@gmail.com',
-		transport: 'smtp',
-		host: 'localhost',
-		port: 25,
-		auth: {
-			user: 'username',
-			pass: 'password'
-		}
+
+	social: {						/*REQUIRED*/
+		twitterAccount: ''				/*REQUIRED, rg: '@opendoorforall'*/
 	},
-	apiKeys: {
-		googleMaps: 'yourApiKey',
-		googleMapsServer: 'yourApiKey',
-		stripePublic: 'yourApiKey',
-		stripeSecret: 'yourApiKey'
-	},
-	social: {
-		twitterAccount: '@yourAccount'
-	},
-	frontend: {
-		itemsPerPage: 25,
-		maxItemsPerPage: 100
-	},
-	l10n: {
-		timeFormat: 'hh:mm tt',
-		dateFormat: 'yyyy-MM-dd',
-		dateTimeFormat: 'yyyy-MM-dd hh:mm tt'
-	},
-	googleAnalytics: {
-		trackingId: 'yourTrackingId'
-	},
-	staticFiles: ['/sitemap.xml']
+
+	// googleAnalytics: {			/*NOT REQUIRED*/
+		// trackingId: ''				/*DEFAULT: 'invalidTrackingId'*/
+	// },
+
+	// frontend: {					/*NOT REQUIRED*/
+		// itemsPerPage: undefined,		/*DEFAULT: 25*/
+		// maxItemsPerPage: undefined	/*DEFAULT: 100*/
+	//},
+
+	// prerenderService: {			/*NOT REQUIRED*/
+		// enable: undefined,			/*DEFAULT: true*/
+		// port: undefined,				/*DEFAULT: 3000*/
+		// instances: undefined			/*DEFAULT: 0, (how many servers will be running, 0 = numCpuCores)*/
+	// },
+
+	// mailConfig: {				/*NOT REQUIRED*/
+		// host: '',					/*DEFAULT: 'localhost'*/
+		// port: undefined,				/*DEFAULT: 25*/
+		// from: '',					/*DEFAULT: 'contanct@opendoor.ooo'*/
+		// auth: {						/*NOT REQUIRED*/
+			// user: '',					/*REQUIRED IF 'auth' specified*/
+			// pass: ''						/*REQUIRED IF 'auth' specified*/
+		// },
+		// tls: {						/*NOT REQUIRED*/
+			// rejectUnauthorized: undefined	/*DEFAULT: false*/
+		// }
+	// },
+
+	// l10n: {							/*NOT REQUIRED*/
+		// timeFormat: '',					/*DEFAULT: 'hh:mm tt'*/
+		// dateFormat: '',					/*DEFAULT: 'yyyy-MM-dd'*/
+		// dateTimeFormat: ''				/*DEFAULT: 'yyyy-MM-dd hh:mm tt'*/
+	// }
 };
