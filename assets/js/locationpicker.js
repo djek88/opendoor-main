@@ -1,7 +1,7 @@
 define(['libs/googlemaps'], function () {
 	$.fn.locationpicker = function(options) {
 		options = options || {};
-		var autoDetect = options.autoDetect || true;
+		var autoDetect = options.autoDetect === false ? false : true;
 		var onLocationDetected = options.onLocationDetected || function() {};
 
 		var geocoder = new google.maps.Geocoder();

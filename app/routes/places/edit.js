@@ -150,8 +150,6 @@ module.exports = function(mongoose, userManager, placeChangeManager, placeNotifi
 				placeManager.add(place, finishRequest);
 			} else {
 				placeManager.findById(req.params.id).populate('maintainer').lean().exec(function (err, currentPlace) {
-					console.log('cuur');
-					console.log(currentPlace);
 					if (currentPlace) {
 						if (currentPlace.maintainer && currentPlace.maintainer._id == req.session.user._id) {
 							placeManager.update(req.params.id, place, finishRequest);
