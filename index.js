@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('./config');
+var config = require('./app/config');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
@@ -15,7 +15,7 @@ var busboy = require('connect-busboy');
 var jade = require('jade');
 var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
-var sendPlaceReminder = require('./app/schedule/sendplacereminder.js');
+var sendPlaceReminder = require('./app/schedule/sendplacereminder');
 var sm = require('sitemap');
 
 require('./assets/js/utils.js');
@@ -24,7 +24,13 @@ require('./app/date.min.js');
 mongoose.connect(config.mongoURI);
 
 var app = express();
-var transporter;
+var transporter = nodemailer.createTransport(config.mailConfig, {from: config.mailConfig.from});
+if (process.env.NODE_ENV === 'production') {
+	transporter.verify().catch((err) => {
+		console.log(`Mail config error: ${err.message}`);
+		process.exit(1);
+	});
+}
 
 mongoose.connection
 	.once('open', function () {
@@ -64,15 +70,6 @@ mongoose.connection
 	})
 	.on('error', console.error);
 
-if (config.mailConfig.transport == 'gmail') {
-	transporter = nodemailer.createTransport(config.mailConfig);
-} else if (config.mailConfig.transport == 'smtp') {
-	var smtpTransport = require('nodemailer-smtp-transport');
-	transporter = nodemailer.createTransport(smtpTransport(config.mailConfig));
-} else {
-	console.err("No valid transport was found");
-	process.exit(1);
-}
 
 var Email = require('./app/email.js');
 var email = new Email(config, transporter);
@@ -147,7 +144,8 @@ app.use('/generateSitemap', require('./app/routes/sitemap.js')(placeManager, sm,
 app.use('/mailingList', require('./app/routes/mailinglist.js')(subscriptionManager, sm, config, fs, path));
 app.use(config.staticFiles, function(req, res){
 	var filename = path.join(__dirname, 'static', req.baseUrl);
-	fs.stat(filename, function(err, stats){
+
+	fs.stat(filename, function(err, stats) {
 		if (stats) {
 			if (filename.match(/\.xml$/)) {
 				res.set('Content-Type', 'text/xml');
