@@ -262,6 +262,7 @@ app.get(frontendPages, function(req, res) {
 		pretty: true,
 		currentYear: (new Date).getFullYear(),
 		originalCss: req.query.originalCss,
+		twitterAccount: config.social.twitterAccount,
 		userIp: req.headers['x-forwarded-for'] || req.connection.remoteAddress
 	};
 
@@ -296,7 +297,9 @@ app.get(placesFrontEndPages, function(req, res) {
 			siteconfig: siteconfig,
 			pretty: true,
 			currentYear: (new Date).getFullYear(),
-			originalCss: req.query.originalCss
+			originalCss: req.query.originalCss,
+			twitterAccount: config.social.twitterAccount,
+			userIp: req.headers['x-forwarded-for'] || req.connection.remoteAddress
 		};
 
 		jade.renderFile(__dirname + '/assets/templates/index.jade', options, function(err, content) {

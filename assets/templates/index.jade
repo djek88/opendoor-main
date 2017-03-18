@@ -50,7 +50,7 @@ html
 		<!-- Google Analytics -->
 		script.
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-			ga('create', window.siteconfig.googleAnalytics.trackingId, 'auto');
+			ga('create', siteconfig.googleAnalytics.trackingId, 'auto');
 			ga('require', 'urlChangeTracker');
 			ga('send', 'pageview');
 		script(async src="https://www.google-analytics.com/analytics.js")
@@ -164,3 +164,5 @@ html
 				a.link(ng-click="leaveFeedback($event)", ng-disabled="isFeedbackPage") Suggest an improvement
 				| &nbsp;-&nbsp;
 				a.link(href="/about") About
+				| &nbsp;-&nbsp;
+				a.link(href="#{'https://twitter.com/' + twitterAccount}") Twitter
