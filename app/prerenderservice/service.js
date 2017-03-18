@@ -2,7 +2,7 @@
 
 const spawn = require('child_process').spawn;
 const prerenderService = require('prerender-node');
-const config = require('../../config');
+const config = require('../config');
 
 const prerenderServerUrl = 'http://localhost:' + config.prerenderService.port;
 const applicationHost = config.hostname + ':' + config.port;
@@ -20,7 +20,7 @@ prerenderService.runServer = function() {
 
 	serverProcess = spawn(process.argv[0], ['./app/prerenderservice/server.js'], {
 		env: { PORT: config.prerenderService.port, NODE_HOSTNAME: 'localhost' },
-		//stdio: 'inherit' // uncomment for see prerender service's logs
+		// stdio: 'inherit' // uncomment for see prerender service's logs
 	});
 
 	serverProcess.unref();
