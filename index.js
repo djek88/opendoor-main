@@ -4,7 +4,6 @@ var config = require('./app/config');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
-var querystring = require('querystring');
 var express = require('express');
 var nodemailer = require('nodemailer');
 var mongoose = require('mongoose');
@@ -16,7 +15,6 @@ var jade = require('jade');
 var schedule = require('node-schedule');
 var stripe = require("stripe")(config.apiKeys.stripeSecret);
 var sendPlaceReminder = require('./app/schedule/sendplacereminder');
-var sm = require('sitemap');
 
 require('./assets/js/utils.js');
 require('./app/date.min.js');
