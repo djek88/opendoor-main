@@ -17,7 +17,7 @@ const configSchema = joi.object({
 		cookieKeys: joi.string().default('1223'),
 		sessionSecret: joi.string().default('1234567890QWERTY1223'),
 		mongoURI: joi.string().default('mongodb://localhost:27017/opendoor'),
-		staticFiles: joi.array().items(joi.string()).unique().default([]),
+		staticFiles: joi.array().items(joi.string()).unique().default(['/sitemap.xml']),
 		frontend: frontendConfigSchema
 	})
 	.unknown()

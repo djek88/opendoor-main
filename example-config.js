@@ -11,7 +11,7 @@ module.exports = {
 	// cookieKeys: '',				/*DEFAULT: '1223'*/
 	// sessionSecret: '',			/*DEFAULT: '1234567890QWERTY1223'*/
 	// mongoURI: '',				/*DEFAULT: 'mongodb://localhost:27017/opendoor'*/
-	// staticFiles: [],				/*DEFAULT: [], eg: ['/path/to/static/file']*/
+	// staticFiles: [],				/*DEFAULT: ['/sitemap.xml'], eg: ['/path/to/static/file']*/
 
 	apiKeys: {						/*REQUIRED*/
 		googleMaps: '',					/*REQUIRED*/

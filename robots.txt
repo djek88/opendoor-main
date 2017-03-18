@@ -8,6 +8,5 @@ Disallow: /photos
 Disallow: /static
 Disallow: /stats
 Disallow: /temp
-Disallow: /backup_db
 
-Sitemap: http://nestino.com/sitemap.xml
+Sitemap: https://opendoor.ooo/sitemap.xml

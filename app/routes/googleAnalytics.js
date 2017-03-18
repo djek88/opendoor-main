@@ -1,6 +1,6 @@
 const http = require('http');
 const querystring = require('querystring');
-const config = require('../../config');
+const config = require('../config');
 
 module.exports.sendEvent = function(opt) {
 	if (!opt._ga || typeof opt._ga !== 'string') {
