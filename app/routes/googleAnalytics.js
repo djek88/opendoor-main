@@ -4,7 +4,8 @@ const config = require('../config');
 
 module.exports.sendEvent = function(opt) {
 	if (!opt._ga || typeof opt._ga !== 'string') {
-		throw new Error('"_ga" cookie required, must be string!');
+		console.error('"_ga" cookie required, must be string!');
+		return;
 	}
 
 	const clientId = opt._ga.split('.').slice(-2).join('.');
