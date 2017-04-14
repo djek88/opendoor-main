@@ -273,16 +273,13 @@ select.form-control,
 }
 
 
-
 #contacts-block div {
 	font-size: 110%;
 }
 
-
 .place-link {
- cursor: pointer;
+	cursor: pointer;
 }
-
 
 .place-link.hover,
 .place-link:hover {
@@ -343,6 +340,10 @@ select.form-control,
 	font-size: 120%;
 }
 
+#place-sidebar .advert {
+	background-color: transparent;
+	padding: 0px;
+}
 
 .change-preview-photo {
 	max-width: 200px;
