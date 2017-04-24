@@ -10,23 +10,6 @@ html
 		meta(content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport")
 		base(href="/")
 
-		//- if originalCss
-			link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
-			link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap/css/bootstrap.min.css')
-			link(rel='stylesheet', href='/assets/color_admin/plugins/font-awesome/css/font-awesome.min.css')
-
-			link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
-			link(rel='stylesheet', href='/assets/color_admin/css/animate.min.css')
-			link(rel='stylesheet', href='/assets/color_admin/css/style.min.css')
-			link(rel='stylesheet', href='/assets/color_admin/css/style-responsive.min.css')
-			link(rel='stylesheet', href='/assets/color_admin/css/theme/default.css')
-			link(rel='stylesheet', href='/bower_components/bootstrap-select/dist/css/bootstrap-select.min.css')
-			link(rel='stylesheet', href='/bower_components/trumbowyg/dist/ui/trumbowyg.min.css')
-			link(rel='stylesheet', href='/bower_components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
-			link(rel='stylesheet', href='/assets/css/style.css')
-		//- else
-			link(rel='stylesheet', href='/assets/css/tidy.css')
-
 		link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/bootstrap/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/assets/color_admin/plugins/font-awesome/css/font-awesome.min.css')
@@ -114,9 +97,8 @@ html
 							//	| OpenDoor.ooo
 					#header-navbar.collapse.navbar-collapse
 						ul.nav.navbar-nav.navbar-right
-							li.dropdown
-								a(href='/')
-									| HOME
+							li
+								a(href='/') HOME
 							li(ng-show="$root.isLoggedIn")
 								a(href='/places/add') ADD A PLACE
 							li
@@ -125,10 +107,9 @@ html
 								a(href='/jobs/search') JOBS
 							li
 								a(href='/events/search') EVENTS
-							li(ng-show="$root.isAdmin")
-								a.link(data-toggle='dropdown')
-									| ADMIN
-									b.caret
+							li.dropdown(ng-show="$root.isAdmin")
+								a.dropdown-toggle(href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") ADMIN
+									span.caret
 								ul.dropdown-menu
 									li
 										a(href='/places/list') PLACES LIST
@@ -138,18 +119,14 @@ html
 										a(href='/users/list') USERS LIST
 									li
 										a(href='/tools') TOOLS
-
-							li(ng-show="isLoggedIn")
-								a.link(data-toggle='dropdown')
-									| MY PLACES
-									b.caret
+							li.dropdown(ng-show="isLoggedIn")
+								a.dropdown-toggle(href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") MY PLACES
+									span.caret
 								ul.dropdown-menu
 									li
 										a(href='/places/maintained') MAINTAINED PLACES
 									li
 										a(href='/places/changes') SUGGESTED CHANGES
-
-
 							li(ng-show="$root.isLoggedIn")
 								a(href='/logout', target="_self") LOG OUT
 							li(ng-hide="$root.isLoggedIn")

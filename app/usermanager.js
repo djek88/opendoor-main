@@ -1,5 +1,4 @@
 module.exports = function(mongoose, config) {
-
 	var userSchema = new mongoose.Schema({
 		name: String,
 		email: String,

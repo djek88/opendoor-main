@@ -1,15 +1,15 @@
 define([
-		'angular',
-		'app',
-		'libs/bootstrap',
-		'libs/googlemaps',
-		'libs/tagsinput',
-		'libs/typeahead',
-		'libs/datetimepicker',
-		'libs/selectpicker',
-		'libs/trumbowyg',
-		'locationpicker'
-	], function(angular, opendoorApp) {
+	'angular',
+	'app',
+	'libs/bootstrap',
+	'libs/googlemaps',
+	'libs/tagsinput',
+	'libs/typeahead',
+	'libs/datetimepicker',
+	'libs/selectpicker',
+	'libs/trumbowyg',
+	'locationpicker'
+], function(angular, opendoorApp) {
 	'use strict';
 
 	opendoorApp.registerController('PlaceFormCtrl', ['$scope', '$rootScope', '$location', '$http',
@@ -44,16 +44,15 @@ define([
 				map.setZoom(2);
 			});
 
-			$('.input-group.date').datetimepicker({
-				format: siteconfig.l10n.timeFormat
-			});
+			$('.input-group.date').datetimepicker({ format: siteconfig.l10n.timeFormat });
 			$('.location-picker').locationpicker();
-
+			$('.bootstrap-tagsinput').addClass('form-control');
 			$denominationsEl.tagsinput({
 				typeahead: {
 					source: function(query) {
 						var results = [];
 						var currentTags = $denominationsEl.val().slice(',');
+
 						for (var i in denominations) {
 							if (denominations.hasOwnProperty(i)) {
 								if (currentTags.indexOf(denominations[i]) == -1) {
@@ -61,14 +60,13 @@ define([
 								}
 							}
 						}
+
 						return results;
 					}
 				},
 				freeInput: true,
 				tagClass: 'label label-primary'
 			});
-
-			$('.bootstrap-tagsinput').addClass('form-control');
 
 			$scope.religions = $rootScope.religions;
 
@@ -127,6 +125,63 @@ define([
 				});
 			};
 
+			$religionEl.on('change', function() {
+				loadOptionsForReligion($religionEl.val());
+			});
+
+			$groupsEl.on('change', function() {
+				$scope.place.groupName = $groupsEl.val();
+			});
+
+			if (placeId) {
+				$scope.edit = true;
+				$scope.mode = 'edit';
+
+				if ($rootScope.selectedPlace) {
+					setData($rootScope.selectedPlace);
+				} else {
+					$http({
+						url: '/ajax/places/' + placeId,
+						method: 'GET'
+					}).success(function(data) {
+						if (typeof data == 'object') {
+							setData(data);
+						} else {
+							$location.url('/notfound');
+						}
+					}).error(function () {
+						$location.url('/notfound');
+					});
+				}
+			} else {
+				$scope.edit = false;
+				$scope.mode = 'add';
+				$scope.place = {
+					address: {},
+					location: {}
+				};
+			}
+
+			function setData(place) {
+				if (place.mainMeetingTime) {
+					var mainMeetingTime = (new Date(place.mainMeetingTime)); //.browserToUTC();
+					place.mainMeetingTime = mainMeetingTime.toString(siteconfig.l10n.timeFormat);
+				}
+
+				$scope.isMaintainer = place.maintainer && place.maintainer._id && place.maintainer._id == $rootScope._id;
+				$scope.place = place;
+
+				loadOptionsForReligion(place.religion);
+				$groupsEl.selectpicker('val', place.groupName);
+				$rootScope.getMapInstance($('#results-map')).then(function (map) {
+					map.setMarker(place.location.coordinates);
+
+					for (var i = 0; i < place.denominations.length; i++) {
+						$denominationsEl.tagsinput('add', place.denominations[i]);
+					}
+				});
+			}
+
 			function loadOptionsForReligion(religion) {
 				$http({
 					url: '/ajax/religionGroups',
@@ -152,63 +207,6 @@ define([
 						return item.name;
 					});
 				});
-			}
-
-			$religionEl.on('change', function () {
-				loadOptionsForReligion($religionEl.val());
-			});
-
-			$groupsEl.on('change', function () {
-				$scope.place.groupName = $groupsEl.val();
-			});
-
-			function setData($place) {
-				if ($place.mainMeetingTime) {
-					var mainMeetingTime = (new Date($place.mainMeetingTime)); //.browserToUTC();
-					$place.mainMeetingTime = mainMeetingTime.toString(siteconfig.l10n.timeFormat);
-				}
-
-				$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
-				$scope.place = $place;
-
-				loadOptionsForReligion($place.religion);
-				$groupsEl.selectpicker('val', $place.groupName);
-				$rootScope.getMapInstance($('#results-map')).then(function (map) {
-					map.setMarker($place.location.coordinates);
-
-					for (var i = 0; i < $place.denominations.length; i++) {
-						$denominationsEl.tagsinput('add', $place.denominations[i]);
-					}
-				});
-			}
-
-			if (placeId) {
-				$scope.edit = true;
-				$scope.mode = 'edit';
-
-				if ($rootScope.selectedPlace) {
-					setData($rootScope.selectedPlace);
-				} else {
-					$http({
-						url: '/ajax/places/' + placeId,
-						method: 'GET'
-					}).success(function (data) {
-						if (typeof data == 'object') {
-							setData(data);
-						} else {
-							$location.url('/notfound');
-						}
-					}).error(function () {
-						$location.url('/notfound');
-					});
-				}
-			} else {
-				$scope.edit = false;
-				$scope.mode = 'add';
-				$scope.place = {
-					address: {},
-					location: {}
-				};
 			}
 		}
 	]);

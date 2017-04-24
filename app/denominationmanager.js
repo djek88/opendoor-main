@@ -1,8 +1,3 @@
-/**
- * Created by Vavooon on 18.12.2015.
- */
-
-
 module.exports = function(mongoose) {
 	var denominationSchema = new mongoose.Schema({
 				name: String

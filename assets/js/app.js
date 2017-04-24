@@ -243,7 +243,7 @@ define([
 		$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 	}]);
 
-	opendoorApp.config( ['$compileProvider', function($compileProvider) {
+	opendoorApp.config(['$compileProvider', function($compileProvider) {
 		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|geo|tel):/);
 	}]);
 

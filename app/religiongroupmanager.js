@@ -1,10 +1,4 @@
-/**
- * Created by Vavooon on 18.12.2015.
- */
-
-
 module.exports = function(mongoose) {
-
 	var religionGroupSchema = new mongoose.Schema({
 				name: String
 			, religion: String

@@ -1,10 +1,8 @@
-'use strict';
-
 const config = require('../config');
+const prerender = require('prerender');
 
-var prerender = require('prerender');
-var server = prerender({
-	workers: config.prerenderService.instances
+const server = prerender({
+  workers: config.prerenderService.instances,
 });
 
 server.start();

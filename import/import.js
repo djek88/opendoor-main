@@ -1,7 +1,3 @@
-/**
- * Created by Vavooon on 04.01.2016.
- */
-
 var args = process.argv.slice(2);
 var fs = require('fs');
 var csv = require('csv');
