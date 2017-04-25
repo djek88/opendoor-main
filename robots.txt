@@ -1,12 +1,15 @@
 User-Agent: *
 Disallow: /app
-Disallow: /assets
 Disallow: /error
-Disallow: /icon
 Disallow: /import
-Disallow: /photos
 Disallow: /static
 Disallow: /stats
 Disallow: /temp
+Disallow: /places/list
+Disallow: /places/claims
+Disallow: /users/list
+Disallow: /tools
+Disallow: /places/maintained
+Disallow: /places/changes
 
 Sitemap: https://opendoor.ooo/sitemap.xml
