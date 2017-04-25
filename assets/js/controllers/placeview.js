@@ -1,44 +1,54 @@
-/**
- * Created by vavooon on 29.03.16.
- */
 define(['angular', 'app'], function (angular, opendoorApp) {
 	'use strict';
 	opendoorApp.registerController('PlaceViewCtrl', ['$scope', '$rootScope', '$location', '$http', '$cookies', '$anchorScroll', '$sce',
 		function ($scope, $rootScope, $location, $http, $cookies, $anchorScroll, $sce) {
-			
-			var splittedUrl = $location.path().split('/');
-			
-			function toUp(string)
-			{
+			var splittedUrl = $location.path().toLowerCase().split('/');
+
+			$scope.placeId = $location.path().substr(8);
+			$scope.country = toUp(splittedUrl[splittedUrl.length - 6]);
+			$scope.locality = toUp(splittedUrl[splittedUrl.length - 4]);
+			$scope.country = $scope.country.replace('-', ' ');
+			$scope.locality = $scope.locality.replace('-', ' ');
+
+			$scope.scrollTo = $anchorScroll;
+			$scope.onLeaderPhotoLoad = onLeaderPhotoLoad;
+
+			if ($rootScope.selectedPlace) {
+				setData($rootScope.selectedPlace);
+				showNearbyPlaces($rootScope.selectedPlace);
+			} else {
+				$http({
+					url: '/ajax/places/' + $scope.placeId,
+					method: 'GET'
+				}).success(function(data) {
+					if (typeof data == 'object') {
+						setData(data);
+						showNearbyPlaces(data);
+					} else {
+						$location.url('/notfound');
+					}
+				}).error(function () {
+					$location.url('/notfound');
+				});
+			}
+
+			function onLeaderPhotoLoad() {
+				var $el = $('.leader-photo');
+
+				if ($el.width() > $el.height()) {
+					$el.removeClass('portrait');
+				} else {
+					$el.addClass('portrait');
+				}
+			}
+
+			function toUp(string) {
 				var firstChar = string.substring( 0, 1 ); // == "c"
 				firstChar = firstChar.toUpperCase();
 				var tail = string.substring( 1 ); // == "heeseburger"
 				string = firstChar + tail;
 				return string;
 			}
-			
-			$scope.country = toUp(splittedUrl[splittedUrl.length - 6]);
-			$scope.locality = toUp(splittedUrl[splittedUrl.length - 4]);
-			
-			$scope.country = $scope.country.replace('-', ' ');
-			$scope.locality = $scope.locality.replace('-', ' ');
-			
-			var placeId = $location.path().substr(8);
-			$scope.placeId = placeId;
-
-			$scope.scrollTo = function (id) {
-				$anchorScroll(id);
-			};
-
-			$scope.onLeaderPhotoLoad = function () {
-				var $el = $('.leader-photo');
-				if ($el.width() > $el.height()) {
-					$el.removeClass('portrait');
-				}
-				else {
-					$el.addClass('portrait');
-				}
-			};
 
 			function showNearbyPlaces(place) {
 				var requestParams = {
@@ -78,7 +88,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				});
 			}
 
-
 			function setData($place) {
 				document.title = $place.name + ' | OpenDoor.ooo';
 				$scope.isMaintainer = $place.maintainer && $place.maintainer._id && $place.maintainer._id == $rootScope._id;
@@ -95,7 +104,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 				if (navigator.userAgent.toLowerCase().indexOf('iphone') != -1 || navigator.userAgent.toLowerCase().indexOf('ipod') != -1 || navigator.userAgent.toLowerCase().indexOf("android") != -1) {
 					$place.externalMapsLink = $sce.trustAsResourceUrl('geo:0,0?q=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '(' + $place.name + ')');
 				}
-
 
 				//if(navigator.userAgent.toLowerCase().indexOf('iphone')!=-1 || navigator.userAgent.toLowerCase().indexOf('ipod')!=-1 || navigator.userAgent.toLowerCase().indexOf("linux") != -1) {
 				//	$place.externalMapsLink = $sce.trustAsResourceUrl('http://maps.apple.com/?ll=' + $place.location.coordinates[1] + ',' + $place.location.coordinates[0] + '&q=' + $place.name);
@@ -145,7 +153,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					}
 				}
 
-
 				$place.activePromotions = [];
 				if ($place.promotions) {
 					for (var i = 0; i < $place.promotions.length; i++) {
@@ -159,7 +166,6 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 						}
 					}
 				}
-
 
 				$place.activeJobs = [];
 				if ($place.jobs.length) {
@@ -178,10 +184,8 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 
 				$scope.place = $place;
 
-
 				$rootScope.getMapInstance($('#results-map'))
-					.then(function(map){
-
+					.then(function(map) {
 						google.maps.event.trigger(map, 'resize');
 						var pos = new google.maps.LatLng($place.location.coordinates[1], $place.location.coordinates[0]);
 						map.setCenter(pos);
@@ -206,31 +210,7 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 						}
 
 					});
-
 			}
-
-			if ($rootScope.selectedPlace) {
-				setData($rootScope.selectedPlace);
-				showNearbyPlaces($rootScope.selectedPlace);
-			}
-			else {
-				$http({
-					url: '/ajax/places/' + placeId
-					, method: 'GET'
-				}).success(function (data) {
-					if (typeof data == 'object') {
-						setData(data);
-						showNearbyPlaces(data);
-					}
-					else {
-						$location.url('/notfound');
-					}
-				}).error(function () {
-					$location.url('/notfound');
-				});
-			}
-
-
 		}
 	]);
 });

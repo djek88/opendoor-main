@@ -192,7 +192,7 @@ app.get('/ajax/places/searchbyip', require('./app/routes/ajax/places/search.js')
 app.get('/ajax/places/maintained', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
 app.get('/ajax/places/maintained/:id', require('./app/routes/ajax/places/maintained.js')(config, mongoose, placeManager));
 app.get('/ajax/places/last', require('./app/routes/ajax/places/last.js')(config, placeManager));
-app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(mongoose, placeManager)); // keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
+app.get(/\/ajax\/places\/(.*)/, require('./app/routes/ajax/places/findone.js')(placeManager)); // keep this route at bottom of all other ones which are /ajax/places/* because this one is greedy
 app.get(['/ajax/jobs/:id', '/ajax/jobs/search'], require('./app/routes/ajax/jobs.js')(mongoose, placeManager));
 app.get(['/ajax/events/:id', '/ajax/events/search'], require('./app/routes/ajax/events.js')(mongoose, placeManager, config));
 app.get('/ajax/placechanges', require('./app/routes/ajax/places/changes.js')(mongoose, placeManager, placeChangeManager));
@@ -291,7 +291,7 @@ app.get(placesFrontEndPages, (req, res) => {
   const query = {};
 
   if (req.params.country) {
-    query.uri = req.path.substr(8);
+    query.uri = req.path.substr(8).toLowerCase();
   } else {
     query.id = req.params.id;
   }
