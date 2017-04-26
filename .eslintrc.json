@@ -3,10 +3,14 @@
         "es6": true,
         "node": true
     },
-    "extends": "airbnb-base",
+    "extends": [
+        "airbnb-base"
+    ],
     "rules": {
         "no-console": "off",
         "consistent-return": "off",
-        "no-use-before-define": "off"
-    }
+        "no-use-before-define": "off",
+        "no-param-reassign": "off"
+    },
+    "root": true
 }

@@ -113,7 +113,6 @@ global.placeManager = placeManager;
 global.religionGroupManager = religionGroupManager;
 global.denominationManager = denominationManager;
 global.placeNotificationManager = placeNotificationManager;
-global.getUniqueFilename = () => Date.now();
 global.appDir = path.dirname(require.main.filename);
 global.imagesPath = '/photos/';
 

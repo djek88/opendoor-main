@@ -1,0 +1,18 @@
+{
+    "env": {
+        "es6": true,
+        "browser": true,
+        "jquery": true
+    },
+    "extends": [
+        "airbnb-base",
+        "plugin:requirejs/recommended"
+    ],
+    "rules": {
+        "import/no-amd": "off"
+    },
+    "plugins": [
+        "requirejs"
+    ],
+    "root": true
+}

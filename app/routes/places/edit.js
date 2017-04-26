@@ -64,7 +64,7 @@ module.exports = (placeChangeManager, email, placeManager) => {
           console.warn('wrong extendion or field name:', fieldname, extension);
         }
 
-        const imgFileName = `${id}_${fieldname}_${global.getUniqueFilename()}.${extension}`;
+        const imgFileName = `${id}_${fieldname}_${Date.now()}.${extension}`;
         const fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
 
         file.pipe(fstream);
@@ -105,7 +105,7 @@ module.exports = (placeChangeManager, email, placeManager) => {
       }
 
       if (place.mainMeetingTime) {
-        place.mainMeetingTime = (new Date(place.mainMeetingTime + ' 01.01.1970'));
+        place.mainMeetingTime = (new Date(`${place.mainMeetingTime} 01.01.1970`));
         place.mainMeetingTime = place.mainMeetingTime.nodeToUTC();
       }
 
