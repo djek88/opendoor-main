@@ -143,7 +143,7 @@ define([
       var pagesList = [];
       var i;
       if ($scope.pages < 6) {
-        for (i = 1; i <= $scope.pages; i + 1) {
+        for (i = 1; i <= $scope.pages; i += 1) {
           pagesList.push(i);
         }
       } else {
@@ -155,7 +155,7 @@ define([
         if (maxPage > $scope.pages) {
           maxPage = $scope.pages;
         }
-        for (i = minPage; i <= maxPage; i + 1) {
+        for (i = minPage; i <= maxPage; i += 1) {
           pagesList.push(i);
         }
       }

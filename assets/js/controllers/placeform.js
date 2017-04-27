@@ -92,7 +92,7 @@ define([
         var regExp = new RegExp('.*' + RegExp.escape(value.toLowerCase()) + '.*');
         var matchesWasFound = false;
 
-        for (var i = 0; i < groups.length; i + 1) {
+        for (var i = 0; i < groups.length; i += 1) {
           if (typeof groups[i].name === 'string' && regExp.test(groups[i].name.toLowerCase())) {
             matchesWasFound = true;
             break;

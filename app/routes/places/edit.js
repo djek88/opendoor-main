@@ -140,11 +140,24 @@ module.exports = (placeChangeManager, email, placeManager) => {
       const placePage = encodeURIComponent(`/places/${place.uri}`);
 
       if (isAdding) {
-        const recipient = isLogged ? req.session.user.email : place.addedByEmail;
+        Promise.resolve()
+          .then(() => {
+            if (!place.maintainer) return place.addedByEmail;
 
-        email.sendNotificationAboutNewPlaceToAdmin(place._id);
-        email.sendConfirmationLink(place._id, recipient);
-        res.redirect('/message?message=placeadded');
+            return new Promise((resolve, reject) => {
+              global.userManager.findById(place.maintainer, (err, maintainer) => {
+                if (err) return reject(err);
+                if (!maintainer) return reject(new Error('Maintainer not found'));
+                resolve(maintainer.email);
+              });
+            });
+          })
+          .then((recipientEmail) => {
+            email.sendNotificationAboutNewPlaceToAdmin(place._id);
+            email.sendConfirmationLink(place._id, recipientEmail);
+            res.redirect('/message?message=placeadded');
+          })
+          .catch(console.log.bind(console));
 
         googleAnalytics.sendEvent({
           _ga: req.cookies._ga,
@@ -187,7 +200,7 @@ module.exports = (placeChangeManager, email, placeManager) => {
           return false;
         }
 
-        for (let i = 0; i < aProps.length; i + 1) {
+        for (let i = 0; i < aProps.length; i += 1) {
           const propName = aProps[i];
 
           if (!equals(a[propName], b[propName])) {

@@ -137,14 +137,34 @@ module.exports = (mongoose, email) => {
     this.model = Place;
 
     this.add = (data, cb = () => {}) => {
-      const place = new Place(data);
-      place.jsonLd = createJsonLd(place);
+      const newPlace = new Place(data);
+      newPlace.jsonLd = createJsonLd(newPlace);
 
-      preprocessFields(place, (err) => {
-        if (err) return cb(err, place);
+      Promise.resolve()
+        .then(lookupMaintainer)
+        .then(() => new Promise((resolve, reject) => {
+          preprocessFields(newPlace, err => (err ? reject(err) : resolve()));
+        }))
+        .then(newPlace.save.bind(newPlace))
+        .then(cb.bind(null, null))
+        .catch(cb);
 
-        place.save(cb);
-      });
+      function lookupMaintainer() {
+        if (!newPlace.maintainer && newPlace.addedByEmail) {
+          return new Promise((resolve, reject) => {
+            global.userManager.findOne({ email: newPlace.addedByEmail }, (err, user) => {
+              if (err) return reject(err);
+              if (!user) return resolve();
+
+              newPlace.addedByEmail = undefined;
+              newPlace.maintainer = user.id;
+
+              user.maintainedPlaces.push(newPlace.id);
+              user.save().then(resolve).catch(reject);
+            });
+          });
+        }
+      }
     };
 
     this.update = (id, data, cb = () => {}) => {
@@ -306,7 +326,7 @@ module.exports = (mongoose, email) => {
 
             global.placeNotificationManager.findNearby(data, (err, placeNotifications) => {
               const ids = [];
-              for (let i = 0; i < placeNotifications.length; i + 1) {
+              for (let i = 0; i < placeNotifications.length; i += 1) {
                 email.sendNotificationAboutNewPlace(data.id, placeNotifications[i].email);
                 ids.push(mongoose.Types.ObjectId(placeNotifications[i]._id));
               }
@@ -324,7 +344,7 @@ module.exports = (mongoose, email) => {
         if (!err && place) {
           place.reviews.push(data);
           let averageRating = 0;
-          for (let i = 0; i < place.reviews.length; i + 1) {
+          for (let i = 0; i < place.reviews.length; i += 1) {
             averageRating += place.reviews[i].rating;
           }
           place.ratingsCount = place.reviews.length;
@@ -351,7 +371,7 @@ module.exports = (mongoose, email) => {
 
     this.editEvent = (id, data, callback) => {
       Place.findOne({ 'events._id': id }, (err, place) => {
-        for (let i = 0; i < place.events.length; i + 1) {
+        for (let i = 0; i < place.events.length; i += 1) {
           if (place.events[i]._id.toString() === id.toString()) {
             Object.keys(data).forEach((j) => {
               if (Object.prototype.hasOwnProperty.call(data, j)) {
@@ -447,7 +467,7 @@ module.exports = (mongoose, email) => {
 
     if (place.reviews.length) {
       data.review = [];
-      for (let i = 0; i < place.reviews.length; i + 1) {
+      for (let i = 0; i < place.reviews.length; i += 1) {
         data.review.push({
           '@type': 'Review',
           author: place.reviews[i].name,
@@ -486,7 +506,7 @@ module.exports = (mongoose, email) => {
       place.name,
     ];
 
-    for (let i = 0; i < uriFields.length; i + 1) {
+    for (let i = 0; i < uriFields.length; i += 1) {
       uriFields[i] = removeDiacritics(uriFields[i].replace(/\//g, '-'));
     }
 
