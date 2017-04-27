@@ -223,15 +223,17 @@ module.exports = (mongoose, email) => {
           coordinates: data.coordinates,
         },
         query: {
-          locationtype: 'Point',
+          'location.type': 'Point',
         },
       };
-      const options = [
-        { $match: matchOption },
-      ];
+      const options = [{ $match: matchOption }];
 
       if (data.coordinates) {
-        options.unshift({ $geoNear: geoNearOption }, { $sort: { distance: 1 } });
+        options.unshift({
+          $geoNear: geoNearOption,
+        }, {
+          $sort: { distance: 1 }, // Show the nearest first
+        });
       }
 
       if (Object.prototype.hasOwnProperty.call(data, 'isConfirmed')) {
@@ -243,7 +245,7 @@ module.exports = (mongoose, email) => {
       }
 
       if (data.event) {
-        matchOption.events._id = mongoose.Types.ObjectId(data.event);
+        matchOption['events._id'] = mongoose.Types.ObjectId(data.event);
       }
 
       if (data.name) {
@@ -251,11 +253,11 @@ module.exports = (mongoose, email) => {
       }
 
       if (data.country) {
-        matchOption.address.country = new RegExp(decodeURI(data.country).replace(/-/g, ' '), 'i');
+        matchOption['address.country'] = new RegExp(decodeURI(data.country).replace(/-/g, ' '), 'i');
       }
 
       if (data.locality) {
-        matchOption.address.locality = new RegExp(decodeURI(data.locality).replace(/-/g, ' '), 'i');
+        matchOption['address.locality'] = new RegExp(decodeURI(data.locality).replace(/-/g, ' '), 'i');
       }
 
       if (data.maxDistance) {
