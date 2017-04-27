@@ -20,6 +20,7 @@ const siteMap = require('./app/routes/sitemap');
 require('./assets/js/utils.js');
 require('./app/date.min.js');
 
+mongoose.Promise = global.Promise;
 mongoose.connect(config.mongoURI);
 
 const app = express();
@@ -76,11 +77,11 @@ const Email = require('./app/email');
 
 const email = new Email(config, transporter);
 
-const UserManager = require('./app/usermanager')(mongoose, config);
+const UserManager = require('./app/usermanager')(mongoose);
 
 const userManager = new UserManager();
 
-const PlaceManager = require('./app/placemanager')(mongoose, email, config);
+const PlaceManager = require('./app/placemanager')(mongoose, email);
 
 const placeManager = new PlaceManager();
 

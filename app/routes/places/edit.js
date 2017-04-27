@@ -5,55 +5,19 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const googleAnalytics = require('../googleAnalytics');
 
 module.exports = (placeChangeManager, email, placeManager) => {
-  function equals(a, b) {
-    let atype = typeof a;
-    const btype = typeof b;
+  return handler;
 
-    if (atype !== btype) {
-      return false;
-    }
-
-    if (Array.isArray(a)) {
-      atype = 'array';
-    }
-
-    if (atype === 'array') {
-      return JSON.stringify(a) === JSON.stringify(b);
-    } else if (atype === 'object') {
-      const aProps = Object.keys(a);
-      const bProps = Object.keys(b);
-
-      if (aProps.length !== bProps.length) {
-        return false;
-      }
-
-      for (let i = 0; i < aProps.length; i + 1) {
-        const propName = aProps[i];
-
-        if (!equals(a[propName], b[propName])) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return a === b;
-  }
-
-  return function handler(req, res) {
-    if (!req.session.user || !req.busboy) return res.end();
-
+  function handler(req, res) {
     const isAdding = !req.params.id;
+    const isLogged = req.session.user;
+
+    if (!req.busboy || (!isAdding && !isLogged)) return res.end();
+
     const fields = {};
     const files = {};
     const allowedFileFields = ['leaderPhoto', 'bannerPhoto'];
     const allowedFileExtensions = ['jpg', 'png'];
-    let id = ObjectId();
-
-    if (!isAdding) {
-      id = ObjectId(req.params.id);
-    }
+    const placeId = isAdding ? ObjectId() : ObjectId(req.params.id);
 
     req.busboy.on('file', (fieldname, file, filename) => {
       if (filename.length) {
@@ -64,7 +28,7 @@ module.exports = (placeChangeManager, email, placeManager) => {
           console.warn('wrong extendion or field name:', fieldname, extension);
         }
 
-        const imgFileName = `${id}_${fieldname}_${Date.now()}.${extension}`;
+        const imgFileName = `${placeId}_${fieldname}_${Date.now()}.${extension}`;
         const fstream = fs.createWriteStream(global.appDir + global.imagesPath + imgFileName);
 
         file.pipe(fstream);
@@ -126,9 +90,20 @@ module.exports = (placeChangeManager, email, placeManager) => {
       delete place.postalCode;
 
       if (isAdding) {
-        place._id = id;
+        place._id = placeId;
         place.isConfirmed = false;
-        place.maintainer = ObjectId(req.session.user._id);
+
+        if (isLogged) {
+          delete place.addedByEmail;
+          place.maintainer = ObjectId(req.session.user._id);
+        } else {
+          // trim spaces
+          place.addedByEmail = place.addedByEmail.replace(/^\s+/, '').replace(/\s+$/, '');
+
+          if (!isValidEmail(fields.addedByEmail)) {
+            return res.end();
+          }
+        }
 
         placeManager.add(place, finishRequest);
       } else {
@@ -165,8 +140,10 @@ module.exports = (placeChangeManager, email, placeManager) => {
       const placePage = encodeURIComponent(`/places/${place.uri}`);
 
       if (isAdding) {
-        email.sendNotificationAboutNewPlaceToAdmin(id);
-        email.sendConfirmationLink(id, req.session.user.email);
+        const recipient = isLogged ? req.session.user.email : place.addedByEmail;
+
+        email.sendNotificationAboutNewPlaceToAdmin(place._id);
+        email.sendConfirmationLink(place._id, recipient);
         res.redirect('/message?message=placeadded');
 
         googleAnalytics.sendEvent({
@@ -187,5 +164,46 @@ module.exports = (placeChangeManager, email, placeManager) => {
         res.redirect(`/message?message=changesadded&back=${placePage}`);
       }
     }
-  };
+
+    function equals(a, b) {
+      let atype = typeof a;
+      const btype = typeof b;
+
+      if (atype !== btype) {
+        return false;
+      }
+
+      if (Array.isArray(a)) {
+        atype = 'array';
+      }
+
+      if (atype === 'array') {
+        return JSON.stringify(a) === JSON.stringify(b);
+      } else if (atype === 'object') {
+        const aProps = Object.keys(a);
+        const bProps = Object.keys(b);
+
+        if (aProps.length !== bProps.length) {
+          return false;
+        }
+
+        for (let i = 0; i < aProps.length; i + 1) {
+          const propName = aProps[i];
+
+          if (!equals(a[propName], b[propName])) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      return a === b;
+    }
+
+    function isValidEmail(emailString) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(emailString);
+    }
+  }
 };

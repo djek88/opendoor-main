@@ -1,15 +1,27 @@
 {
     "env": {
-        "es6": true,
         "browser": true,
         "jquery": true
     },
     "extends": [
-        "airbnb-base",
+        "airbnb-base/legacy",
         "plugin:requirejs/recommended"
     ],
+    "globals": {
+        "google": true,
+        "siteconfig": true,
+        "ga": true
+    },
     "rules": {
-        "import/no-amd": "off"
+        "import/no-amd": "off",
+        "no-use-before-define": "off",
+        "no-param-reassign": "off",
+        "func-names": "off",
+        "space-before-function-paren": "off",
+        "vars-on-top": "off",
+        "no-console": "off",
+        "global-require": "off",
+        "no-underscore-dangle": "off"
     },
     "plugins": [
         "requirejs"

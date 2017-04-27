@@ -10,7 +10,8 @@
         "no-console": "off",
         "consistent-return": "off",
         "no-use-before-define": "off",
-        "no-param-reassign": "off"
+        "no-param-reassign": "off",
+        "no-shadow": "off"
     },
     "root": true
 }

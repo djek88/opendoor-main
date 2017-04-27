@@ -1,36 +1,40 @@
+/* eslint no-underscore-dangle: "off" */
+
 const sha1 = require('sha1');
 const googleAnalytics = require('./googleAnalytics');
 
-module.exports = function(userManager) {
-	return function(req, res) {
-		if (req.session.user) {
-			return res.redirect('/');
-		}
+module.exports = (userManager) => {
+  return handler;
 
-		if (req.body.email && req.body.password) {
-			const usersData = {
-				name: req.body.name,
-				email: req.body.email,
-				password: sha1(req.body.password)
-			};
+  function handler(req, res) {
+    if (req.session.user) {
+      return res.redirect('/');
+    }
 
-			userManager.register(usersData, function(err, user) {
-				if (err) {
-					const redirectUrl = err.message === 'alreadyregistered'
-						? '/register?message=alreadyregistered'
-						: '/error';
+    if (req.body.email && req.body.password) {
+      const usersData = {
+        name: req.body.name,
+        email: req.body.email,
+        password: sha1(req.body.password),
+      };
 
-					return res.redirect(redirectUrl);
-				}
+      userManager.register(usersData, (err) => {
+        if (err) {
+          const redirectUrl = err.message === 'alreadyregistered'
+            ? '/register?message=alreadyregistered'
+            : '/error';
 
-				googleAnalytics.sendEvent({
-					_ga: req.cookies._ga,
-					eventCategory: 'authorization',
-					eventAction: 'sign up'
-				});
+          return res.redirect(redirectUrl);
+        }
 
-				res.redirect('/login?message=regsuccess');
-			});
-		}
-	};
+        googleAnalytics.sendEvent({
+          _ga: req.cookies._ga,
+          eventCategory: 'authorization',
+          eventAction: 'sign up',
+        });
+
+        res.redirect('/login?message=regsuccess');
+      });
+    }
+  }
 };
