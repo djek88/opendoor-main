@@ -1,7 +1,14 @@
 #content.content
 	.container
 		.row
-			.col-lg-12(ng-show='searchComplete')
+			.col-md-offset-3.col-lg-6
+				.embed-responsive.embed-responsive-16by9
+					video.embed-responsive-item(controls="" poster="/assets/img/opendoor_video_poster.png")
+						source(src="/assets/video/open_door.mp4" type="video/mp4")
+						source(src="/assets/video/open_door.ogv" type="video/ogg")
+						source(src="/assets/video/open_door.webm" type="video/webm")
+		.row
+			.col-lg-12.m-t-20(ng-show='searchComplete')
 				form.form-inline(name="form", style="width: 40%; margin: 0 auto 15px;" novalidate)
 					.form-group(ng-class="{'has-error': (form.$submitted || form.address.$touched) && form.location.$error.required}")
 						.input-group.location-picker
