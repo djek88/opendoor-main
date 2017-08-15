@@ -26,7 +26,7 @@
 					| &nbsp;or we can&nbsp;
 					a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
 		.row
-			.col-lg-6.m-t-20
+			.col-md-offset-3.col-lg-6.m-t-20
 				div(ng-show="places")
 					div(ng-show="places.length")
 						.table-wrap.bg-white
@@ -46,5 +46,6 @@
 											i.fa.fa-chevron-right
 						h4.m-t-40.text-center If the Place of Worship you are looking for isn't listed, please help us by&nbsp;
 							a.add-place(href="/places/add") adding it
-			.col-lg-6.m-t-20(ng-hide='message.length')
+		.row
+			.col-md-offset-3.col-lg-6.m-t-20(ng-hide='message.length')
 				#results-map
