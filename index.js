@@ -1,6 +1,5 @@
 const config = require('./app/config');
 const http = require('http');
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -37,28 +36,7 @@ if (process.env.NODE_ENV === 'production') {
 
 mongoose.connection
   .once('open', () => {
-    let server = null;
-
-    if (process.env.NODE_ENV !== 'production') {
-      server = http.createServer(app);
-    } else {
-      http.createServer((req, res) => {
-        res.writeHead(301, { Location: config.url + req.url });
-        res.end();
-      }).listen(7000, config.hostname);
-
-      const options = {};
-
-      try {
-        options.key = fs.readFileSync('./ssl.key');
-        options.cert = fs.readFileSync('./ssl.cert');
-      } catch (err) {
-        console.log(`Https config error: ${err.message}`);
-        process.exit(1);
-      }
-
-      server = https.createServer(options, app);
-    }
+    const server = http.createServer(app);
 
     server.listen(config.port, config.hostname);
     server.on('error', (error) => {
