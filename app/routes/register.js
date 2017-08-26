@@ -1,7 +1,6 @@
 /* eslint no-underscore-dangle: "off" */
 
 const sha1 = require('sha1');
-const googleAnalytics = require('./googleAnalytics');
 
 module.exports = (userManager) => {
   return handler;
@@ -26,12 +25,6 @@ module.exports = (userManager) => {
 
           return res.redirect(redirectUrl);
         }
-
-        googleAnalytics.sendEvent({
-          _ga: req.cookies._ga,
-          eventCategory: 'authorization',
-          eventAction: 'sign up',
-        });
 
         res.redirect('/login?message=regsuccess');
       });

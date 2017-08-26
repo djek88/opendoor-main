@@ -24,10 +24,6 @@ module.exports = {
 		twitterAccount: ''				/*REQUIRED, rg: '@opendoorforall'*/
 	},
 
-	// googleAnalytics: {			/*NOT REQUIRED*/
-		// trackingId: ''				/*DEFAULT: 'invalidTrackingId'*/
-	// },
-
 	// frontend: {					/*NOT REQUIRED*/
 		// itemsPerPage: undefined,		/*DEFAULT: 25*/
 		// maxItemsPerPage: undefined	/*DEFAULT: 100*/

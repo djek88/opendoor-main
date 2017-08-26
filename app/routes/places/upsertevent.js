@@ -1,5 +1,3 @@
-const googleAnalytics = require('../googleAnalytics');
-
 module.exports = function(placeManager, mongoose){
 	return function (req, res) {
 		if (!req.session.user) return res.end();
@@ -52,11 +50,7 @@ module.exports = function(placeManager, mongoose){
 					res.redirect('/message?message=' + message + '&back=' + encodeURIComponent('/places/' + place.uri));
 
 					if (isAdding) {
-						googleAnalytics.sendEvent({
-							_ga: req.cookies._ga,
-							eventCategory: 'place event',
-							eventAction: 'create'
-						});
+
 					}
 				});
 			} else {

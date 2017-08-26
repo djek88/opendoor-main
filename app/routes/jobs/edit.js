@@ -1,5 +1,3 @@
-const googleAnalytics = require('../googleAnalytics');
-
 module.exports = function(mongoose, placeManager) {
 	return function(req, res) {
 		if (!req.session.user) return res.end();
@@ -18,12 +16,6 @@ module.exports = function(mongoose, placeManager) {
 					data.expireDate = new Date;
 					placeManager.addJob(data.place, data, function(err, job) {
 						res.redirect('/jobs/fund/' + job._id);
-
-						googleAnalytics.sendEvent({
-							_ga: req.cookies._ga,
-							eventCategory: 'job',
-							eventAction: 'post'
-						});
 					});
 				} else {
 

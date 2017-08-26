@@ -1,5 +1,3 @@
-const googleAnalytics = require('../googleAnalytics');
-
 module.exports = function(placeManager){
 	return function(req, res) {
 		if (!req.session.user) return res.redirect('/message?message=pleaselogin');
@@ -15,12 +13,6 @@ module.exports = function(placeManager){
 			if (err || !place) return res.redirect('/error');
 
 			res.redirect('/message?message=reviewsaved&back=' + encodeURIComponent('/places/' + place.uri));
-
-			googleAnalytics.sendEvent({
-				_ga: req.cookies._ga,
-				eventCategory: 'place review',
-				eventAction: 'create'
-			});
 		});
 	};
 };

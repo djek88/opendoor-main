@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
-const googleAnalytics = require('../googleAnalytics');
 
 module.exports = (placeChangeManager, email, placeManager) => {
   return handler;
@@ -158,20 +157,8 @@ module.exports = (placeChangeManager, email, placeManager) => {
             res.redirect('/message?message=placeadded');
           })
           .catch(console.log.bind(console));
-
-        googleAnalytics.sendEvent({
-          _ga: req.cookies._ga,
-          eventCategory: 'place',
-          eventAction: 'create',
-        });
       } else if (place.maintainer === req.session.user._id) {
         res.redirect(`/message?message=placesaved&back=${placePage}`);
-
-        googleAnalytics.sendEvent({
-          _ga: req.cookies._ga,
-          eventCategory: 'place',
-          eventAction: 'update',
-        });
       } else {
         email.sendPlaceChanges({ id: place._id, recipientEmail: place.maintainer.email });
         res.redirect(`/message?message=changesadded&back=${placePage}`);

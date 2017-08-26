@@ -1,5 +1,4 @@
 const sha1 = require('sha1');
-const googleAnalytics = require('./googleAnalytics');
 
 module.exports = function(userManager) {
 	return function(req, res) {
@@ -18,12 +17,6 @@ module.exports = function(userManager) {
 			res.cookie('email', user.email);
 			res.cookie('isAdmin', user.isAdmin);
 			res.redirect('/');
-
-			googleAnalytics.sendEvent({
-				_ga: req.cookies._ga,
-				eventCategory: 'authorization',
-				eventAction: 'log in'
-			});
 		});
 	};
 };

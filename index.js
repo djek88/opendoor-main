@@ -124,9 +124,6 @@ const siteconfig = {
   twitterAccount: config.social.twitterAccount,
   frontend: config.frontend,
   l10n: config.l10n,
-  googleAnalytics: {
-    trackingId: config.googleAnalytics.trackingId,
-  },
   apiKeys: {
     stripePublic: config.apiKeys.stripePublic,
     googleMaps: config.apiKeys.googleMaps,
