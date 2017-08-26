@@ -1,7 +1,7 @@
 #content.content
 	.container
 		.row
-			.col-md-offset-3.col-lg-6
+			.col-lg-12
 				.embed-responsive.embed-responsive-16by9
 					video.embed-responsive-item(controls="" poster="/assets/img/opendoor_video_poster.png")
 						source(src="/assets/video/open_door.mp4" type="video/mp4")
@@ -26,11 +26,11 @@
 					| &nbsp;or we can&nbsp;
 					a(href="/subscribefornotification?lat={{lat}}&lng={{lng}}") notify you when a place nearby is added
 		.row
-			.col-md-offset-3.col-lg-6.m-t-20
+			.col-lg-6.m-t-20
 				div(ng-show="places")
 					div(ng-show="places.length")
 						.table-wrap.bg-white
-							table#search-table.table
+							table#search-table.table.search-table
 								thead
 									tr
 										th Name
@@ -46,6 +46,5 @@
 											i.fa.fa-chevron-right
 						h4.m-t-40.text-center If the Place of Worship you are looking for isn't listed, please help us by&nbsp;
 							a.add-place(href="/places/add") adding it
-		.row
-			.col-md-offset-3.col-lg-6.m-t-20(ng-hide='message.length')
+			.col-lg-6.m-t-20(ng-hide='message.length')
 				#results-map
