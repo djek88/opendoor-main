@@ -30,15 +30,23 @@ html
 		script(src="/assets/js/ui.js")
 		script(src="/assets/js/utils.js")
 
-		<!-- Begin Inspectlet Embed Code -->
-		script(type="text/javascript" id="inspectletjs").
-			window.__insp = window.__insp || [];
-			__insp.push(['wid', 298518304]);
-			(function() {
-			function ldinsp(){if(typeof window.__inspld != "undefined") return; window.__inspld = 1; var insp = document.createElement('script'); insp.type = 'text/javascript'; insp.async = true; insp.id = "inspsync"; insp.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://cdn.inspectlet.com/inspectlet.js'; var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(insp, x); };
-			setTimeout(ldinsp, 500); document.readyState != "complete" ? (window.attachEvent ? window.attachEvent('onload', ldinsp) : window.addEventListener('load', ldinsp, false)) : ldinsp();
-			})();
-		<!-- End Inspectlet Embed Code -->
+		<!— Google Tag Manager —>
+		script(type="text/javascript").
+			(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+			'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+			})(window,document,'script','dataLayer','GTM-T3SDMBG');
+		<!— End Google Tag Manager —>
+
+		<!-- Begin Adsense Embed Code -->
+		script(async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+		script(type="text/javascript").
+			(adsbygoogle = window.adsbygoogle || []).push({
+				google_ad_client: "ca-pub-9803395703102777",
+				enable_page_level_ads: true
+			});
+		<!-- End Adsense Embed Code -->
 
 		if isPlace
 			script(type="application/ld+json")!= "\n" + JSON.stringify(place.jsonLd, null, ' ') + "\n"
@@ -73,6 +81,10 @@ html
 			//+ '<meta(property="fb:admins", content="#{place.about
 	block body
 		body
+			<!— Google Tag Manager (noscript) —>
+			noscript
+				iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-T3SDMBG" height="0" width="0" style="display:none;visibility:hidden")
+			<!— End Google Tag Manager (noscript) —>
 			#header.header.navbar.navbar-default.navbar-fixed-top
 				.container
 					.navbar-header
