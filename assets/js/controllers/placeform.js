@@ -17,22 +17,18 @@ define([
     var geocoder = new google.maps.Geocoder();
     var map;
     var denominations = [];
-    var groups;
-
     var $denominationsEl = $('input[name="denominations"]');
-    var $groupsEl = $('select[name="groupName"]');
-    var $religionEl = $('select[name="religion"]');
-    var $bsSearchbox = $('.bs-searchbox input');
-    var $newReligionGroupOption;
 
     $('.input-group.date').datetimepicker({ format: siteconfig.l10n.timeFormat });
     $('.location-picker').locationpicker();
     $('.bootstrap-tagsinput').addClass('form-control');
 
     $scope.religions = $rootScope.religions;
+    $scope.religionGroups = [];
     $scope.isLogged = !!$rootScope._id;
 
     $scope.searchByAddress = searchByAddress;
+    $scope.loadOptionsForReligion = loadOptionsForReligion;
 
     if (placeId === 'add') {
       placeId = 0;
@@ -73,47 +69,6 @@ define([
       },
       freeInput: true,
       tagClass: 'label label-primary'
-    });
-
-    $groupsEl.selectpicker({
-      style: 'form-control btn-white',
-      liveSearch: true,
-      noneSelectedText: ''
-    });
-
-    $bsSearchbox.on('input', function() {
-      var value = $bsSearchbox.val();
-
-      if ($newReligionGroupOption) {
-        $newReligionGroupOption.detach();
-      }
-
-      if (value) {
-        var regExp = new RegExp('.*' + RegExp.escape(value.toLowerCase()) + '.*');
-        var matchesWasFound = false;
-
-        for (var i = 0; i < groups.length; i += 1) {
-          if (typeof groups[i].name === 'string' && regExp.test(groups[i].name.toLowerCase())) {
-            matchesWasFound = true;
-            break;
-          }
-        }
-
-        if (!matchesWasFound) {
-          $newReligionGroupOption = $('<option value="' + value + '">' + value + '</option>');
-          $groupsEl.append($newReligionGroupOption);
-        }
-      }
-
-      $groupsEl.selectpicker('refresh');
-    });
-
-    $religionEl.on('change', function() {
-      loadOptionsForReligion($religionEl.val());
-    });
-
-    $groupsEl.on('change', function() {
-      $scope.place.groupName = $groupsEl.val();
     });
 
     if (placeId) {
@@ -168,7 +123,7 @@ define([
             map.setMarker(
               [firstResult.geometry.location.lng(), firstResult.geometry.location.lat()],
               firstResult.geometry.bounds
-              );
+            );
           }
         }
       });
@@ -176,8 +131,8 @@ define([
 
     function setData(place) {
       if (place.mainMeetingTime) {
-        var mainMeetingTime = (new Date(place.mainMeetingTime)); // .browserToUTC();
-        place.mainMeetingTime = mainMeetingTime.toString(siteconfig.l10n.timeFormat);
+        place.mainMeetingTime = (new Date(place.mainMeetingTime))
+          .toString(siteconfig.l10n.timeFormat);
       }
 
       $scope.place = place;
@@ -185,7 +140,7 @@ define([
         && place.maintainer._id && place.maintainer._id === $rootScope._id;
 
       loadOptionsForReligion(place.religion);
-      $groupsEl.selectpicker('val', place.groupName);
+      $scope.place.groupName = place.groupName;
       $rootScope.getMapInstance($('#results-map')).then(function(m) {
         m.setMarker(place.location.coordinates);
 
@@ -200,17 +155,8 @@ define([
         url: '/ajax/religionGroups',
         method: 'GET',
         params: { religion: religion }
-      }).success(function(data) {
-        $groupsEl.empty();
-        groups = data;
-        $groupsEl.append('<option value="" selected disabled></option>');
-
-        groups.forEach(function(group) {
-          $groupsEl.append('<option value="' + group.name + '">' + group.name + '</option>');
-        });
-
-        $groupsEl.selectpicker('refresh');
-        $groupsEl.selectpicker('val', $scope.place.groupName);
+      }).success(function(groups) {
+        $scope.religionGroups = groups.map(function(group) { return group.name; });
       });
 
       $http({

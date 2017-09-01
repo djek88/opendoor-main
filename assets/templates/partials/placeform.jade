@@ -24,13 +24,13 @@
 			.form-group(ng-class="{'has-error': (form.$submitted || form.religion.$touched) && form.religion.$error.required}")
 				label.col-md-3.control-label Religion
 				.col-md-9
-					select.form-control(name="religion", ng-model="place.religion", required)
-						option(value="",selected, disabled)
+					select.form-control(name="religion", ng-change="loadOptionsForReligion(place.religion)" ng-model="place.religion", required)
 						option(value="{{religion}}", ng-repeat="religion in religions") {{religion}}
 			.form-group(ng-class="{'has-error': (form.$submitted || form.groupName.$touched) && form.groupName.$error.required}")
 				label.col-md-3.control-label Group name
 				.col-md-9
-					select.selectpicker.form-control(name="groupName", disabled-ng-model="place.groupName")
+					select.form-control(name="groupName", ng-model="place.groupName", required)
+						option(value="{{group}}", ng-repeat="group in religionGroups") {{group}}
 			.form-group
 				.col-md-3
 				.col-md-9
@@ -44,7 +44,7 @@
 				.col-md-9
 					input.form-control(type="text", name="addressLine2", ng-model="place.address.line2")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.locality.$touched) && form.locality.$error.required}")
-				label.col-md-3.control-label Locality
+				label.col-md-3.control-label City
 				.col-md-9
 					input.form-control(type="text", name="locality", ng-model="place.address.locality", required)
 			.form-group(ng-class="{'has-error': (form.$submitted || form.region.$touched) && form.region.$error.required}")
@@ -58,12 +58,11 @@
 			.form-group(ng-class="{'has-error': (form.$submitted || form.postalCode.$touched) && form.postalCode.$error.required}")
 				label.col-md-3.control-label Postal code
 				.col-md-9
-					input.form-control(type="text", name="postalCode", ng-model="place.address.postalCode", required)
-
+					input.form-control(type="text", name="postalCode", ng-model="place.address.postalCode")
 			.form-group(ng-class="{'has-error': (form.$submitted || form.location.$touched) && form.location.$error.required}")
 				label.col-md-3.control-label Location
 				.col-md-9
-					//h5.m-r-10 Type place address to find it on map
+					h5.m-r-10 Type place address to find it on map
 					.btn.btn-sm.btn-primary.m-b-10(ng-click="searchByAddress()") Find address on map
 					input.hidden(name="location", ng-model="place.location.coordinates", required)
 					#results-map
@@ -142,7 +141,6 @@
 							input.timepicker-input.form-control.input-small(type='text', name="mainMeetingTime", ng-model="place.mainMeetingTime")
 							span.input-group-addon
 								i.glyphicon.glyphicon-time
-
 
 				.form-group
 					.col-md-3

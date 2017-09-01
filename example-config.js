@@ -1,3 +1,4 @@
+/* eslint-disable */
 // After adding new configurations, should add validation rules in appropriate file
 
 // Any DEFAULT and NOT REQUIRED options can be absent
@@ -49,7 +50,7 @@ module.exports = {
 	// },
 
 	// l10n: {							/*NOT REQUIRED*/
-		// timeFormat: '',					/*DEFAULT: 'hh:mm tt'*/
+		// timeFormat: '',					/*DEFAULT: 'hh:mm a'*/
 		// dateFormat: '',					/*DEFAULT: 'yyyy-MM-dd'*/
 		// dateTimeFormat: ''				/*DEFAULT: 'yyyy-MM-dd hh:mm tt'*/
 	// }

@@ -132,6 +132,11 @@ define(['angular', 'app'], function (angular, opendoorApp) {
 					$scope.alertTitle = 'Error';
 					$scope.alertMessage = 'Error during place confirmation';
 					break;
+				case 'placeaddederror':
+					$scope.alertType = 'danger';
+					$scope.alertTitle = 'Error';
+					$scope.alertMessage = 'Error during saving place';
+					break;
 				case 'subscriptionadded':
 					$scope.alertType = 'info';
 					$scope.alertTitle = 'Success';

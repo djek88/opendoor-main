@@ -6,7 +6,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 module.exports = (placeChangeManager, email, placeManager) => {
   return handler;
 
-  function handler(req, res) {
+  function handler(req, res, next) {
     const isAdding = !req.params.id;
     const isLogged = req.session.user;
 
@@ -69,7 +69,6 @@ module.exports = (placeChangeManager, email, placeManager) => {
 
       if (place.mainMeetingTime) {
         place.mainMeetingTime = (new Date(`${place.mainMeetingTime} 01.01.1970`));
-        place.mainMeetingTime = place.mainMeetingTime.nodeToUTC();
       }
 
       place.address = {
@@ -100,7 +99,7 @@ module.exports = (placeChangeManager, email, placeManager) => {
           place.addedByEmail = place.addedByEmail.replace(/^\s+/, '').replace(/\s+$/, '');
 
           if (!isValidEmail(fields.addedByEmail)) {
-            return res.end();
+            return next(new Error('Invalid email!'));
           }
         }
 
@@ -136,6 +135,10 @@ module.exports = (placeChangeManager, email, placeManager) => {
     }
 
     function finishRequest(err, place) {
+      console.log(err);
+
+      if (err) return res.redirect('/error?message=placeaddederror');
+
       const placePage = encodeURIComponent(`/places/${place.uri}`);
 
       if (isAdding) {

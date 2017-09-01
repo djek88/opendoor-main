@@ -5,7 +5,7 @@ const configObj = require('../../../config');
 
 const l10nConfigSchema = joi
   .object({
-    timeFormat: joi.string().default('hh:mm tt'),
+    timeFormat: joi.string().default('hh:mm a'),
     dateFormat: joi.string().default('yyyy-MM-dd'),
     dateTimeFormat: joi.string().default('yyyy-MM-dd hh:mm tt'),
   })
