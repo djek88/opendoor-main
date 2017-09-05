@@ -114,6 +114,14 @@ define(['./app'], function(opendoorApp) {
         controller: 'EditorProposalCtrl',
         resolve: opendoorApp.resolveController('/assets/js/controllers/editorproposal.js')
       })
+
+      .when('/places/by-group-name', {
+        title: 'Places list',
+        templateUrl: 'assets/templates/partials/placesbygroupnamelist.html',
+        controller: 'PlacesByGroupNameListCtrl',
+        resolve: opendoorApp.resolveController('/assets/js/controllers/placesByGroupNamelist.js')
+      })
+
       .when('/places/:country/', {
         title: 'Localities list',
         templateUrl: 'assets/templates/partials/localitieslist.html',

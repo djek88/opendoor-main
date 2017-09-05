@@ -231,6 +231,9 @@ const frontendPages = [
   '/users/list',
   '/users/:id',
   '/promotion/:id',
+
+  '/places/by-group-name',
+
   '/places/maintained',
   '/places/:country/',
   '/places/:country/:locality/',

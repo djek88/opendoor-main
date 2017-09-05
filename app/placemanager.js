@@ -261,6 +261,10 @@ module.exports = (mongoose) => {
         matchOption['address.locality'] = new RegExp(decodeURI(data.locality).replace(/-/g, ' '), 'i');
       }
 
+      if (data.groupName) {
+        matchOption.groupName = data.groupName;
+      }
+
       if (data.maxDistance) {
         geoNearOption.maxDistance = parseInt(data.maxDistance, 10);
       }
