@@ -1,4 +1,6 @@
-module.exports = function(mongoose, placeManager, email){
+const email = require('../../email');
+
+module.exports = function(mongoose){
 	return function (req, res) {
 		var id = req.params.id;
 		var data = {
@@ -17,7 +19,7 @@ module.exports = function(mongoose, placeManager, email){
 
 		console.log({$match: {'jobs._id': mongoose.Types.ObjectId(id)}});
 
-		placeManager.aggregate([
+		global.placeManager.aggregate([
 			{$match: {'jobs._id': mongoose.Types.ObjectId(id)}}
 			, {$unwind: '$jobs'}
 			, {$project: {_id: '$jobs._id', placeuri: '$uri', email: '$jobs.email'}}

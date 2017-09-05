@@ -1,34 +1,33 @@
-module.exports = function(placeChangeManager, email){
-	return function (req, res) {
-		if (req.session.user) {
-			var id = req.params.id;
+/* eslint no-underscore-dangle: "off", eqeqeq: "off" */
+const promisify = require('util').promisify;
 
+module.exports = async (req, res, next) => {
+  const placeChangeId = req.params.id;
 
-			placeChangeManager.findOne({_id: id}, function(err, placeChange){
-				if (err || !placeChange) {
-					res.end();
-				}
-				else {
-					placeManager.findOne({_id: placeChange.place}, function(err, place){
-						if (place.maintainer == req.session.user._id) {
-							placeChangeManager.acceptChange(id, function (err, place) {
-								if (!err && place) {
-									email.notifyAboutAcceptedChanges({id: place._id, recipientEmail: placeChange});
-									res.redirect('/message?message=changeaccepted&back=' + encodeURIComponent('/places/changes'));
-								}
-								else {
-									res.redirect('/error&back=' + encodeURIComponent('/places/changes'));
-								}
-							});
-						}
-						else {
-							res.end();
-						}
-					});
-				}
+  try {
+    if (!req.session.user) throw new Error('Access denied');
 
-			})
+    const placeChange = await global.placeChangeManager.findOne({ _id: placeChangeId }).exec();
+    if (!placeChange) throw new Error('Place change not found!');
 
-		}
-	};
+    const place = await global.placeManager.findOne({ _id: placeChange.place }).exec();
+    if (!place) throw new Error('Place not found!');
+
+    if (place.maintainer == req.session.user._id) {
+      await global.placeChangeManager.acceptChange(placeChangeId);
+    } else {
+      throw new Error('You are not maintainer of this place!');
+    }
+
+    res.redirect(`/message?message=changeaccepted&back=${encodeURIComponent('/places/changes')}`);
+
+    const claimedUser = await global.userManager.findOne({ _id: placeChange.user }).exec();
+    if (!claimedUser) throw new Error('User who created claim to change, not found!');
+
+    const notifyAboutAcceptedChanges = promisify(global.email.notifyAboutAcceptedChanges);
+    await notifyAboutAcceptedChanges({ id: place._id, recipientEmail: claimedUser.email });
+  } catch (err) {
+    res.redirect(`/error&back=${encodeURIComponent('/places/changes')}`);
+    next(err);
+  }
 };

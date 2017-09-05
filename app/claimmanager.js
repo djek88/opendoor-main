@@ -1,4 +1,6 @@
-module.exports = function(mongoose, email) {
+const email = require('./email');
+
+module.exports = function(mongoose) {
   var claimSchema = new mongoose.Schema({
       user: {
         type: mongoose.Schema.Types.ObjectId

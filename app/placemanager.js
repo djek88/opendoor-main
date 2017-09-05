@@ -1,9 +1,10 @@
 /* eslint no-underscore-dangle: "off" */
 
 const config = require('./config');
+const email = require('./email');
 const sanitizeHtml = require('sanitize-html');
 
-module.exports = (mongoose, email) => {
+module.exports = (mongoose) => {
   const promotionSchema = new mongoose.Schema({
     name: String,
     expireDate: Date,
@@ -510,8 +511,10 @@ module.exports = (mongoose, email) => {
 
     for (let i = 0; i < uriFields.length; i += 1) {
       uriFields[i] = removeDiacritics(uriFields[i].replace(/\//g, '-'));
+    }
 
-      const re = /[^\-a-zA-Z0-9/\s]/g;
+    for (let i = 0; i < uriFields.length; i += 1) {
+      const re = /[^,\-a-zA-Z0-9/\s]/g;
       if (re.test(uriFields[i])) {
         return cb(new Error('Place country, region, locality or name is invalid'));
       }
@@ -525,6 +528,7 @@ module.exports = (mongoose, email) => {
     place.uri = uriFields
       .join('/')
       .replace(/_/g, '')
+      .replace(/[^\-a-zA-Z0-9/\s]/g, '')
       .replace(/\s+/g, '-')
       .toLowerCase();
     place.concatenatedAddress = [place.address.line1, place.address.line2, place.address.locality, place.address.region, place.address.country, place.address.postalCode].cleanArray().join(', ');
