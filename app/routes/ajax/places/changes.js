@@ -1,3 +1,5 @@
+const PlaceChange = require('../../../models/place.change.model');
+
 module.exports = function(mongoose){
 	return function (req, res) {
 		if (req.session.user) {
@@ -7,7 +9,7 @@ module.exports = function(mongoose){
 					for (var i=0; i<places.length; i++) {
 						ids.push(places[i]._id);
 					}
-					global.placeChangeManager.find({place: {'$in': ids}}).populate('user', 'name').populate('place').exec(function(err, changes){
+					PlaceChange.find({place: {'$in': ids}}).populate('user', 'name').populate('place').exec(function(err, changes){
 						res.send(JSON.stringify(changes));
 					});
 				}

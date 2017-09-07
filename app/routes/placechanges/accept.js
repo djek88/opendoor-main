@@ -1,5 +1,6 @@
 /* eslint no-underscore-dangle: "off", eqeqeq: "off" */
 const promisify = require('util').promisify;
+const PlaceChange = require('../../models/place.change.model');
 
 module.exports = async (req, res, next) => {
   const placeChangeId = req.params.id;
@@ -7,14 +8,14 @@ module.exports = async (req, res, next) => {
   try {
     if (!req.session.user) throw new Error('Access denied');
 
-    const placeChange = await global.placeChangeManager.findOne({ _id: placeChangeId }).exec();
+    const placeChange = await PlaceChange.findOne({ _id: placeChangeId }).exec();
     if (!placeChange) throw new Error('Place change not found!');
 
     const place = await global.placeManager.findOne({ _id: placeChange.place }).exec();
     if (!place) throw new Error('Place not found!');
 
     if (place.maintainer == req.session.user._id) {
-      await global.placeChangeManager.acceptChange(placeChangeId);
+      await PlaceChange.acceptChange(placeChangeId);
     } else {
       throw new Error('You are not maintainer of this place!');
     }

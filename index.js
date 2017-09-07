@@ -55,10 +55,6 @@ server.on('listening', () => {
   console.log(`Listening on ${bind}`);
 });
 
-const UserManager = require('./app/usermanager')(mongoose);
-
-const userManager = new UserManager();
-
 const PlaceManager = require('./app/placemanager')(mongoose);
 
 const placeManager = new PlaceManager();
@@ -75,10 +71,6 @@ const ClaimManager = require('./app/claimmanager')(mongoose);
 
 const claimManager = new ClaimManager();
 
-const PlaceChangeManager = require('./app/placechangemanager')(mongoose);
-
-global.placeChangeManager = new PlaceChangeManager();
-
 const PlaceNotificationManager = require('./app/placenotificationmanager')(mongoose);
 
 const placeNotificationManager = new PlaceNotificationManager();
@@ -87,7 +79,7 @@ const SubscriptionManager = require('./app/subscriptionmanager')(mongoose);
 
 const subscriptionManager = new SubscriptionManager();
 
-global.userManager = userManager;
+// global.userManager = userManager;
 global.placeManager = placeManager;
 global.religionGroupManager = religionGroupManager;
 global.denominationManager = denominationManager;
@@ -155,13 +147,13 @@ app.get('/assets/templates/partials/:filename.html', (req, res) => {
   });
 });
 
-app.get('/siteconfig.js', require('./app/routes/siteconfig.js')(siteconfig));
-app.post('/register', require('./app/routes/register.js')(userManager));
-app.post('/login', require('./app/routes/login.js')(userManager));
-app.get('/logout', require('./app/routes/logout.js')());
+app.get('/siteconfig.js', require('./app/routes/siteconfig')(siteconfig));
+app.post('/register', require('./app/routes/register'));
+app.post('/login', require('./app/routes/login'));
+app.get('/logout', require('./app/routes/logout'));
 
-app.get('/ajax/users', require('./app/routes/ajax/users.js')(userManager));
-app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser.js')(userManager));
+app.get('/ajax/users', require('./app/routes/ajax/users'));
+app.get('/ajax/users/:id', require('./app/routes/ajax/findoneuser'));
 app.get('/ajax/places/search', require('./app/routes/ajax/places/search.js')(config, placeManager));
 app.get('/ajax/places/geosearch', require('./app/routes/ajax/places/search.js')(config, placeManager));
 app.get('/ajax/places/searchbyip', require('./app/routes/ajax/places/search.js')(config, placeManager));

@@ -1,8 +1,8 @@
 /* eslint no-underscore-dangle: "off" */
-const email = require('../../email');
-
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
+const PlaceChange = require('../../models/place.change.model');
+const email = require('../../email');
 
 module.exports = (req, res, next) => {
   const isAdding = !req.params.id;
@@ -103,10 +103,10 @@ module.exports = (req, res, next) => {
 
       global.placeManager.add(place, finishRequest);
     } else {
-      debugger;
       global.placeManager.findById(req.params.id).populate('maintainer').lean().exec((err, currentPlace) => {
         if (currentPlace) {
-          if (currentPlace.maintainer && currentPlace.maintainer._id.toString() === req.session.user._id) {
+          if (currentPlace.maintainer &&
+          currentPlace.maintainer._id.toString() === req.session.user._id) {
             global.placeManager.update(req.params.id, place, finishRequest);
           } else {
             Object.keys(place).forEach((key) => {
@@ -115,7 +115,7 @@ module.exports = (req, res, next) => {
               if (place[key]
                 && !equals(currentPlace[key], place[key])
                 && (currentPlace[key] || place[key])) {
-                global.placeChangeManager.add({
+                PlaceChange.add({
                   user: ObjectId(req.session.user._id),
                   place: ObjectId(req.params.id),
                   field: key,
