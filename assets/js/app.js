@@ -257,8 +257,6 @@ define([
     var id = $cookies.get('_id');
     if (typeof id === 'string') {
       $rootScope._id = id.substring(3, id.length - 1);
-      // set google analytics 'userId' for unite sessions
-      ga('set', 'userId', $rootScope._id);
     }
     $rootScope.email = $cookies.get('email');
     $rootScope.isAdmin = $cookies.get('isAdmin') === 'true';
