@@ -3,13 +3,13 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('cookie-session');
 const busboy = require('connect-busboy');
 const jade = require('jade');
 const stripe = require('stripe')(config.apiKeys.stripeSecret);
+const mongoose = require('./app/lib/mongoose');
 const prerender = require('./app/prerenderservice');
 const mailingList = require('./app/routes/mailinglist');
 const siteMap = require('./app/routes/sitemap');
@@ -19,48 +19,41 @@ const siteMap = require('./app/routes/sitemap');
 require('./assets/js/utils.js');
 require('./app/date.min.js');
 
-mongoose.Promise = global.Promise;
-mongoose.connect(config.mongoURI);
-
 const app = express();
 
-mongoose.connection
-  .once('open', () => {
-    const server = http.createServer(app);
+const server = http.createServer(app);
 
-    server.listen(config.port, config.hostname);
-    server.on('error', (error) => {
-      if (error.syscall !== 'listen') {
-        throw error;
-      }
+server.listen(config.port, config.hostname);
+server.on('error', (error) => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
 
-      const bind = typeof config.port === 'string'
-        ? `Pipe ${config.port}`
-        : `Port ${config.port}`;
+  const bind = typeof config.port === 'string'
+    ? `Pipe ${config.port}`
+    : `Port ${config.port}`;
 
-      // handle specific listen errors with friendly messages
-      switch (error.code) {
-        case 'EACCES':
-          console.error(`${bind} requires elevated privileges`);
-          process.exit(1);
-          break;
-        case 'EADDRINUSE':
-          console.error(`${bind} is already in use`);
-          process.exit(1);
-          break;
-        default:
-          throw error;
-      }
-    });
-    server.on('listening', () => {
-      const addr = server.address();
-      const bind = typeof addr === 'string'
-        ? `pipe ${addr}`
-        : `port ${addr.port}`;
-      console.log(`Listening on ${bind}`);
-    });
-  })
-  .on('error', console.error);
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(`${bind} requires elevated privileges`);
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(`${bind} is already in use`);
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+});
+server.on('listening', () => {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
+    ? `pipe ${addr}`
+    : `port ${addr.port}`;
+  console.log(`Listening on ${bind}`);
+});
 
 const UserManager = require('./app/usermanager')(mongoose);
 
