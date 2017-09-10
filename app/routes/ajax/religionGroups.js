@@ -1,10 +1,7 @@
-module.exports = function(religionGroupManager){
-	var extend = require('util')._extend;
-	return function (req, res) {
-		var query = extend({}, req.query);
+const ReligionGroup = require('../../models/religion.group.model');
 
-		religionGroupManager.find(query, function(err, religionGroups){
-			res.send(JSON.stringify(religionGroups));
-		});
-	};
+module.exports = (req, res) => {
+  const query = Object.assign({}, req.query);
+
+  ReligionGroup.find(query, (err, groups) => res.send(JSON.stringify(err || groups)));
 };

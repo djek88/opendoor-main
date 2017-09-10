@@ -1,14 +1,11 @@
-module.exports = function(placeManager){
-	return function (req, res) {
-		var id = req.params.id;
-		placeManager.markAsConfirmed(id, function(err, place){
-			if (!err && place) {
-				console.log('Place with ' + id + ' was confirmed');
-				res.redirect('/message?message=placeconfirmed&back=' + encodeURIComponent('/places/' + place.uri));
-			}
-			else {
-				res.redirect('/error?message=placeconfirmationerror');
-			}
-		});
-	};
+const Place = require('../../models/place.model.js');
+
+module.exports = (req, res) => {
+  const id = req.params.id;
+
+  Place.markAsConfirmed(id, (err, place) => {
+    if (err || !place) return res.redirect('/error?message=placeconfirmationerror');
+
+    res.redirect(`/message?message=placeconfirmed&back=${encodeURIComponent(`/places/${place.uri}`)}`);
+  });
 };

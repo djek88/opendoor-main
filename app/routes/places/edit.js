@@ -2,7 +2,9 @@
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
 const PlaceChange = require('../../models/place.change.model');
-const email = require('../../email');
+const User = require('../../models/user.model');
+const Place = require('../../models/place.model');
+const email = require('../../lib/email');
 
 module.exports = (req, res, next) => {
   const isAdding = !req.params.id;
@@ -101,13 +103,13 @@ module.exports = (req, res, next) => {
         }
       }
 
-      global.placeManager.add(place, finishRequest);
+      Place.add(place, finishRequest);
     } else {
-      global.placeManager.findById(req.params.id).populate('maintainer').lean().exec((err, currentPlace) => {
+      Place.findById(req.params.id).populate('maintainer').lean().exec((err, currentPlace) => {
         if (currentPlace) {
           if (currentPlace.maintainer &&
           currentPlace.maintainer._id.toString() === req.session.user._id) {
-            global.placeManager.update(req.params.id, place, finishRequest);
+            Place.update(req.params.id, place, finishRequest);
           } else {
             Object.keys(place).forEach((key) => {
               if (!Object.prototype.hasOwnProperty.call(place, key)) return;
@@ -146,7 +148,7 @@ module.exports = (req, res, next) => {
           if (!place.maintainer) return place.addedByEmail;
 
           return new Promise((resolve, reject) => {
-            global.userManager.findById(place.maintainer, (err, maintainer) => {
+            User.findById(place.maintainer, (err, maintainer) => {
               if (err) return reject(err);
               if (!maintainer) return reject(new Error('Maintainer not found'));
               resolve(maintainer.email);

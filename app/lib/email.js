@@ -1,5 +1,6 @@
-const config = require('../app/config');
 const nodemailer = require('nodemailer');
+const config = require('../config');
+const User = require('../models/user.model');
 
 const transporter = nodemailer.createTransport(config.mailConfig, { from: config.mailConfig.from });
 
@@ -186,7 +187,7 @@ module.exports.sendSubscriptionConfirmation = function(options, callback) {
 };
 
 function getAdminEmails(callback) {
-  global.userManager.find({ isAdmin: true }, function (err, users) {
+  User.find({ isAdmin: true }, function (err, users) {
     if (err) {
       console.log(err);
     }

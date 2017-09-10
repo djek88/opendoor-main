@@ -1,61 +1,62 @@
-module.exports = function(placeManager, mongoose){
-	return function (req, res) {
-		if (!req.session.user) return res.end();
+const ObjectId = require('mongoose').Types.ObjectId;
+const Place = require('../../models/place.model');
 
-		const isAdding = !req.params.id;
-		const placeId = req.body.place;
-		let id = mongoose.Types.ObjectId();
-		let message = 'eventadded';
+module.exports = (req, res) => {
+  if (!req.session.user) return res.end();
 
-		if (!isAdding) {
-			id = mongoose.Types.ObjectId(req.params.id);
-			message = 'eventsaved';
-		}
+  const isAdding = !req.params.id;
+  const placeId = req.body.place;
+  let id = ObjectId();
+  let message = 'eventadded';
 
-		placeManager.findOne({_id: placeId}, function(err, place) {
-			if (!err && place && place.maintainer == req.session.user._id) {
-				const locationAsString = req.body.location.split(',');
+  if (!isAdding) {
+    id = ObjectId(req.params.id);
+    message = 'eventsaved';
+  }
 
-				let startDate = null;
-				let endDate = null;
+  Place.findOne({_id: placeId}, function(err, place) {
+    if (!err && place && place.maintainer == req.session.user._id) {
+      const locationAsString = req.body.location.split(',');
 
-				if (req.body.startDate) {
-					startDate = new Date(req.body.startDate);
-					startDate.nodeToUTC();
-				}
+      let startDate = null;
+      let endDate = null;
 
-				if (req.body.endDate) {
-					endDate = new Date(req.body.endDate);
-					endDate.nodeToUTC();
-				}
+      if (req.body.startDate) {
+        startDate = new Date(req.body.startDate);
+        startDate.nodeToUTC();
+      }
 
-				const data = {
-					name: req.body.name,
-					startDate: startDate,
-					endDate: endDate,
-					description: req.body.description,
-					address: req.body.address,
-					location: {
-						type: 'Point',
-						coordinates: [
-							parseFloat(locationAsString[0]) || null,
-							parseFloat(locationAsString[1]) || null
-						]
-					}
-				};
+      if (req.body.endDate) {
+        endDate = new Date(req.body.endDate);
+        endDate.nodeToUTC();
+      }
 
-				placeManager[isAdding ? 'addEvent' : 'editEvent'](isAdding ? placeId : id, data, function(err, place) {
-					if (err || !place) return res.redirect('/error');
+      const data = {
+        name: req.body.name,
+        startDate: startDate,
+        endDate: endDate,
+        description: req.body.description,
+        address: req.body.address,
+        location: {
+          type: 'Point',
+          coordinates: [
+            parseFloat(locationAsString[0]) || null,
+            parseFloat(locationAsString[1]) || null
+          ]
+        }
+      };
 
-					res.redirect('/message?message=' + message + '&back=' + encodeURIComponent('/places/' + place.uri));
+      Place[isAdding ? 'addEvent' : 'editEvent'](isAdding ? placeId : id, data, function(err, place) {
+        if (err || !place) return res.redirect('/error');
 
-					if (isAdding) {
+        res.redirect('/message?message=' + message + '&back=' + encodeURIComponent('/places/' + place.uri));
 
-					}
-				});
-			} else {
-				res.end();
-			}
-		});
-	};
+        if (isAdding) {
+
+        }
+      });
+    } else {
+      res.end();
+    }
+  });
 };

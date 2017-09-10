@@ -1,18 +1,18 @@
-module.exports = function(placeManager){
-	return function(req, res) {
-		if (!req.session.user) return res.redirect('/message?message=pleaselogin');
+const Place = require('../../models/place.model');
 
-		var id = req.params.id;
-		var data = {
-			rating: req.body.rating,
-			text: req.body.text,
-			name: req.session.user.name
-		};
+module.exports = (req, res) => {
+  if (!req.session.user) return res.redirect('/message?message=pleaselogin');
 
-		placeManager.addReview(id, data, function(err, place) {
-			if (err || !place) return res.redirect('/error');
+  const id = req.params.id;
+  const data = {
+    rating: req.body.rating,
+    text: req.body.text,
+    name: req.session.user.name,
+  };
 
-			res.redirect('/message?message=reviewsaved&back=' + encodeURIComponent('/places/' + place.uri));
-		});
-	};
+  Place.addReview(id, data, (err, place) => {
+    if (err || !place) return res.redirect('/error');
+
+    res.redirect(`/message?message=reviewsaved&back=${encodeURIComponent(`/places/${place.uri}`)}`);
+  });
 };

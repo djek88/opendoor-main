@@ -1,12 +1,10 @@
-module.exports = function(config, placeManager){
-	return function (req, res) {
-		placeManager.find({}).skip('-createdAt').limit(5).populate('maintainer', 'name').exec(function(err, place){
-			if (!err) {
-				res.send(JSON.stringify(place));
-			}
-			else {
-				res.send(JSON.stringify(err));
-			}
-		});
-	};
+const Place = require('../../../models/place.model');
+
+module.exports = (req, res) => {
+  Place
+    .find({})
+    .skip('-createdAt')
+    .limit(5)
+    .populate('maintainer', 'name')
+    .exec((err, place) => res.send(JSON.stringify(err || place)));
 };

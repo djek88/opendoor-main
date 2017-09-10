@@ -1,14 +1,13 @@
-var countryList = require('country-list')();
+const Place = require('../../models/place.model');
+const countryList = require('country-list')();
 
-module.exports = function(placeManager){
-	return function (req, res) {
-		if (req.query.withPlaces) {
-			return placeManager.getCountries(function(err, countries) {
-				countries.sort();
-				res.send(countries);
-			});
-		}
+module.exports = (req, res) => {
+  if (req.query.withPlaces) {
+    return Place.getCountries(function(err, countries) {
+      countries.sort();
+      res.send(countries);
+    });
+  }
 
-		res.send(JSON.stringify(countryList.getNames()));
-	};
+  res.send(JSON.stringify(countryList.getNames()));
 };

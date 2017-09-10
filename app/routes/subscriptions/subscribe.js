@@ -1,5 +1,7 @@
 /* eslint no-underscore-dangle: "off" */
-const email = require('../../email');
+const email = require('../../lib/email');
+const Place = require('../../models/place.model');
+const Subscription = require('../../models/subscription.model');
 
 module.exports = (req, res, next) => {
   const data = {
@@ -9,11 +11,11 @@ module.exports = (req, res, next) => {
     isConfirmed: !!req.session.user,
   };
 
-  global.placeManager.findOne({ _id: data.place }, (err, place) => {
+  Place.findOne({ _id: data.place }, (err, place) => {
     if (err) return next(err);
     if (!place) return res.redirect('/error');
 
-    global.subscriptionManager.add(data, (err, subscription) => {
+    Subscription.add(data, (err, subscription) => {
       if (err) {
         if (err.message === 'exists') {
           return res.redirect(`/error?message=subscriptionexists&back=${encodeURIComponent(`/places/${place.uri}`)}`);

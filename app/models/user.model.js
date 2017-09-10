@@ -1,5 +1,6 @@
 const config = require('../config');
 const mongoose = require('../lib/mongoose');
+const Place = require('../models/place.model');
 
 const Schema = new mongoose.Schema({
   name: String,
@@ -13,12 +14,13 @@ const Schema = new mongoose.Schema({
 });
 
 Schema.statics.register = function register(data, cb) {
+  const User = this;
   // trim spaces
   data.email = data.email.replace(/^\s+/, '').replace(/\s+$/, '');
 
   if (!isValidEmail(data.email)) return cb(new Error('Email is not valid!'));
 
-  const newUser = new this({
+  const newUser = new User({
     name: data.name,
     email: data.email,
     password: data.password,
@@ -33,7 +35,7 @@ Schema.statics.register = function register(data, cb) {
 
   function checkIsAlreadyRegistered() {
     return new Promise((resolve, reject) => {
-      this.findOne({ email: newUser.email }, (err, result) => {
+      User.findOne({ email: newUser.email }, (err, result) => {
         if (err) return reject(err);
         if (result) return reject(new Error('alreadyregistered'));
 
@@ -44,7 +46,7 @@ Schema.statics.register = function register(data, cb) {
 
   function setPlacesMaintainer() {
     return new Promise((resolve, reject) => {
-      global.placeManager.find({
+      Place.find({
         addedByEmail: newUser.email,
         maintainer: { $exists: false },
       }, (err, places) => {
@@ -75,6 +77,7 @@ Schema.statics.register = function register(data, cb) {
 };
 
 Schema.statics.search = function search(data, callback) {
+  const User = this;
   let skipPosition;
   let limitPosition;
   const matchOption = {};
@@ -102,7 +105,7 @@ Schema.statics.search = function search(data, callback) {
     limitPosition = options.push({ $limit: config.frontend.itemsPerPage });
   }
 
-  this.aggregate(options, (err, users) => {
+  User.aggregate(options, (err, users) => {
     options.push({ $group: { _id: null, count: { $sum: 1 } } });
 
     if (limitPosition) {
@@ -111,7 +114,7 @@ Schema.statics.search = function search(data, callback) {
     if (skipPosition) {
       options.splice(skipPosition - 1, 1);
     }
-    this.aggregate(options, (err, stats) => {
+    User.aggregate(options, (err, stats) => {
       // Place.populate(places, {path: "maintainer"}, (err, places) => {
       const response = {
         results: users,

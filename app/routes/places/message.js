@@ -1,7 +1,8 @@
-const email = require('../../email');
+const email = require('../../lib/email');
+const Place = require('../../models/place.model');
 
 module.exports = (req, res, next) => {
-  global.placeManager.findOne({ _id: req.body.id }, (err, place) => {
+  Place.findOne({ _id: req.body.id }, (err, place) => {
     if (err) return next(err);
     if (!place) return next(new Error('Place not found!'));
     if (!place.email) return next(new Error('Place email not found!'));

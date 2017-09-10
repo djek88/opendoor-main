@@ -1,13 +1,7 @@
-module.exports = function(claimManager){
-	return function (req, res) {
+const Claim = require('../../models/claim.model');
 
-		if (req.session.user && req.session.user.isAdmin) {
-			claimManager.findAll(function (err, claims) {
-				res.send(JSON.stringify(claims));
-			});
-		}
-		else {
-			res.end();
-		}
-	};
+module.exports = (req, res, next) => {
+  if (!req.session.user && !req.session.user.isAdmin) return next('Access denied!');
+
+  Claim.findAll((err, claims) => res.send(JSON.stringify(err || claims)));
 };

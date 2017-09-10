@@ -1,9 +1,5 @@
-module.exports = function(denominationManager){
-	return function (req, res) {
-		var query = req.query;
+const Denomination = require('../../models/denomination.model');
 
-		denominationManager.find(query, function(err, denominations){
-			res.send(JSON.stringify(denominations));
-		});
-	};
+module.exports = (req, res) => {
+  Denomination.find(req.query, (err, denomins) => res.send(JSON.stringify(err || denomins)));
 };

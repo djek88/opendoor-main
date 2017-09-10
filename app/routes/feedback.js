@@ -1,4 +1,4 @@
-const email = require('../email');
+const email = require('../lib/email');
 
 module.exports = (req, res) => {
   email.sendFeedback({

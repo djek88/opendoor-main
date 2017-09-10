@@ -1,13 +1,8 @@
-module.exports = function(placeManager){
+const Place = require('../../models/place.model');
 
-
-	return function (req, res) {
-		placeManager.getLocalities(req.query.country,
-			function(err, localities) {
-
-				localities.sort();
-				res.send(localities);
-			}
-		);
-	};
+module.exports = (req, res) => {
+  Place.getLocalities(req.query.country, (err, localities) => {
+    localities.sort();
+    res.send(localities);
+  });
 };

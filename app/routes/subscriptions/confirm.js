@@ -1,15 +1,10 @@
-module.exports = function(subscriptionManager, email){
-	return function (req, res) {
-		var id = req.params.id;
+const Subscription = require('../../models/subscription.model');
 
-		subscriptionManager.markAsConfirmed(id, function(err, subscription) {
-			console.log(arguments);
-			if (!err && subscription) {
-				res.redirect('/message?message=subscriptionconfirmed');
-			}
-			else {
-				res.redirect('/error?message=subscriptionconfirmationerror');
-			}
-		});
-	};
+module.exports = (req, res, next) => {
+  Subscription.markAsConfirmed(req.params.id, (err, subscription) => {
+    if (err) return next(err);
+    if (!subscription) return res.redirect('/error?message=subscriptionconfirmationerror');
+
+    res.redirect('/message?message=subscriptionconfirmed');
+  });
 };

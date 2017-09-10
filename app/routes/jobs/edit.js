@@ -1,28 +1,29 @@
-module.exports = function(mongoose, placeManager) {
-	return function(req, res) {
-		if (!req.session.user) return res.end();
+const ObjectId = require('mongoose').Types.ObjectId;
+const Place = require('../../models/place.model');
 
-		var data = req.body;
-		var isAdding = !req.params.id;
-		var id = mongoose.Types.ObjectId();
+module.exports = (req, res) => {
+  if (!req.session.user) return res.end();
 
-		if (!isAdding) {
-			var id = mongoose.Types.ObjectId(req.params.id);
-		}
+  var data = req.body;
+  var isAdding = !req.params.id;
+  var id = ObjectId();
 
-		placeManager.getById(data.place, function(err, place){
-			if (err || !place || place.maintainer != req.session.user._id) {
-				if (isAdding) {
-					data.expireDate = new Date;
-					placeManager.addJob(data.place, data, function(err, job) {
-						res.redirect('/jobs/fund/' + job._id);
-					});
-				} else {
+  if (!isAdding) {
+    var id = ObjectId(req.params.id);
+  }
 
-				}
-			} else {
-				res.redirect('/error');
-			}
-		});
-	}
+  Place.getById(data.place, function(err, place) {
+    if (err || !place || place.maintainer != req.session.user._id) {
+      if (isAdding) {
+        data.expireDate = new Date;
+        Place.addJob(data.place, data, function(err, job) {
+          res.redirect('/jobs/fund/' + job._id);
+        });
+      } else {
+
+      }
+    } else {
+      res.redirect('/error');
+    }
+  });
 };
