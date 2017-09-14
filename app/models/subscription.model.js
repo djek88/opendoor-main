@@ -5,7 +5,7 @@ const Schema = new mongoose.Schema({
   email: String,
   place: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'place',
+    ref: 'Place',
   },
   isConfirmed: {
     type: Boolean,

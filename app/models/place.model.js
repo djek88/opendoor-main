@@ -100,7 +100,7 @@ const Schema = new mongoose.Schema({
   addedByEmail: String,
   maintainer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
   },
   isConfirmed: Boolean,
   reviews: {
@@ -175,7 +175,7 @@ Schema.statics.update = function update(id, data, cb = () => {}) {
 
     Object.assign(place, data);
 
-    preprocessFields(place, (error) => {
+    preprocessFields(place, error => {
       if (error) return cb(error);
 
       place.jsonLd = createJsonLd(place);
@@ -184,34 +184,20 @@ Schema.statics.update = function update(id, data, cb = () => {}) {
   });
 };
 
-Schema.statics.setMaintainer = function setMaintainer(id, maintainerId, cb = () => {}) {
+Schema.statics.setMaintainer = async function setMaintainer(id, userId) {
   const Place = this;
 
-  Place.findById(id, (err, place) => {
-    if (err) return cb(err);
+  const place = await Place.findById(id).exec();
+  if (!place) throw new Error('Place not found');
 
-    if (place.maintainer) {
-      User.findOne({ _id: place.maintainer }, (err, user) => {
-        if (user) {
-          const index = user.maintainedPlaces.indexOf(place._id);
-          if (index !== -1) {
-            user.maintainedPlaces.splice(index, 1);
-            user.save();
-          }
-        }
-      });
-    }
+  if (place.maintainer) {
+    await User.removePlaceFromMaintenance(place.maintainer, place._id);
+  }
 
-    User.findOne({ _id: maintainerId }, (err, user) => {
-      if (user) {
-        user.maintainedPlaces.push(place._id);
-        user.save();
-      }
-    });
+  await User.addPlaceForMaintenance(userId, place._id);
 
-    place.maintainer = maintainerId;
-    place.save(cb);
-  });
+  place.maintainer = userId;
+  return place.save();
 };
 
 Schema.statics.findNearby = function findNearby(data, callback) {
@@ -342,7 +328,7 @@ Schema.statics.markAsConfirmed = function markAsConfirmed(id, callback) {
         global.placeNotificationManager.findNearby(data, (err, placeNotifications) => {
           const ids = [];
           for (let i = 0; i < placeNotifications.length; i += 1) {
-            email.sendNotificationAboutNewPlace(data.id, placeNotifications[i].email);
+            email.send('sendNotificationAboutNewPlace', { recipientEmail: placeNotifications[i].email, placeId: data.id });
             ids.push(mongoose.Types.ObjectId(placeNotifications[i]._id));
           }
           global.placeNotificationManager.remove({ _id: { $in: ids } }, () => {});
@@ -394,7 +380,7 @@ Schema.statics.editEvent = function editEvent(id, data, callback) {
   Place.findOne({ 'events._id': id }, (err, place) => {
     for (let i = 0; i < place.events.length; i += 1) {
       if (place.events[i]._id.toString() === id.toString()) {
-        Object.keys(data).forEach((j) => {
+        Object.keys(data).forEach(j => {
           if (Object.prototype.hasOwnProperty.call(data, j)) {
             place.events[i][j] = data[j];
           }
@@ -652,7 +638,7 @@ function removeDiacritics(str) {
     { base: 'z', letters: /[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]/g },
   ];
 
-  defaultDiacriticsRemovalMap.forEach((item) => {
+  defaultDiacriticsRemovalMap.forEach(item => {
     str = str.replace(item.letters, item.base);
   });
 

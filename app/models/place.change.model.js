@@ -5,11 +5,11 @@ const Place = require('../models/place.model');
 const Schema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
   },
   place: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'place',
+    ref: 'Place',
   },
   field: String,
   value: mongoose.Schema.Types.Mixed,

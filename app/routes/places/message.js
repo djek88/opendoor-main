@@ -7,15 +7,15 @@ module.exports = (req, res, next) => {
     if (!place) return next(new Error('Place not found!'));
     if (!place.email) return next(new Error('Place email not found!'));
 
-    const data = {
-      subject: req.body.subject,
-      text: req.body.text,
+    const options = {
       recipientEmail: place.email,
       senderEmail: req.session.user ? req.session.user.email : req.body.email,
+      subject: req.body.subject,
+      message: req.body.text,
     };
 
-    email.sendMessage(data, () => {
-      res.redirect(`/message?message=messagesent&back=${encodeURIComponent(`/places/${place.uri}`)}`);
-    });
+    email.send('sendMessage', options)
+      .then(() => res.redirect(`/message?message=messagesent&back=${encodeURIComponent(`/places/${place.uri}`)}`))
+      .catch(console.log.bind(console));
   });
 };

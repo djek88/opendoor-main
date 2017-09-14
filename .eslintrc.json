@@ -11,7 +11,9 @@
         "consistent-return": "off",
         "no-use-before-define": "off",
         "no-param-reassign": "off",
-        "no-shadow": "off"
+        "no-shadow": "off",
+        "no-underscore-dangle": "off",
+        "arrow-parens": ["error", "as-needed"]
     },
     "root": true
 }

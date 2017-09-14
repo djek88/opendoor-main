@@ -3,12 +3,11 @@ const email = require('../../lib/email');
 module.exports = (req, res) => {
   if (req.session.user) {
     const options = {
-      id: req.params.id,
+      placeId: req.params.id,
       recipientEmail: req.body.email,
     };
 
-    email.sendEditorProposal(options, () => {
-      res.redirect(`/message?message=proposalsent&back=${encodeURIComponent(`/places/${place.uri}`)}`);
-    });
+    email.send('sendEditorProposal', options)
+      .then(() => res.redirect(`/message?message=proposalsent&back=${encodeURIComponent(`/places/${place.uri}`)}`));
   }
 };

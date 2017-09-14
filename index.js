@@ -53,6 +53,8 @@ server.on('listening', () => {
   console.log(`Listening on ${bind}`);
 });
 
+// process.on('SIGTERM', () => server.close(() => process.exit(0)));
+
 global.appDir = path.dirname(require.main.filename);
 global.imagesPath = '/photos/';
 

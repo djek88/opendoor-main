@@ -1,8 +1,8 @@
 /* eslint no-underscore-dangle: "off", eqeqeq: "off" */
-const promisify = require('util').promisify;
 const PlaceChange = require('../../models/place.change.model');
 const User = require('../../models/user.model');
 const Place = require('../../models/place.model');
+const email = require('../../lib/email');
 
 
 module.exports = async (req, res, next) => {
@@ -28,8 +28,7 @@ module.exports = async (req, res, next) => {
     const claimedUser = await User.findOne({ _id: placeChange.user }).exec();
     if (!claimedUser) throw new Error('User who created claim to change, not found!');
 
-    const notifyAboutAcceptedChanges = promisify(global.email.notifyAboutAcceptedChanges);
-    await notifyAboutAcceptedChanges({ id: place._id, recipientEmail: claimedUser.email });
+    await email.send('notifyAboutAcceptedChanges', { recipientEmail: claimedUser.email, placeId: place._id });
   } catch (err) {
     res.redirect(`/error&back=${encodeURIComponent('/places/changes')}`);
     next(err);

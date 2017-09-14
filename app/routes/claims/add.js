@@ -1,24 +1,27 @@
-const ObjectId = require('mongoose').Types.ObjectId;
 const Place = require('../../models/place.model');
 const Claim = require('../../models/claim.model');
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   if (!req.session.user) return res.redirect('/message?message=pleaselogin');
-
   const placeId = req.params.id;
-  const data = {
-    user: ObjectId(req.session.user._id),
-    place: ObjectId(placeId),
-  };
+  const userId = req.session.user._id;
 
-  Claim.add(data, (err) => {
-    if (err) return next(err);
+  try {
+    const place = await Place.findById(placeId).exec();
+    if (!place) return res.redirect('/notfound');
 
-    Place.getById(placeId, (err, place) => {
-      if (err) return next(err);
-      if (!place) return next(new Error('Place not found!'));
+    const data = {
+      user: userId,
+      place: placeId,
+    };
 
-      res.redirect(`/message?message=claimadded&back=${encodeURIComponent(`/places/${place.uri}`)}`);
-    });
-  });
+    if (await Claim.isExist(data)) {
+      return res.redirect(`/message?message=claimealreadyexists&back=${encodeURIComponent(`/places/${place.uri}`)}`);
+    }
+    await new Claim(data).save();
+
+    res.redirect(`/message?message=claimadded&back=${encodeURIComponent(`/places/${place.uri}`)}`);
+  } catch (err) {
+    next(err);
+  }
 };

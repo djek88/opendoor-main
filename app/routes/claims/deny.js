@@ -1,12 +1,14 @@
 const Claim = require('../../models/claim.model');
 
-module.exports = (req, res, next) => {
-  if (!req.session.user && !req.session.user.isAdmin) return next(new Error('Access denied!'));
+module.exports = async (req, res, next) => {
+  try {
+    if (!req.session.user && !req.session.user.isAdmin) throw new Error('Access denied!');
 
-  Claim.removeClaim(req.params.id, (err, place) => {
-    if (err) return next(err);
-    if (!place) return res.redirect(`/error&back=${encodeURIComponent('/places/claims')}`);
+    const claim = await Claim.findByIdAndRemove(req.params.id).exec();
+    if (!claim) return res.redirect(`/message?message=claimnotfound&back=${encodeURIComponent('/places/claims')}`);
 
     res.redirect(`/message?message=claimdenied&back=${encodeURIComponent('/places/claims')}`);
-  });
+  } catch (err) {
+    next(err);
+  }
 };

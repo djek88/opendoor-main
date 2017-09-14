@@ -9,7 +9,7 @@ const Schema = new mongoose.Schema({
   isAdmin: Boolean,
   maintainedPlaces: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'place',
+    ref: 'Place',
   },
 });
 
@@ -127,6 +127,25 @@ Schema.statics.search = function search(data, callback) {
       // });
     });
   });
+};
+
+Schema.statics.removePlaceFromMaintenance = async function removePlaceFromMaintenance(id, placeId) {
+  const User = this;
+
+  const user = await User.findById(id).exec();
+  if (!user) return;
+
+  user.maintainedPlaces.pull(placeId);
+  return user.save();
+};
+
+Schema.statics.addPlaceForMaintenance = async function addPlaceForMaintenance(id, placeId) {
+  const User = this;
+
+  const user = await User.findByIdAndUpdate(id, { $push: { maintainedPlaces: placeId } }).exec();
+  if (!user) throw new Error('User not found!');
+
+  return user;
 };
 
 module.exports = mongoose.model('User', Schema);

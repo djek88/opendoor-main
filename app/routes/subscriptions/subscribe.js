@@ -29,15 +29,13 @@ module.exports = (req, res, next) => {
         }
 
         const options = {
-          id: subscription._id,
           recipientEmail: data.email,
+          subscriptionId: subscription._id,
         };
 
-        return email.sendSubscriptionConfirmation(options, () => {
-          res.redirect(`/message?message=verifysubscription&back=${encodeURIComponent(`/places/${place.uri}`)}`);
-        });
+        return email.send('sendSubscriptionConfirmation', options)
+          .then(() => res.redirect(`/message?message=verifysubscription&back=${encodeURIComponent(`/places/${place.uri}`)}`));
       }
-
 
       res.redirect(`/error&back=${encodeURIComponent(`/places/${place.uri}`)}`);
     });

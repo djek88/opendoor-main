@@ -1,7 +1,12 @@
 const Claim = require('../../models/claim.model');
 
-module.exports = (req, res, next) => {
-  if (!req.session.user && !req.session.user.isAdmin) return next('Access denied!');
+module.exports = async (req, res, next) => {
+  try {
+    if (!req.session.user && !req.session.user.isAdmin) throw new Error('Access denied!');
 
-  Claim.findAll((err, claims) => res.send(JSON.stringify(err || claims)));
+    const claims = await Claim.find({}).populate('user').populate('place').exec();
+    res.send(JSON.stringify(claims));
+  } catch (err) {
+    next(err);
+  }
 };
