@@ -20,10 +20,13 @@ module.exports = (req, res, next) => {
 
   req.busboy.on('file', (fieldname, file, filename) => {
     if (filename.length) {
-      const extension = filename.toLowerCase().split('.').pop();
+      const extension = filename
+        .toLowerCase()
+        .split('.')
+        .pop();
 
-      if (allowedFileFields.indexOf(fieldname) === -1
-        && allowedFileExtensions.indexOf(extension) === -1) {
+      if (allowedFileFields.indexOf(fieldname) === -1 &&
+      allowedFileExtensions.indexOf(extension) === -1) {
         console.warn('wrong extendion or field name:', fieldname, extension);
       }
 
@@ -54,10 +57,7 @@ module.exports = (req, res, next) => {
 
       place.location = {
         type: 'Point',
-        coordinates: [
-          parseFloat(locationAsString[0]),
-          parseFloat(locationAsString[1]),
-        ],
+        coordinates: [parseFloat(locationAsString[0]), parseFloat(locationAsString[1])],
       };
     }
 
@@ -65,10 +65,6 @@ module.exports = (req, res, next) => {
       place.denominations = place.denominations.split(',');
     } else {
       place.denominations = [];
-    }
-
-    if (place.mainMeetingTime) {
-      place.mainMeetingTime = (new Date(`${place.mainMeetingTime} 01.01.1970`));
     }
 
     place.address = {
@@ -105,39 +101,41 @@ module.exports = (req, res, next) => {
 
       Place.add(place, finishRequest);
     } else {
-      Place.findById(req.params.id).populate('maintainer').lean().exec((err, currentPlace) => {
-        if (currentPlace) {
-          if (currentPlace.maintainer &&
-          currentPlace.maintainer._id.toString() === req.session.user._id) {
-            Place.update(req.params.id, place, finishRequest);
-          } else {
-            Object.keys(place).forEach((key) => {
-              if (!Object.prototype.hasOwnProperty.call(place, key)) return;
+      Place.findById(req.params.id)
+        .populate('maintainer')
+        .lean()
+        .exec((err, currentPlace) => {
+          if (currentPlace) {
+            if (currentPlace.maintainer
+            && currentPlace.maintainer._id.toString() === req.session.user._id) {
+              Place.update(req.params.id, place, finishRequest);
+            } else {
+              Object.keys(place).forEach(key => {
+                if (!Object.prototype.hasOwnProperty.call(place, key)) return;
 
-              if (place[key]
-                && !equals(currentPlace[key], place[key])
+                if (place[key] && !equals(currentPlace[key], place[key])
                 && (currentPlace[key] || place[key])) {
-                PlaceChange.add({
-                  user: ObjectId(req.session.user._id),
-                  place: ObjectId(req.params.id),
-                  field: key,
-                  value: place[key],
-                }, () => {});
-              }
-            });
+                  const data = {
+                    user: ObjectId(req.session.user._id),
+                    place: ObjectId(req.params.id),
+                    field: key,
+                    value: place[key],
+                  };
+                  PlaceChange.add(data, () => {});
+                }
+              });
 
-            finishRequest(err, currentPlace);
+              finishRequest(err, currentPlace);
+            }
+          } else {
+            res.send("Object wasn't found");
           }
-        } else {
-          res.send("Object wasn't found");
-        }
-      });
+        });
     }
   }
 
   function finishRequest(err, place) {
     console.log(err);
-
     if (err) return res.redirect('/error?message=placeaddederror');
 
     const placePage = encodeURIComponent(`/places/${place.uri}`);
@@ -155,16 +153,19 @@ module.exports = (req, res, next) => {
             });
           });
         })
-        .then((recipientEmail) => {
-          email.sendNotificationAboutNewPlaceToAdmin(place._id);
-          email.sendConfirmationLink(place._id, recipientEmail);
+        .then(recipientEmail => {
+          email.send('sendNotificationAboutNewPlaceToAdmin', { placeId: place._id });
+          email.send('sendConfirmationLink', { recipientEmail, placeId: place._id });
           res.redirect('/message?message=placeadded');
         })
         .catch(console.log.bind(console));
-    } else if (place.maintainer === req.session.user._id) {
+    } else if (place.populated('maintainer') === req.session.user.id) {
       res.redirect(`/message?message=placesaved&back=${placePage}`);
     } else {
-      email.sendPlaceChanges({ id: place._id, recipientEmail: place.maintainer.email });
+      email.send('sendPlaceChanges', {
+        recipientEmail: place.maintainer.email,
+        placeId: place._id,
+      });
       res.redirect(`/message?message=changesadded&back=${placePage}`);
     }
   }

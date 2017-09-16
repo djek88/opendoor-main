@@ -21,9 +21,6 @@
 						div.m-t-15(ng-show="place.denominations.length")
 							.label.label-primary.m-r-5(ng-repeat="denomination in place.denominations") {{denomination}}
 
-
-
-
 				.row#photos(ng-if="place.bannerPhoto || place.leaderPhoto")
 					.place-photo-wrap(ng-if="place.bannerPhoto")
 						img.place-photo(ng-src="{{siteconfig.imagesPath + place.bannerPhoto}}", ng-show="place.bannerPhoto")
@@ -78,6 +75,9 @@
 						div(ng-show="place.concatenatedAddress")
 							.fa.fa-home
 							|  {{place.concatenatedAddress}}
+						div(ng-show="place.openingHours")
+							.fa.fa-clock-o
+							|  {{place.openingHours}}
 						div(ng-show="place.phone")
 							a(href="{{place.phoneUrl}}")
 								.fa.fa-phone

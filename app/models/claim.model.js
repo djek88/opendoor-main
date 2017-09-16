@@ -1,54 +1,38 @@
 const mongoose = require('../lib/mongoose.js');
 const Place = require('../models/place.model');
-const User = require('../models/user.model');
 const email = require('../lib/email');
 
 const Schema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
   },
   place: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'place',
+    ref: 'Place',
   },
 });
 
-Schema.statics.add = function add(data, cb = () => {}) {
+Schema.statics.isExist = async function isExist(data) {
   const Claim = this;
 
-  new Claim(data).save(cb);
+  const claim = await Claim.findOne(data).exec();
+  return !!claim;
 };
 
-Schema.statics.findAll = function findAll(cb) {
+Schema.statics.acceptClaim = async function acceptClaim(id) {
   const Claim = this;
 
-  Claim.find({}).populate('user').populate('place').exec(cb);
-};
+  const claim = await Claim.findById(id)
+    .populate('user')
+    .exec();
+  if (!claim) throw new Error('Claim not found!');
 
-Schema.statics.acceptClaim = function acceptClaim(id, cb = () => {}) {
-  const Claim = this;
+  await Place.setMaintainer(claim.place, claim.user._id);
 
-  Claim.findOne({ _id: id }, (err, claim) => {
-    if (err) return cb(err);
-    if (!claim) return cb(new Error('Claim not found!'));
+  await claim.remove();
 
-    Place.setMaintainer(claim.place, claim.user, (err, place) => {
-      if (err) return cb(err);
-      if (!place) return cb(new Error('Place not found!'));
-
-      User.findOne(claim.user, (err, user) => {
-        email.sendClaimConfirmation({ id: claim.place, recipientEmail: user.email });
-      });
-
-      claim.remove({}, cb);
-    });
-  });
-};
-
-Schema.statics.removeClaim = function removeClaim(id, cb) {
-  const Claim = this;
-  Claim.findOneAndRemove({ _id: id }, cb);
+  await email.send('sendClaimConfirmation', { recipientEmail: claim.user.email, placeId: claim.place });
 };
 
 module.exports = mongoose.model('Claim', Schema);
