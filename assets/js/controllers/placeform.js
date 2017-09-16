@@ -130,11 +130,6 @@ define([
     }
 
     function setData(place) {
-      if (place.mainMeetingTime) {
-        place.mainMeetingTime = (new Date(place.mainMeetingTime))
-          .toString(siteconfig.l10n.timeFormat);
-      }
-
       $scope.place = place;
       $scope.isMaintainer = place.maintainer
         && place.maintainer._id && place.maintainer._id === $rootScope._id;

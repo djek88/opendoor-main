@@ -67,10 +67,6 @@ module.exports = (req, res, next) => {
       place.denominations = [];
     }
 
-    if (place.mainMeetingTime) {
-      place.mainMeetingTime = new Date(`${place.mainMeetingTime} 01.01.1970`);
-    }
-
     place.address = {
       line1: place.addressLine1,
       line2: place.addressLine2,
@@ -110,20 +106,15 @@ module.exports = (req, res, next) => {
         .lean()
         .exec((err, currentPlace) => {
           if (currentPlace) {
-            if (
-              currentPlace.maintainer &&
-              currentPlace.maintainer._id.toString() === req.session.user._id
-            ) {
+            if (currentPlace.maintainer
+            && currentPlace.maintainer._id.toString() === req.session.user._id) {
               Place.update(req.params.id, place, finishRequest);
             } else {
               Object.keys(place).forEach(key => {
                 if (!Object.prototype.hasOwnProperty.call(place, key)) return;
 
-                if (
-                  place[key] &&
-                  !equals(currentPlace[key], place[key]) &&
-                  (currentPlace[key] || place[key])
-                ) {
+                if (place[key] && !equals(currentPlace[key], place[key])
+                && (currentPlace[key] || place[key])) {
                   const data = {
                     user: ObjectId(req.session.user._id),
                     place: ObjectId(req.params.id),
@@ -145,7 +136,6 @@ module.exports = (req, res, next) => {
 
   function finishRequest(err, place) {
     console.log(err);
-
     if (err) return res.redirect('/error?message=placeaddederror');
 
     const placePage = encodeURIComponent(`/places/${place.uri}`);
@@ -169,7 +159,7 @@ module.exports = (req, res, next) => {
           res.redirect('/message?message=placeadded');
         })
         .catch(console.log.bind(console));
-    } else if (place.maintainer === req.session.user._id) {
+    } else if (place.populated('maintainer') === req.session.user.id) {
       res.redirect(`/message?message=placesaved&back=${placePage}`);
     } else {
       email.send('sendPlaceChanges', {

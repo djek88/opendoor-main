@@ -60,6 +60,13 @@ define([
   opendoorApp.config(['$routeProvider', '$controllerProvider',
     function($routeProvider, $controllerProvider) {
       opendoorApp.registerController = $controllerProvider.register;
+      opendoorApp.resolveController = function(path) {
+        return {
+          load: ['$q', '$rootScope', function ($q, $rootScope) {
+            return resolveDependencies($q, $rootScope, [path]);
+          }]
+        };
+      };
 
       function resolveDependencies($q, $rootScope, dependencies) {
         var defer = $q.defer();
@@ -71,14 +78,6 @@ define([
 
         return defer.promise;
       }
-
-      opendoorApp.resolveController = function(path) {
-        return {
-          load: ['$q', '$rootScope', function ($q, $rootScope) {
-            return resolveDependencies($q, $rootScope, [path]);
-          }]
-        };
-      };
     }
   ]);
 
