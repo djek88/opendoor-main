@@ -30,8 +30,12 @@
 			.form-group(ng-class="{'has-error': (form.$submitted || form.groupName.$touched) && form.groupName.$error.required}")
 				label.col-md-3.control-label Group name
 				.col-md-9
-					select.form-control(name="groupName", ng-model="place.groupName", required)
+					select.form-control(ng-if="place.groupName != ADDNEWGROUP" name="groupName", ng-model="place.groupName", required)
 						option(value="{{group}}", ng-repeat="group in religionGroups") {{group}}
+					.input-group(ng-if="place.groupName == ADDNEWGROUP")
+						input.form-control(name="groupName", ng-model="place.freeGroupName" required)
+						span.input-group-btn
+							button.btn.btn-primary(type="button" ng-click="place.groupName = null") Cancel
 			.form-group
 				.col-md-3
 				.col-md-9

@@ -499,7 +499,7 @@ function preprocessFields(place, cb) {
     if (err) throw err;
 
     if (!religionGroups.length) {
-      ReligionGroup.add(religionGroup);
+      new ReligionGroup(religionGroup).save();
     }
   });
 

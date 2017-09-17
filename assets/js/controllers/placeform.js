@@ -23,6 +23,7 @@ define([
     $('.location-picker').locationpicker();
     $('.bootstrap-tagsinput').addClass('form-control');
 
+    $scope.ADDNEWGROUP = 'Add new group...';
     $scope.religions = $rootScope.religions;
     $scope.religionGroups = [];
     $scope.isLogged = !!$rootScope._id;
@@ -151,6 +152,7 @@ define([
         method: 'GET',
         params: { religion: religion }
       }).success(function(groups) {
+        groups.unshift({ name: $scope.ADDNEWGROUP });
         $scope.religionGroups = groups.map(function(group) { return group.name; });
       });
 

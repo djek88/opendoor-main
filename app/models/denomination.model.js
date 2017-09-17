@@ -5,33 +5,26 @@ const Schema = new mongoose.Schema({
   religion: String,
 });
 
-Schema.statics.add = function add(data, cb = () => {}) {
+Schema.index({ religion: 1, name: -1 }, { unique: true });
+
+Schema.statics.addIfNotExists = async function addIfNotExists(denominations, religion) {
   const Denomination = this;
+  const newDenominations = denominations.slice(0);
 
-  new Denomination({
-    name: data.name,
-    religion: data.religion,
-  }).save(cb);
-};
+  const oldDenominations = await Denomination.find({ name: { $in: newDenominations } }).exec();
 
-Schema.statics.addIfNotExists = function addIfNotExists(currDenominations, religion, cb = () => {}) {
-  const Denomination = this;
-  const newDenominations = currDenominations.slice(0, currDenominations.length);
+  for (let i = 0; i < oldDenominations.length; i += 1) {
+    const index = newDenominations.indexOf(oldDenominations[i].name);
 
-  Denomination.find({ name: { $in: newDenominations } }, (err, denominations) => {
-    for (var i=0; i<denominations.length; i++) {
-      var index = newDenominations.indexOf(denominations[i].name);
-      if (index!=-1) {
-        newDenominations.splice(index, 1);
-        i--;
-      }
+    if (index !== -1) {
+      newDenominations.splice(index, 1);
+      i -= 1;
     }
-    for (var j = 0; j < newDenominations.length; j++) {
-      Denomination.add({ name: newDenominations[j], religion });
-    }
+  }
 
-    cb(err, denominations);
-  });
+  const promices = newDenominations.map(name => new Denomination({ name, religion }).save());
+
+  return Promise.all(promices);
 };
 
 module.exports = mongoose.model('Denomination', Schema);
